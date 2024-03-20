@@ -49,6 +49,10 @@ const VoiceRecorder: React.FC = () => {
     speechEvents.on('speaking', () => {
       console.log('Speaking...');
 
+      if (mediaRecorder.state === 'inactive') {
+        mediaRecorder.start();
+      }
+
       voiceStartTimestampRef.current = Date.now();
       console.log('Voice start timestamp: ', voiceStartTimestampRef);
     });
