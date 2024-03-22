@@ -1,10 +1,14 @@
 import hark from 'hark';
 import React, { useRef, useState } from 'react';
 
+interface Props {
+  onVoiceRecorded?: (message: string) => void;
+}
+
 let mediaRecorder: MediaRecorder;
 let audioChunks: { data: Blob; timespamp: number }[] = [];
 
-const VoiceRecorder: React.FC = () => {
+function VoiceRecorder(props: Props) {
   const [isRecording, setIsRecording] = useState(false);
   const voiceStartTimestampRef = useRef(0);
 
@@ -24,7 +28,7 @@ const VoiceRecorder: React.FC = () => {
     console.log('Audio chunks amount: ', audioChunks.length);
 
     if (startChunkIndex > 2) {
-      // init chunks are needed as it seams to be the file header 
+      // init chunks are needed as it seams to be the file header
       // without the audio data won't be playable
       const initChunks = audioChunks.slice(0, 2);
       const laterChunks = audioChunks.slice(startChunkIndex - 4);
@@ -37,6 +41,7 @@ const VoiceRecorder: React.FC = () => {
     // Send the audio blob to the server
     whisperRequestSTT(audioBlob).then((text) => {
       console.log(text);
+      props.onVoiceRecorded?.(text);
     });
 
     audioChunks = []; // Clear the audio chunks
@@ -108,7 +113,7 @@ const VoiceRecorder: React.FC = () => {
       </button>
     </div>
   );
-};
+}
 
 export default VoiceRecorder;
 
