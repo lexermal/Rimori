@@ -1,7 +1,7 @@
 "use client";
 // pages/index.tsx
 import type { NextPage } from 'next';
-import VoiceRecorder from './VoiceRecoder';
+import VoiceRecorder from '../../components/VoiceRecoder';
 
 const Home: NextPage = () => {
   return (
