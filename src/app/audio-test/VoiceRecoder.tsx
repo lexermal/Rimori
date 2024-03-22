@@ -2,7 +2,7 @@ import hark from 'hark';
 import React, { useRef, useState } from 'react';
 
 let mediaRecorder: MediaRecorder;
-let audioChunks: Blob[] = [];
+let audioChunks: { data: Blob; timespamp: number }[] = [];
 
 const VoiceRecorder: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -11,40 +11,60 @@ const VoiceRecorder: React.FC = () => {
   const handleDataAvailable = (e: BlobEvent) => {
     console.log('Chunks get saved...');
 
-    audioChunks.push(e.data);
+    audioChunks.push({ data: e.data, timespamp: Date.now() });
   };
 
   const handleStop = async () => {
     console.log('Recording stopped.');
-    const endingTimestamp = Date.now();
-    const durationToRemove = endingTimestamp - voiceStartTimestampRef.current;
+    const startTimestamp = voiceStartTimestampRef.current;
+    const startChunkIndex = audioChunks.findIndex(
+      (chunk) => chunk.timespamp > startTimestamp,
+    );
+    console.log('Start chunk index: ', startChunkIndex);
+    console.log('Audio chunks amount: ', audioChunks.length);
 
-    const audioBlob = new Blob(audioChunks);
+    if (startChunkIndex > 2) {
+      // init chunks are needed as it seams to be the file header 
+      // without the audio data won't be playable
+      const initChunks = audioChunks.slice(0, 2);
+      const laterChunks = audioChunks.slice(startChunkIndex - 4);
 
-    // console.log('Audio blob before removing silence: ', audioBlob);
+      audioChunks = initChunks.concat(laterChunks);
+    }
 
-    // Remove silence from the audio blob
+    const audioBlob = new Blob(audioChunks.map((chunk) => chunk.data));
 
-    // console.log('Audio blob after removing silence: ', newBlob);
     // Send the audio blob to the server
-    whisperRequestSTT(audioBlob, durationToRemove).then((text) => {
+    whisperRequestSTT(audioBlob).then((text) => {
       console.log(text);
     });
 
     audioChunks = []; // Clear the audio chunks
 
     // play the blob
-    // const audioUrl = URL.createObjectURL(newBlob);
-    // const audio = new Audio(audioUrl);
-    // audio.play();
-    // Trigger your function here with the audioBlob
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    audio.play();
   };
+
+  function triggerChunkFetching() {
+    if (mediaRecorder.state !== 'inactive') {
+      mediaRecorder.requestData();
+      // console.log('Fetching chunks...');
+    }
+    setTimeout(() => {
+      triggerChunkFetching();
+    }, 100);
+  }
 
   const startRecording = async () => {
     console.log('Start recording...');
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-    const speechEvents = hark(stream, { interval: 100 });
+    mediaRecorder = new MediaRecorder(stream, {
+      mimeType: 'audio/webm',
+      audioBitsPerSecond: 128000,
+    });
+    const speechEvents = hark(stream, { interval: 50 });
 
     speechEvents.on('speaking', () => {
       console.log('Speaking...');
@@ -66,6 +86,8 @@ const VoiceRecorder: React.FC = () => {
     mediaRecorder.onstop = handleStop;
     mediaRecorder.start();
     setIsRecording(true);
+
+    triggerChunkFetching();
   };
 
   const stopRecording = () => {
@@ -90,10 +112,9 @@ const VoiceRecorder: React.FC = () => {
 
 export default VoiceRecorder;
 
-const whisperRequestSTT = async (audioFile: Blob, durationToRemove: number) => {
+const whisperRequestSTT = async (audioFile: Blob) => {
   const formData = new FormData();
   formData.append('file', audioFile, 'audio.wav');
-  formData.append('durationToRemove', durationToRemove.toString());
 
   return fetch('/api/stt', {
     method: 'POST',
