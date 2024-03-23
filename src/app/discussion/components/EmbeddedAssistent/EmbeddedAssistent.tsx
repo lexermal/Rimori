@@ -10,7 +10,7 @@ export default function EmbettedAssistent(props: {
 }): JSX.Element {
   return (
     <div>
-      <p>{props.firstMessage}</p>
+      {/* <p>{props.firstMessage}</p> */}
       <CopilotSidebar
         defaultOpen={true}
         className={styles.supress}
