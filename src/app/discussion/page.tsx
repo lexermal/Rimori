@@ -28,7 +28,7 @@ export default function Page(): JSX.Element {
             />
             <DiscussionPopup
               show={showDiscussion === index + 1}
-              title={`Discussion with ${persona.name}`}
+              title={persona.discussionTitle}
               onClose={() => setShowDiscussion(0)}
             >
               <EmbettedAssistent
@@ -50,6 +50,7 @@ function getPersonas(
   return [
     {
       name: 'Leo',
+      discussionTitle: 'Leo the curious kid',
       image: '/images/opponents/kid-1.webp',
       description:
         "He heared the first time about your subject. It's confusing but he wants to undstand it. Can you explain it in easy terms?",
@@ -69,6 +70,7 @@ function getPersonas(
     },
     {
       name: 'Clarence',
+      discussionTitle: 'Clarence with the fixed mindset',
       image: '/images/opponents/mindset-1.webp',
       description:
         'He has a fixed oppinion about your subject that is outdated. Can you convince him how it really looks like?',
@@ -79,6 +81,7 @@ function getPersonas(
     },
     {
       name: 'Elena',
+      discussionTitle: 'Elena the entrepreneur',
       image: '/images/opponents/inventor-1.webp',
       description:
         'She is excited about your subject and thinks one step further. She wants to apply it in a different field. Can you explain her how it would be possible?',
