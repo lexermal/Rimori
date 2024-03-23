@@ -1,6 +1,13 @@
+'use client';
+
+import { Alert } from 'flowbite-react';
+import { useState } from 'react';
+
 import Card from './components/Card';
+import DiscussionPopup from './components/DiscussionPopup';
 
 export default function Page(): JSX.Element {
+  const [showDiscussion, setShowDiscussion] = useState(0);
   return (
     <div>
       <h1 className='text-center mt-20 mb-7'>Discussions</h1>
@@ -22,15 +29,23 @@ export default function Page(): JSX.Element {
           <Card
             title='Clarence (fixed mindset)'
             src='/images/opponents/mindset-1.webp'
-            description="He has a fixed oppinion about your subject that is outdated. Can you convince him how it really looks like?"
+            description='He has a fixed oppinion about your subject that is outdated. Can you convince him how it really looks like?'
           />
         </div>
         <div className='w-1/3 bg-gray-400 p-5'>
-        <Card
+          <Card
             title='Elena (entrepreneur)'
             src='/images/opponents/inventor-1.webp'
-            description="She is excited about your subject and thinks one step further. She wants to apply it in a different field. Can you explain her how it would be possible?"
+            description='She is excited about your subject and thinks one step further. She wants to apply it in a different field. Can you explain her how it would be possible?'
+            onClick={() => setShowDiscussion(3)}
           />
+          <DiscussionPopup
+            show={showDiscussion === 3}
+            title='Discussion with Elena'
+            onClose={() => setShowDiscussion(0)}
+          >
+            <p>abc</p>
+          </DiscussionPopup>
         </div>
       </div>
     </div>
