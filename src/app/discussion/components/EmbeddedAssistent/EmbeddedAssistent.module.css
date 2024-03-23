@@ -1,0 +1,20 @@
+:global(.copilotKitSidebarContentWrapper.sidebarExpanded):has(.supress) {
+  margin: 0 !important;
+}
+
+.supress {
+  position: relative !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+.supress :global(.copilotKitWindow) {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.supress :global(.copilotKitMessages) {
+  padding: 5px !important;
+  padding-top: 10px !important;
+}
+

@@ -1,13 +1,15 @@
 'use client';
 
-import { Alert } from 'flowbite-react';
 import { useState } from 'react';
 
 import Card from './components/Card';
 import DiscussionPopup from './components/DiscussionPopup';
+import { CopilotChat } from '@copilotkit/react-ui/dist/components/chat/Chat';
+import { CopilotSidebar } from '@copilotkit/react-ui';
+import EmbettedAssistent from './components/EmbeddedAssistent/EmbeddedAssistent';
 
 export default function Page(): JSX.Element {
-  const [showDiscussion, setShowDiscussion] = useState(0);
+  const [showDiscussion, setShowDiscussion] = useState(3);
   return (
     <div>
       <h1 className='text-center mt-20 mb-7'>Discussions</h1>
@@ -44,7 +46,10 @@ export default function Page(): JSX.Element {
             title='Discussion with Elena'
             onClose={() => setShowDiscussion(0)}
           >
-            <p>abc</p>
+            <EmbettedAssistent
+              instructions='Act as a entrepreneur. You just got to know AI can help prople to translate voice into text. Now you want to know how it can help your elderly equipment business. Anwer only questions related to your business. Your name is Elena.'
+              firstMessage='Hi, I am Elena. I am running a business that helps elderly people with equipment. I just heard about AI that can translate voice into text. Can you explain me how it can help my business?'
+            />
           </DiscussionPopup>
         </div>
       </div>
