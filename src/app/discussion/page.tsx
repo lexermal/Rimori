@@ -5,9 +5,36 @@ import { useState } from 'react';
 import Card from './components/Card';
 import DiscussionPopup from './components/DiscussionPopup';
 import EmbettedAssistent from './components/EmbeddedAssistent/EmbeddedAssistent';
+import { useCopilotAction } from '@copilotkit/react-core';
 
 export default function Page(): JSX.Element {
   const [showDiscussion, setShowDiscussion] = useState(1);
+
+  useCopilotAction({
+    name: 'explanationUnderstood',
+    description: 'Evaluate the explanation of a topic in easy terms.',
+    parameters: [
+      {
+        name: 'explanationUnderstood',
+        type: 'boolean',
+        description: 'if the explanation was understood',
+      },
+      {
+        name: 'explanation',
+        type: 'string',
+        description: 'the explanation why it was understood or not',
+      },
+      {
+        name: 'improvementHints',
+        type: 'string',
+        description: 'hints for improvement',
+      },
+    ],
+    handler: async (params: any) => {
+      console.log('action explanationUnderstood called with params', params);
+    },
+  });
+
   return (
     <div>
       <h1 className='text-center mt-20 mb-7'>Discussions</h1>
@@ -60,12 +87,14 @@ function getPersonas(
     Your Persona: Act as a happy currious 6 years old kid who wants to know everything about the topic.
     Topic: "Why educators perception about AI is important for entrepreneurial education". 
     Goal: 
-    - After 10 messages assess if the user explained it in easy terms or not. Answer with the following JSON object: {explanationUnderstood: true/false, explanation: 'your explanation', improvementHints: 'your hints for improvement'}
+    - After 10 messages assess if the user explained it in easy terms or not by calling the action "explanationUnderstood" and tell the user if you understood it or not.
     Restrictions: 
     - Not answering any questions connected with the topic.
     - Not explaining anything, only asking questions that help clarifying the context.
     - If the user uses terms a 6 years old kid wouldn't understand, tell you understand these complicated words.
     - You are now allowed to fall out of the role of a 6 years old kid.
+    - If the user returns short answers, ask for more details. If he still doesn't provide enough information, he failed the explanation.
+    - Don't help the user to explain the topic. Tell them as 6 year old kid you don't know it but hoped they could explain it to you.
     `,
     },
     {

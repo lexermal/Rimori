@@ -25,7 +25,22 @@ export default function EmbettedAssistent(props: {
           // console.log('contextString: ', contextString);
           // console.log('instructions: ', instructions);
 
-          return instructions + '';
+          return (
+            instructions +
+            `
+
+            The user has provided you with the following context:
+\`\`\`
+${contextString}
+\`\`\`
+
+The user have also provided you with functions you can call to initiate actions on their behalf.
+
+Please assist them as best you can.
+
+This is not a conversation, so please do not ask questions. Just call a function without saying anything else.
+          `
+          );
         }}
       />
     </div>
