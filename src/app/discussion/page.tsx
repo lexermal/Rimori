@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Card from './components/Card';
 import DiscussionPopup from './components/DiscussionPopup';
 import EmbeddedAssistent from './components/EmbeddedAssistent/EmbeddedAssistent';
+import TTS from './TTS';
 
 interface Exam {
   examNr: number;
@@ -33,6 +34,11 @@ export default function Page(): JSX.Element {
         improvementHints: 'none',
       },
     ]);
+
+    setTimeout(() => {
+      console.log('Start TTS');
+      const x=TTS.getInstance();
+    }, 5000);
   }, []);
 
   useCopilotAction({
@@ -73,7 +79,8 @@ export default function Page(): JSX.Element {
       {
         name: 'studentKnowsTopic',
         type: 'boolean',
-        description: 'if the student knows the topic in depth and explained it right',
+        description:
+          'if the student knows the topic in depth and explained it right',
       },
       {
         name: 'explanation',
@@ -173,7 +180,7 @@ function getPersonas(
         'He has a fixed oppinion about your subject that is outdated. Can you convince him how it really looks like?',
       firstMessage:
         'Clarence has a fixed mindset and wants to know more about AI.',
-        instructions: `
+      instructions: `
     Context: You have a conversation with the user who should convince you to change your oppinion about a topic.
     Your Persona: Act as a old guy with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it.
     Your Oppinion: "AI is just a fancy term for a program that consists of many if's". 
