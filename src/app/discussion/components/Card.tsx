@@ -4,37 +4,48 @@ interface Props {
   src: string;
   title: string;
   description: string;
+  success?: boolean;
   onClick?: () => void;
 }
 
 export default function Card(props: Props): JSX.Element {
   return (
     <div
-      className='max-w-sm rounded overflow-hidden shadow-lg cursor-pointer'
-      onClick={props.onClick}
+      className={
+        'max-w-sm rounded overflow-hidden shadow-lg ' +
+        (props.success ? '' : 'cursor-pointer')
+      }
+      onClick={props.success ? undefined : props.onClick}
     >
+      {props.success && (
+        <div className='absolute flex z-10 items-center justify-center bg-green-500'>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            fill='none'
+            viewBox='0 0 24 24'
+            stroke='currentColor'
+            className='h-16 w-16 text-white'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M5 13l4 4L19 7'
+            />
+          </svg>
+        </div>
+      )}
       <Image
-        className='w-full'
+        className={'w-full' + (props.success ? ' opacity-50' : '')}
         src={props.src}
         alt='image'
         width={500}
         height={500}
       />
-      <div className='px-6 py-4'>
+      <div className={'px-6 py-4' + (props.success ? ' opacity-50' : '')}>
         <div className='font-bold text-xl mb-2'>{props.title}</div>
         <p className='text-gray-700 text-base'>{props.description}</p>
       </div>
-      {/* <div className='px-6 pt-4 pb-2'>
-        <span className='inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'>
-          #photography
-        </span>
-        <span className='inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'>
-          #travel
-        </span>
-        <span className='inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2'>
-          #winter
-        </span>
-      </div> */}
     </div>
   );
 }

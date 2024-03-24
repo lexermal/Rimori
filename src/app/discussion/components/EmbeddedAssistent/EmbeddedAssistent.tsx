@@ -4,7 +4,7 @@ import styles from './EmbeddedAssistent.module.css';
 
 import { Input } from '@/components/ai-sidebar/Input';
 
-export default function EmbettedAssistent(props: {
+export default function EmbeddedAssistent(props: {
   instructions: string;
   firstMessage: string;
 }): JSX.Element {

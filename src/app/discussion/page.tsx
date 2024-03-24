@@ -1,14 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useCopilotAction } from '@copilotkit/react-core';
+import { useEffect, useState } from 'react';
 
 import Card from './components/Card';
 import DiscussionPopup from './components/DiscussionPopup';
-import EmbettedAssistent from './components/EmbeddedAssistent/EmbeddedAssistent';
-import { useCopilotAction } from '@copilotkit/react-core';
+import EmbeddedAssistent from './components/EmbeddedAssistent/EmbeddedAssistent';
+
+interface Exam {
+  examNr: number;
+  passed?: boolean;
+  reason: string;
+  improvementHints: string;
+}
 
 export default function Page(): JSX.Element {
   const [showDiscussion, setShowDiscussion] = useState(1);
+  const [exams, setExams] = useState<Exam[]>([]);
+
+  useEffect(() => {
+    setExams([
+      {
+        examNr: 1,
+        passed: true,
+        reason: 'I understood the explanation',
+        improvementHints: 'none',
+      },
+      {
+        examNr: 2,
+        passed: false,
+        reason: 'I did not understand the explanation',
+        improvementHints: 'none',
+      },
+    ]);
+  }, []);
 
   useCopilotAction({
     name: 'explanationUnderstood',
@@ -31,7 +56,13 @@ export default function Page(): JSX.Element {
       },
     ],
     handler: async (params: any) => {
-      console.log('action explanationUnderstood called with params', params);
+      const newExam = {
+        examNr: 1,
+        passed: params.explanationUnderstood,
+        reason: params.explanation,
+        improvementHints: params.improvementHints,
+      };
+      setExams([...exams, newExam]);
     },
   });
 
@@ -40,31 +71,36 @@ export default function Page(): JSX.Element {
       <h1 className='text-center mt-20 mb-7'>Discussions</h1>
       <p className='text-center mb-8'>
         Now it's time to show what you're capable off! <br />
-        Here a 3 opponents and your mission is to show that you understand your
+        Here are 3 opponents. Your mission is to show that you understand your
         subject!
       </p>
 
       <div className='flex'>
-        {getPersonas('', '', '').map((persona, index) => (
-          <div className='w-1/3 bg-gray-400 p-5' key={index}>
-            <Card
-              title={persona.name}
-              src={persona.image}
-              description={persona.description}
-              onClick={() => setShowDiscussion(index + 1)}
-            />
-            <DiscussionPopup
-              show={showDiscussion === index + 1}
-              title={persona.discussionTitle}
-              onClose={() => setShowDiscussion(0)}
-            >
-              <EmbettedAssistent
-                instructions={persona.instructions}
-                firstMessage={persona.firstMessage}
+        {getPersonas('', '', '').map((persona, index) => {
+          const exam = exams.filter((e) => e.examNr === index + 1);
+
+          return (
+            <div className='w-1/3 bg-gray-400 p-5' key={index}>
+              <Card
+                title={persona.name}
+                src={persona.image}
+                description={persona.description}
+                success={exam[0]?.passed}
+                onClick={() => setShowDiscussion(index + 1)}
               />
-            </DiscussionPopup>
-          </div>
-        ))}
+              <DiscussionPopup
+                show={showDiscussion === index + 1}
+                title={persona.discussionTitle}
+                onClose={() => setShowDiscussion(0)}
+              >
+                <EmbeddedAssistent
+                  instructions={persona.instructions}
+                  firstMessage={persona.firstMessage}
+                />
+              </DiscussionPopup>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
