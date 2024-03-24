@@ -34,27 +34,7 @@ export default function Page(): JSX.Element {
         improvementHints: 'none',
       },
     ]);
-
-    setTimeout(() => {
-      testVoice();
-    }, 5000);
   }, []);
-
-  async function testVoice() {
-    const tts = await TTS.createAsync(VoiceId.OLD_MAN);
-
-    const sentences = [
-      'Well, hello there, young one.',
-      "I reckon you're here to discuss artificial intelligence, eh?",
-      "I've been around for quite some time, and let me tell you, all this talk about AI is just a bunch of hooey",
-    ];
-
-    sentences.forEach((sentence) => {
-      tts.sendMessage(sentence);
-    });
-
-    tts.endConversation();
-  }
 
   useCopilotAction({
     name: 'explanationUnderstood',

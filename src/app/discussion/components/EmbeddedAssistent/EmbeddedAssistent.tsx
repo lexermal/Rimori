@@ -3,6 +3,7 @@ import { CopilotSidebar } from '@copilotkit/react-ui';
 import styles from './EmbeddedAssistent.module.css';
 
 import { Input } from '@/components/ai-sidebar/Input';
+import CustomMessages from './CustomMessages';
 
 export default function EmbeddedAssistent(props: {
   instructions: string;
@@ -17,6 +18,7 @@ export default function EmbeddedAssistent(props: {
         Header={() => <div />}
         Button={() => <div />}
         Input={(props) => Input(props)}
+        Messages={CustomMessages}
         hitEscapeToClose={false}
         clickOutsideToClose={false}
         showResponseButton={false}

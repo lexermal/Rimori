@@ -83,6 +83,7 @@ export default class TTS {
             const audioBlob = new Blob(audioArrays, { type: 'audio/wav' });
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = new Audio(audioUrl);
+            audio.playbackRate = 1.05;
             console.log("Start Playing audio...");
             audio.play();
             console.log("Audio played");
