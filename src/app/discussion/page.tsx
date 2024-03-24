@@ -15,7 +15,7 @@ interface Exam {
 }
 
 export default function Page(): JSX.Element {
-  const [showDiscussion, setShowDiscussion] = useState(1);
+  const [showDiscussion, setShowDiscussion] = useState(2);
   const [exams, setExams] = useState<Exam[]>([]);
 
   useEffect(() => {
@@ -59,6 +59,38 @@ export default function Page(): JSX.Element {
       const newExam = {
         examNr: 1,
         passed: params.explanationUnderstood,
+        reason: params.explanation,
+        improvementHints: params.improvementHints,
+      };
+      setExams([...exams, newExam]);
+    },
+  });
+
+  useCopilotAction({
+    name: 'oppinionChanged',
+    description: 'Evaluate if the user managed to change your oppinion.',
+    parameters: [
+      {
+        name: 'studentKnowsTopic',
+        type: 'boolean',
+        description: 'if the student knows the topic in depth and explained it right',
+      },
+      {
+        name: 'explanation',
+        type: 'string',
+        description: 'the explanation why the oppinion was changed or not',
+      },
+      {
+        name: 'improvementHints',
+        type: 'string',
+        description: 'hints for improvement',
+      },
+    ],
+    handler: async (params: any) => {
+      console.log('params of oppinionChanged Result: ', params);
+      const newExam = {
+        examNr: 1,
+        passed: params.studentKnowsTopic,
         reason: params.explanation,
         improvementHints: params.improvementHints,
       };
@@ -117,7 +149,7 @@ function getPersonas(
       image: '/images/opponents/kid-1.webp',
       description:
         "He heared the first time about your subject. It's confusing but he wants to undstand it. Can you explain it in easy terms?",
-      firstMessage: 'Leo is a student and wants to know more about AI.',
+      firstMessage: 'Leo is a student who wants to know everything.',
       instructions: `
     Context: You have a conversation with the user who should explain you a topic in easy terms.
     Your Persona: Act as a happy currious 6 years old kid who wants to know everything about the topic.
@@ -141,8 +173,22 @@ function getPersonas(
         'He has a fixed oppinion about your subject that is outdated. Can you convince him how it really looks like?',
       firstMessage:
         'Clarence has a fixed mindset and wants to know more about AI.',
-      instructions:
-        'Act as a person with a fixed mindset. You have a fixed oppinion about AI that is outdated. Answer only questions related to AI. Your name is Clarence.',
+        instructions: `
+    Context: You have a conversation with the user who should convince you to change your oppinion about a topic.
+    Your Persona: Act as a old guy with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it.
+    Your Oppinion: "AI is just a fancy term for a program that consists of many if's". 
+    Goal: 
+    - After 10 messages assess if the user managed you to change your oppinion or not by calling the action "oppinionChanged" and tell the user if you changed your oppinion.
+    - If the user explained something right about the topic challenge him with your arguments to explain more about the topic.
+    - The earliest you call the function, if the user is on the right track, is after 5 messages.
+    Restrictions: 
+    - Not answering any questions not related to the topic.
+    - Not explaining anything apart from your oppinion on the topic.
+    - If the user says your oppinion is wrong he failed the conversation. Trigger the function "oppinionChanged". Then tell him to come back when he is majour enough.
+    - You are now allowed to fall out of the role of a old guy with a fixed mindset.
+    - If the user returns short answers, give a 300 word argumentation about you oppinion on the topic. If he still doesn't provide longer answers, he failed the conversation.
+    - Don't help the user to explain the topic. Tell them they should have done their homework before coming here. 
+    `,
     },
     {
       name: 'Elena',
