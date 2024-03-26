@@ -1,3 +1,5 @@
+import ChunkedAudioPlayer from "./Player";
+
 export enum VoiceId {
     OLD_MAN = "t0jbNlBVZ17f02VDIeMI",
     // Add more voice IDs here...
@@ -6,6 +8,9 @@ export enum VoiceId {
 export default class TTS {
     private socket: WebSocket;
     private chunks: string[] = [];
+    private player = new ChunkedAudioPlayer();
+    private sentencesParts = [] as number[];
+    private messageCount = 0;
 
     private constructor(socket: WebSocket) {
         this.socket = socket;
@@ -51,12 +56,31 @@ export default class TTS {
     }
 
     sendMessage(text: string) {
+        console.log('Sending message ' + this.messageCount + ":" + text);
+
         const textMessage = {
             "text": text,
             "try_trigger_generation": true,
         };
 
         this.socket.send(JSON.stringify(textMessage));
+
+        // If textMessage contains a sentence ending like . or ! or ?, write the current index to sentencesParts
+        if (textMessage.text.match(/[.!?]/)) {
+            console.log("Sentence ending found")
+            this.sentencesParts.push(this.messageCount);
+        }
+        this.messageCount++;
+    }
+
+    private base64ToArrayBuffer(base64: string) {
+        const binaryString = window.atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes.buffer;
     }
 
     private handleMessage(event: MessageEvent) {
@@ -66,11 +90,21 @@ export default class TTS {
             const audioChunk = response.audio as string;
             this.chunks.push(audioChunk);
             console.log("Received audio chunk");
+
+            // const audioBuffer = this.base64ToArrayBuffer(audioChunk);
+            // const audioContext = new AudioContext();
+            // audioContext.decodeAudioData(audioBuffer, (buffer) => {
+            this.player.addChunk(this.base64ToArrayBuffer(audioChunk), this.sentencesParts);
+            // });
+
         } else {
             console.log("No audio data in the response");
         }
 
         if (response.isFinal) {
+            console.log("sentence splits", this.sentencesParts);
+            this.messageCount = 0;
+
             const audioArrays = this.chunks.map(chunk => {
                 const audioData = atob(chunk);
                 const audioArray = new Uint8Array(audioData.length);
@@ -85,8 +119,9 @@ export default class TTS {
             const audio = new Audio(audioUrl);
             audio.playbackRate = 1.05;
             console.log("Start Playing audio...");
-            audio.play();
+            // audio.play();
             console.log("Audio played");
+            this.player.endConversation();
 
             // Clear the chunks after playing the audio
             this.chunks = [];

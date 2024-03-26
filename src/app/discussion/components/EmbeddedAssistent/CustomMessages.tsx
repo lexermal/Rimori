@@ -11,7 +11,6 @@ export interface MessagesProps {
   inProgress: boolean;
 }
 
-
 export default function CustomMessages({
   messages,
   inProgress,
@@ -19,6 +18,7 @@ export default function CustomMessages({
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const [tts, setTTS] = React.useState<TTS | null>(null);
   const prefLastAssistentMessage = React.useRef<string | null>();
+  const updateCount = React.useRef<number>(0);
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -46,23 +46,85 @@ export default function CustomMessages({
 
     if (lastMessage) {
       if (lastMessage.includes(prefLastAssistentMessage.current || '')) {
-        const newSubstring = lastMessage.replace(
-          prefLastAssistentMessage.current || '',
-          '',
-        );
-        console.log('Sending message', newSubstring);
-        tts?.sendMessage(newSubstring);
-        prefLastAssistentMessage.current = lastMessage;
+        if (updateCount.current % 2 === 0) {
+          // Only send message on every second update
+          // console.log('Sending message', newSubstring);
+          sendMessage(lastMessage);
+        }
+        updateCount.current++;
       }
 
       if (!inProgress) {
-        prefLastAssistentMessage.current = "";
+        sendMessage(lastMessage, true);
+        prefLastAssistentMessage.current = '';
         tts?.endConversation();
-        console.log('TTS ended')
+        console.log('TTS ended');
         setTTS(null);
       }
     }
   }, [messages, inProgress]);
+
+  // useEffect(() => {
+  //   if (inProgress) {
+  //     return;
+  //   }
+  //   console.log('starting sending leftover messages');
+  //   const assistentMessages = messages.filter(
+  //     (message) => message.role === 'assistant',
+  //   );
+
+  //   const lastMessage =
+  //     assistentMessages[assistentMessages.length - 1]?.content;
+
+  //   let newSubstring = lastMessage.replace(
+  //     prefLastAssistentMessage.current || '',
+  //     '',
+  //   );
+
+  //   while (newSubstring.length > 0) {
+  //     newSubstring = lastMessage.replace(
+  //       prefLastAssistentMessage.current || '',
+  //       '',
+  //     );
+
+  //     sendMessage(lastMessage);
+  //   }
+  // }, [inProgress]);
+
+  function sendMessage(lastMessage: string, everything = false) {
+    let newSubstring = lastMessage.replace(
+      prefLastAssistentMessage.current || '',
+      '',
+    );
+
+    if (everything) {
+      console.log('will send full last rest of message:' + newSubstring);
+      tts?.sendMessage(newSubstring);
+      return;
+    }
+    const parts = newSubstring.split(' ');
+    if (parts.length > 1 && !(parts.length === 2 && parts[0] === '')) {
+      const subString = parts.splice(0, parts.length - 1).join(' ');
+      console.log('will send message:' + subString);
+      console.log('full string would have been:' + newSubstring);
+      newSubstring = subString;
+    }
+    //check if newSubstring constains a sentence ending like . or ! or ?
+    //if it does, send each part separately
+    const parts2 = newSubstring.split(/(?<=[.?!])/);
+    parts2.forEach((part) => {
+      tts?.sendMessage(part);
+    });
+    // console.log('newSubstring:' + newSubstring);
+    // console.log(
+    //   'prefLastAssistentMessage.current: ',
+    //   prefLastAssistentMessage.current,
+    // );
+    // append the new substring to the prefLastAssistentMessage
+    prefLastAssistentMessage.current = prefLastAssistentMessage.current
+      ? prefLastAssistentMessage.current + newSubstring
+      : newSubstring;
+  }
 
   return (
     <div className='copilotKitMessages'>
