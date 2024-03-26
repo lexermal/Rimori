@@ -16,6 +16,7 @@ export default class TTS {
         this.socket = socket;
     }
 
+    // based on https://elevenlabs.io/docs/api-reference/websockets#example-voice-streaming-using-elevenlabs-and-openai
     static createAsync(voiceId: VoiceId, model = 'eleven_monolingual_v1'): Promise<TTS> {
         return new Promise((resolve, reject) => {
             const wsUrl = `wss://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream-input?model_id=${model}`;
