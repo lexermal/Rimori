@@ -3,10 +3,10 @@
 import { useCopilotAction } from '@copilotkit/react-core';
 import { useEffect, useState } from 'react';
 
-import Card from './components/Card';
-import DiscussionPopup from './components/DiscussionPopup';
-import EmbeddedAssistent from './components/EmbeddedAssistent/EmbeddedAssistent';
-import TTS, { VoiceId } from './TTS';
+import Card from '../../components/discussion/Card';
+import DiscussionPopup from '../../components/discussion/DiscussionPopup';
+import EmbeddedAssistent from '../../components/EmbeddedAssistent/EmbeddedAssistent';
+import TTS, { VoiceId } from '../../components/EmbeddedAssistent/Voice/TTS';
 
 interface Exam {
   examNr: number;

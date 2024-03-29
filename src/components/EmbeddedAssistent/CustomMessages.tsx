@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 import { SpinnerIcon } from '@/components/ai-sidebar/Icons';
 
-import TTS, { VoiceId } from '../../TTS';
+import TTS, { VoiceId } from './Voice/TTS';
 
 export interface MessagesProps {
   messages: Message[];
