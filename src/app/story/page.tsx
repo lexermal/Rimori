@@ -5,7 +5,6 @@ import React, { memo, useEffect } from 'react';
 
 import EmbeddedAssistent from '@/components/EmbeddedAssistent/EmbeddedAssistent';
 
-import { examSummary } from './components/ExamUtils';
 import { useGlobalContext } from '@/components/GlobalContext';
 import CustomMessages from '@/components/EmbeddedAssistent/CustomMessages';
 
@@ -24,7 +23,7 @@ const Page = memo(() => {
   }, []);
 
   return (
-    <CopilotKit url='/api/copilotkit/openai'>
+    <CopilotKit url='http://localhost:4000/story'>
       <div>
         <h1 className='text-center mt-5 mb-5'>Story time!</h1>
         <EmbeddedAssistent

@@ -129,7 +129,46 @@ crew = Crew(
 )
 
 # Get your crew to work!
-result = crew.kickoff()
+# result = crew.kickoff()
 
 # print("##########FULL STORY############")
 # print(result)
+
+from flask import Flask, Response, request, jsonify
+from flask_cors import CORS
+import time
+import json
+
+app = Flask(__name__)
+CORS(app)  # This will enable CORS for all routes
+
+
+
+
+@app.route('/story', methods=['POST'])
+def stream_hello_world():
+  def generate(input_data):
+    for word in input_data.split():
+      data = {
+        "id": "chatcmpl-123",
+        "object": "chat.completion.chunk",
+        "created": 1694268190,
+        "model": "gpt-4-0613",
+        "system_fingerprint": None,
+        "choices": [
+          {
+            "index": 0,
+            "delta": {
+              "content": word
+            },
+            "logprobs": None,
+            "finish_reason": None
+          }
+        ]
+      }
+      yield f"data: {json.dumps(data)}\n\n"
+      time.sleep(0.2)
+  return Response(generate("hello im rudi nice to meet you"), mimetype='text/event-stream')
+
+if __name__ == '__main__':
+  app.run(port=4000)
