@@ -8,6 +8,7 @@ import CustomMessages from './CustomMessages';
 export default function EmbeddedAssistent(props: {
   instructions: string;
   firstMessage: string;
+  enableVoice?: boolean;
 }): JSX.Element {
   return (
     <div>
@@ -18,14 +19,14 @@ export default function EmbeddedAssistent(props: {
         Header={() => <div />}
         Button={() => <div />}
         Input={(props) => Input(props)}
-        Messages={CustomMessages}
+        Messages={props.enableVoice ? CustomMessages : undefined}
         hitEscapeToClose={false}
         clickOutsideToClose={false}
         showResponseButton={false}
         instructions={props.instructions}
         makeSystemMessage={(contextString: string, instructions?: string) => {
-          // console.log('contextString: ', contextString);
-          // console.log('instructions: ', instructions);
+          console.log('contextString: ', contextString);
+          console.log('instructions: ', instructions);
 
           return (
             instructions +

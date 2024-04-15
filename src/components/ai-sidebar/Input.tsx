@@ -1,7 +1,7 @@
 import { InputProps } from '@copilotkit/react-ui/dist/components/chat/props';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import VoiceRecorder from '@/components/VoiceRecoder';
+import VoiceRecorder from './VoiceRecoder';
 
 import { ActivityIcon, SendIcon } from './Icons';
 import AutoResizingTextarea from './Textarea';

@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import Card from '../../components/discussion/Card';
 import DiscussionPopup from '../../components/discussion/DiscussionPopup';
 import EmbeddedAssistent from '../../components/EmbeddedAssistent/EmbeddedAssistent';
-import TTS, { VoiceId } from '../../components/EmbeddedAssistent/Voice/TTS';
 
 interface Exam {
   examNr: number;

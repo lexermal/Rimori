@@ -1,7 +1,7 @@
-"use client";
+'use client';
 // pages/index.tsx
 import type { NextPage } from 'next';
-import VoiceRecorder from '../../components/EmbeddedAssistent/VoiceRecoder';
+import VoiceRecorder from '../../components/ai-sidebar/VoiceRecoder';
 
 const Home: NextPage = () => {
   return (
