@@ -64,33 +64,6 @@ export default function CustomMessages({
     }
   }, [messages, inProgress]);
 
-  // useEffect(() => {
-  //   if (inProgress) {
-  //     return;
-  //   }
-  //   console.log('starting sending leftover messages');
-  //   const assistentMessages = messages.filter(
-  //     (message) => message.role === 'assistant',
-  //   );
-
-  //   const lastMessage =
-  //     assistentMessages[assistentMessages.length - 1]?.content;
-
-  //   let newSubstring = lastMessage.replace(
-  //     prefLastAssistentMessage.current || '',
-  //     '',
-  //   );
-
-  //   while (newSubstring.length > 0) {
-  //     newSubstring = lastMessage.replace(
-  //       prefLastAssistentMessage.current || '',
-  //       '',
-  //     );
-
-  //     sendMessage(lastMessage);
-  //   }
-  // }, [inProgress]);
-
   function sendMessage(lastMessage: string, everything = false) {
     let newSubstring = lastMessage.replace(
       prefLastAssistentMessage.current || '',

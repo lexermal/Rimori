@@ -3,16 +3,16 @@ import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } f
 interface AutoResizingTextareaProps {
   maxRows?: number;
   placeholder?: string;
-  value: string;
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   autoFocus?: boolean;
 }
 
 const AutoResizingTextarea = forwardRef<HTMLTextAreaElement, AutoResizingTextareaProps>(
-  ({ maxRows = 1, placeholder, value, onChange, onKeyDown, autoFocus }, ref) => {
+  ({ maxRows = 1, placeholder, onChange, onKeyDown, autoFocus }, ref) => {
     const internalTextareaRef = useRef<HTMLTextAreaElement>(null);
     const [maxHeight, setMaxHeight] = useState<number>(0);
+    const [value, setValue] = useState<string>(""); // Local state for value
 
     useImperativeHandle(ref, () => internalTextareaRef.current as HTMLTextAreaElement);
 
@@ -40,11 +40,16 @@ const AutoResizingTextarea = forwardRef<HTMLTextAreaElement, AutoResizingTextare
       }
     }, [value, maxHeight]);
 
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setValue(event.target.value); // Update local state on change
+      onChange(event); // Call the passed onChange function
+    };
+
     return (
       <textarea
         ref={internalTextareaRef}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         style={{

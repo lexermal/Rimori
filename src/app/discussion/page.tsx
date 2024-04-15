@@ -127,6 +127,7 @@ export default function Page(): JSX.Element {
                 onClose={() => setShowDiscussion(0)}
               >
                 <EmbeddedAssistent
+                  id='discussion_assistant'
                   instructions={persona.instructions}
                   firstMessage={persona.firstMessage}
                 />

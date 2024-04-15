@@ -1,32 +1,44 @@
 import { CopilotSidebar } from '@copilotkit/react-ui';
+import React from 'react';
 
 import styles from './EmbeddedAssistent.module.css';
 
 import { Input } from '@/components/ai-sidebar/Input';
-import CustomMessages from './CustomMessages';
 
-export default function EmbeddedAssistent(props: {
+import CustomMessages, { MessagesProps } from './CustomMessages';
+
+const EmbeddedAssistent = (props: {
+  id: string;
   instructions: string;
-  firstMessage: string;
+  firstMessage?: string;
   enableVoice?: boolean;
-}): JSX.Element {
+  customMessageComponent?: React.ComponentType<MessagesProps>;
+}): JSX.Element => {
   return (
     <div>
-      {/* <p>{props.firstMessage}</p> */}
       <CopilotSidebar
+        labels={{ initial: props.firstMessage }}
         defaultOpen={true}
         className={styles.supress}
         Header={() => <div />}
         Button={() => <div />}
-        Input={(props) => Input(props)}
-        Messages={props.enableVoice ? CustomMessages : undefined}
+        Input={(props2) => (
+          <Input
+            id={props.id}
+            inProgress={props2.inProgress}
+            onSend={props2.onSend}
+          />
+        )}
+        Messages={
+          renderMessageReceiver(!!props.enableVoice, props.customMessageComponent)
+        }
         hitEscapeToClose={false}
         clickOutsideToClose={false}
         showResponseButton={false}
         instructions={props.instructions}
         makeSystemMessage={(contextString: string, instructions?: string) => {
-          console.log('contextString: ', contextString);
-          console.log('instructions: ', instructions);
+          // console.log('contextString: ', contextString);
+          // console.log('instructions: ', instructions);
 
           return (
             instructions +
@@ -48,4 +60,20 @@ This is not a conversation, so please do not ask questions. Just call a function
       />
     </div>
   );
+};
+
+function renderMessageReceiver(enableVoice: boolean, CustomMessageComponent: React.ComponentType<MessagesProps> | undefined) {
+  if (CustomMessageComponent) {
+    return (props3: MessagesProps) => <CustomMessageComponent {...props3} />;
+  }
+  
+  if (!enableVoice) {
+    return undefined;
+  }
+
+  return (props3: MessagesProps) => (
+    <CustomMessages inProgress={props3.inProgress} messages={props3.messages} />
+  );
 }
+
+export default React.memo(EmbeddedAssistent);
