@@ -9,11 +9,21 @@ import TTS, { VoiceId } from './Voice/TTS';
 export interface MessagesProps {
   messages: Message[];
   inProgress: boolean;
+  hideUserMessages?: boolean;
+  AssistantMessageComponent?: React.ComponentType<{ message: Message }>;
+  onlyShowLastAssistantMessage?: boolean;
+  spinner?: React.ReactNode;
+  enableVoice?: boolean;
 }
 
 export default function CustomMessages({
   messages,
   inProgress,
+  hideUserMessages,
+  AssistantMessageComponent,
+  onlyShowLastAssistantMessage,
+  spinner,
+  enableVoice,
 }: MessagesProps) {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const [tts, setTTS] = React.useState<TTS | null>(null);
@@ -30,6 +40,11 @@ export default function CustomMessages({
 
   useEffect(() => {
     scrollToBottom();
+  }, [messages, inProgress]);
+
+  useEffect(() => {
+    if (!enableVoice) return;
+
     const assistentMessages = messages.filter(
       (message) => message.role === 'assistant',
     );
@@ -101,76 +116,103 @@ export default function CustomMessages({
 
   return (
     <div className='copilotKitMessages'>
-      {messages.map((message, index) => {
-        const isCurrentMessage = index === messages.length - 1;
-
-        if (message.role === 'user') {
-          return (
-            <div
-              key={index}
-              className='copilotKitMessage copilotKitUserMessage'
-            >
-              {message.content}
-            </div>
-          );
-        } else if (message.role == 'assistant') {
-          if (
-            isCurrentMessage &&
-            inProgress &&
-            !message.content &&
-            !message.partialFunctionCall
-          ) {
-            // The message is in progress and there is no content- show the spinner
-            return (
-              <div
-                key={index}
-                className='copilotKitMessage copilotKitAssistantMessage'
-              >
-                {SpinnerIcon}
-              </div>
-            );
+      {messages
+        .filter((message, index) => {
+          if (hideUserMessages && message.role === 'user') {
+            return false;
           }
 
-          if (message.content) {
+          if (onlyShowLastAssistantMessage && message.role === 'user') {
+            //if last message is from user
+            if (
+              index === messages.length - 2 &&
+              messages[messages.length - 1].role === 'user'
+            ) {
+              return true;
+            }
+            return index === messages.length - 1;
+          }
+
+          return true;
+        })
+        .map((message, index) => {
+          const isCurrentMessage = index === messages.length - 1;
+
+          if (message.role === 'user') {
             return (
               <div
                 key={index}
-                className='copilotKitMessage copilotKitAssistantMessage'
+                className='copilotKitMessage copilotKitUserMessage'
               >
                 {message.content}
-                {/* <Markdown content={message.content} /> */}
               </div>
             );
+          } else if (message.role == 'assistant') {
+            if (
+              isCurrentMessage &&
+              inProgress &&
+              !message.content &&
+              !message.partialFunctionCall
+            ) {
+              // The message is in progress and there is no content- show the spinner
+              if (spinner) {
+                return spinner;
+              }
+              return (
+                <div
+                  key={index}
+                  className='copilotKitMessage copilotKitAssistantMessage'
+                >
+                  {SpinnerIcon}
+                </div>
+              );
+            }
+
+            if (message.content) {
+              if (AssistantMessageComponent) {
+                return (
+                  <AssistantMessageComponent key={index} message={message} />
+                );
+              }
+              return (
+                <div
+                  key={index}
+                  className='copilotKitMessage copilotKitAssistantMessage'
+                >
+                  {message.content}
+                  {/* <Markdown content={message.content} /> */}
+                </div>
+              );
+            }
+
+            if (message.partialFunctionCall) {
+              return (
+                <div
+                  key={index}
+                  className='copilotKitMessage copilotKitAssistantMessage'
+                >
+                  {message.content}
+                  {/* <Markdown content={message.partialFunctionCall} /> */}
+                </div>
+              );
+            }
+
+            if (message.function_call) {
+              // return <div key={index}/>;
+              return (
+                <div
+                  key={index}
+                  className='copilotKitMessage copilotKitAssistantMessage'
+                >
+                  {message.content}
+                  {/* <Markdown content={functionResults[message.id]} /> */}
+                </div>
+              );
+            }
           }
 
-          if (message.partialFunctionCall) {
-            return (
-              <div
-                key={index}
-                className='copilotKitMessage copilotKitAssistantMessage'
-              >
-                {message.content}
-                {/* <Markdown content={message.partialFunctionCall} /> */}
-              </div>
-            );
-          }
-
-          if (message.function_call) {
-            // return <div key={index}/>;
-            return (
-              <div
-                key={index}
-                className='copilotKitMessage copilotKitAssistantMessage'
-              >
-                {message.content}
-                {/* <Markdown content={functionResults[message.id]} /> */}
-              </div>
-            );
-          }
-        }
-
-        return null;
-      })}
+          return null;
+        })}
       <div ref={messagesEndRef} />
     </div>
   );
