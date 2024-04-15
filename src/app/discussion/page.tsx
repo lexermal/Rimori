@@ -130,6 +130,7 @@ export default function Page(): JSX.Element {
                   id='discussion_assistant'
                   instructions={persona.instructions}
                   firstMessage={persona.firstMessage}
+                  enableVoice={true}
                 />
               </DiscussionPopup>
             </div>
