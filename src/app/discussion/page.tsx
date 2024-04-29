@@ -129,7 +129,9 @@ export default function Page(): JSX.Element {
                 >
                   <EmbeddedAssistent
                     id='discussion_assistant'
-                    instructions={persona.instructions}
+                    //temporarely disabled
+                    instructions={""}
+                    // instructions={persona.instructions}
                     firstMessage={persona.firstMessage}
                     enableVoice={true}
                   />

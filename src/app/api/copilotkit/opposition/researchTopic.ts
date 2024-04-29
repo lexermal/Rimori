@@ -1,11 +1,14 @@
 // this whole file is based on https://github.com/CopilotKit/presentation-demo/blob/main/src/app/api/copilotkit/research.ts
-import { TavilySearchAPIRetriever } from "@langchain/community/retrievers/tavily_search_api";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { RunnableLambda } from "@langchain/core/runnables";
 import { END, StateGraph } from "@langchain/langgraph";
 import { ChatOpenAI } from "@langchain/openai";
 import path from 'path';
-// import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+
+//gpt class having the builder pattern to build pipes with gpt models
+//every step is an own chatgpt instance and has one specific task
+//the pipe is a sequence of steps
 
 interface AgentState {
     topic: string;
@@ -21,14 +24,11 @@ function model() {
     });
 }
 
-async function search(state: {
-    agentState: AgentState;
-}): Promise<{ agentState: AgentState }> {
+async function search({ context }: AgentContext): Promise<AgentContext> {
     // this function is based on https://js.langchain.com/docs/integrations/document_loaders/file_loaders/pdf
 
-    const { PDFLoader } = await import("langchain/document_loaders/fs/pdf");
     // Load the PDF data
-    const pdfpath="/home/mconvert/Code/RIAU-MVP/src/app/api/copilotkit/opposition/pdf-decision-making.pdf";
+    const pdfpath = "/home/mconvert/Code/RIAU-MVP/src/app/api/copilotkit/opposition/pdf-decision-making.pdf";
     // console.log("pdfpath:", pdfpath);
 
     const loader = new PDFLoader(pdfpath, {
@@ -36,61 +36,38 @@ async function search(state: {
     });
     const docs2 = await loader.load();
 
-    console.log("searching for topic:", state.agentState.topic);
-    // console.log("search result length:", docs2.length);
-    // console.log("search result:", docs2);
+    console.log("searching for topic:", context.topic);
 
-    // Convert the documents to a format suitable for your application
-    // const searchResults = docs2.map(doc => doc.text).join("\n");
-
-    return {
-        agentState: {
-            ...state.agentState,
-            searchResults:JSON.stringify(docs2),
-        },
-    };
-
-
-    const retriever = new TavilySearchAPIRetriever({
-        k: 10,
+    return addToContext(context, {
+        searchResults: JSON.stringify(docs2),
     });
-    let topic = state.agentState.topic;
-    // must be at least 5 characters long
-    if (topic.length < 5) {
-        topic = "topic: " + topic;
-    }
-    console.log("searching for topic:", topic);
-    const docs = await retriever.getRelevantDocuments(topic);
-    console.log("search result length:", docs.length);
-    return {
-        agentState: {
-            ...state.agentState,
-            searchResults: JSON.stringify(docs),
-        },
-    };
 }
 
-async function curate(state: {
-    agentState: AgentState;
-}): Promise<{ agentState: AgentState }> {
+async function curate({ context }: AgentContext): Promise<AgentContext> {
     console.log("curating search results");
     const response = await model().invoke(
         [
             new SystemMessage(
-                `You are a personal newspaper editor. 
-         Your sole task is to return a list of URLs of the 5 most relevant articles for the provided topic or query as a JSON list of strings
+                `You are an  advanced AI specialized in processing and extracting relevant information from extensive documents. 
+         Your sole task is to return a list of relevant information related to the provided topic as a JSON list of strings
          in this format:
          {
-          urls: ["url1", "url2", "url3", "url4", "url5"]
-         }
+            info:[
+         {
+          title: "title",
+          original_text: "original text from the provided source",
+          example: "optional example",
+         },
+         ...
+        ]
+        }
          .`.replace(/\s+/g, " ")
             ),
             new HumanMessage(
-                `Today's date is ${new Date().toLocaleDateString("en-GB")}.
-       Topic or Query: ${state.agentState.topic}
+                `Topic: ${context.topic}
        
-       Here is a list of articles:
-       ${state.agentState.searchResults}`.replace(/\s+/g, " ")
+       Here is a list of source information to curate from:
+       ${context.searchResults}`.replace(/\s+/g, " ")
             ),
         ],
         {
@@ -99,28 +76,29 @@ async function curate(state: {
             },
         }
     );
-    const urls = JSON.parse(response.content as string).urls;
-    const searchResults = JSON.parse(state.agentState.searchResults!);
-    const newSearchResults = searchResults.filter((result: any) => {
-        return urls.includes(result.metadata.source);
+    const info = JSON.parse(response.content as string).info;
+    console.log("curated results:", info);
+    //console log pretty formatting the info
+    // info.forEach((element: any) => {
+    //     console.log("title:", element.title);
+    //     console.log("original_text:", element.original_text);
+    //     console.log("example:", element.example);
+    // });
+    return addToContext(context, {
+        searchResults: JSON.stringify(info),
     });
-    console.log("curated search results:", newSearchResults);
-    return {
-        agentState: {
-            ...state.agentState,
-            searchResults: JSON.stringify(newSearchResults),
-        },
-    };
 }
 
-async function critique(state: {
-    agentState: AgentState;
-}): Promise<{ agentState: AgentState }> {
+async function critique({ context }: AgentContext): Promise<AgentContext> {
     console.log("critiquing article");
+    return addToContext(context, {
+        critique: undefined,
+    });
+
     let feedbackInstructions = "";
-    if (state.agentState.critique) {
+    if (context.critique) {
         feedbackInstructions =
-            `The writer has revised the article based on your previous critique: ${state.agentState.critique}
+            `The writer has revised the article based on your previous critique: ${context.critique}
        The writer might have left feedback for you encoded between <FEEDBACK> tags.
        The feedback is only for you to see and will be removed from the final article.
     `.replace(/\s+/g, " ");
@@ -138,23 +116,23 @@ async function critique(state: {
         ),
         new HumanMessage(
             `${feedbackInstructions}
-       This is the article: ${state.agentState.article}`
+       This is the article: ${context.article}`
         ),
     ]);
     const content = response.content as string;
     console.log("critique:", content);
-    return {
-        agentState: {
-            ...state.agentState,
-            critique: content.includes("[DONE]") ? undefined : content,
-        },
-    };
+
+    return addToContext(context, {
+        critique: content.includes("[DONE]") ? undefined : content,
+    });
 }
 
-async function write(state: {
-    agentState: AgentState;
-}): Promise<{ agentState: AgentState }> {
+async function write({ context }: AgentContext): Promise<AgentContext> {
     console.log("writing article");
+    return addToContext(context, {
+        article: context.searchResults,
+    });
+
     const response = await model().invoke([
         new SystemMessage(
             `You are a personal newspaper writer. Your sole purpose is to write a well-written article about a 
@@ -167,8 +145,8 @@ async function write(state: {
             `Today's date is ${new Date().toLocaleDateString("en-GB")}.
       Your task is to write a critically acclaimed article for me about the provided query or 
       topic based on the sources. 
-      Here is a list of articles: ${state.agentState.searchResults}
-      This is the topic: ${state.agentState.topic}
+      Here is a list of articles: ${context.searchResults}
+      This is the topic: ${context.topic}
       Please return a well-written article based on the provided information.`.replace(
                 /\s+/g,
                 " "
@@ -177,17 +155,15 @@ async function write(state: {
     ]);
     const content = response.content as string;
     console.log("article:", content);
-    return {
-        agentState: {
-            ...state.agentState,
-            article: content,
-        },
-    };
+    return addToContext(context, {
+        article: content,
+    });
 }
 
-async function revise(state: {
-    agentState: AgentState;
-}): Promise<{ agentState: AgentState }> {
+async function revise({ context }: AgentContext): Promise<AgentContext> {
+    return addToContext(context, {
+        article: context.article,
+    });
     console.log("revising article");
     const response = await model().invoke([
         new SystemMessage(
@@ -196,8 +172,8 @@ async function revise(state: {
         ),
         new HumanMessage(
             `Your task is to edit the article based on the critique given.
-      This is the article: ${state.agentState.article}
-      This is the critique: ${state.agentState.critique}
+      This is the article: ${context.article}
+      This is the critique: ${context.critique}
       Please return the edited article based on the critique given.
       You may leave feedback about the critique encoded between <FEEDBACK> tags like this:
       <FEEDBACK> here goes the feedback ...</FEEDBACK>`.replace(/\s+/g, " ")
@@ -205,38 +181,33 @@ async function revise(state: {
     ]);
     const content = response.content as string;
     console.log("revised article:", content);
-    return {
-        agentState: {
-            ...state.agentState,
-            article: content,
-        },
-    };
+    return addToContext(context, {
+        article: content,
+    });
 }
 
-const agentState = {
-    agentState: {
-        value: (x: AgentState, y: AgentState) => y,
-        default: () => ({
-            topic: "",
-        }),
-    },
-};
-
 // Define the function that determines whether to continue or not
-const shouldContinue = (state: { agentState: AgentState }) => {
-    const result = state.agentState.critique === undefined ? "end" : "continue";
+const shouldContinue = (state: { context: AgentState }) => {
+    const result = state.context.critique === undefined ? "end" : "continue";
     return result;
 };
 
 const workflow = new StateGraph({
-    channels: agentState,
+    channels: {
+        context: {
+            value: (x: AgentState, y: AgentState) => y,
+            default: () => ({
+                topic: "",
+            }),
+        },
+    },
 });
 
-workflow.addNode("search", new RunnableLambda({ func: search }) as any);
-workflow.addNode("curate", new RunnableLambda({ func: curate }) as any);
-workflow.addNode("write", new RunnableLambda({ func: write }) as any);
-workflow.addNode("critique", new RunnableLambda({ func: critique }) as any);
-workflow.addNode("revise", new RunnableLambda({ func: revise }) as any);
+workflow.addNode("search", new RunnableLambda({ func: search }) );
+workflow.addNode("curate", new RunnableLambda({ func: curate }) );
+workflow.addNode("write", new RunnableLambda({ func: write }) );
+workflow.addNode("critique", new RunnableLambda({ func: critique }));
+workflow.addNode("revise", new RunnableLambda({ func: revise }));
 
 workflow.addEdge("search", "curate");
 workflow.addEdge("curate", "write");
@@ -270,12 +241,24 @@ const app = workflow.compile();
 
 export async function researchWithLangGraph(topic: string) {
     const inputs = {
-        agentState: {
+        context: {
             topic,
         },
     };
     const result = await app.invoke(inputs);
+    const result2= result.context.article;
+    console.log("--------------------")
+    console.log("result:", result2);
+    return result2;
     const regex = /<FEEDBACK>[\s\S]*?<\/FEEDBACK>/g;
-    const article = result.agentState.article.replace(regex, "");
+    const article = result.context.article.replace(regex, "");
     return article;
+}
+
+interface AgentContext {
+    context: AgentState;
+}
+
+function addToContext(context: AgentState, newValues: { [key: string]: any }): AgentContext {
+    return { context: { ...context, ...newValues } };
 }
