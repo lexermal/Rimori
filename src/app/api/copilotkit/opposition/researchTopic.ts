@@ -1,8 +1,4 @@
-/**
- * This is a port of GPT Newspaper to LangGraph JS, adapted from the original Python code.
- *
- * https://github.com/assafelovic/gpt-newspaper
- */
+// this whole file is based on https://github.com/CopilotKit/presentation-demo/blob/main/src/app/api/copilotkit/research.ts
 import { TavilySearchAPIRetriever } from "@langchain/community/retrievers/tavily_search_api";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { RunnableLambda } from "@langchain/core/runnables";
@@ -28,10 +24,12 @@ function model() {
 async function search(state: {
     agentState: AgentState;
 }): Promise<{ agentState: AgentState }> {
+    // this function is based on https://js.langchain.com/docs/integrations/document_loaders/file_loaders/pdf
+
     const { PDFLoader } = await import("langchain/document_loaders/fs/pdf");
     // Load the PDF data
     const pdfpath="/home/mconvert/Code/RIAU-MVP/src/app/api/copilotkit/opposition/pdf-decision-making.pdf";
-    console.log("pdfpath:", pdfpath);
+    // console.log("pdfpath:", pdfpath);
 
     const loader = new PDFLoader(pdfpath, {
         parsedItemSeparator: "",
@@ -39,8 +37,8 @@ async function search(state: {
     const docs2 = await loader.load();
 
     console.log("searching for topic:", state.agentState.topic);
-    console.log("search result length:", docs2.length);
-    console.log("search result:", docs2);
+    // console.log("search result length:", docs2.length);
+    // console.log("search result:", docs2);
 
     // Convert the documents to a format suitable for your application
     // const searchResults = docs2.map(doc => doc.text).join("\n");
