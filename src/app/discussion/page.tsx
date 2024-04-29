@@ -1,6 +1,6 @@
 'use client';
 
-import { useCopilotAction } from '@copilotkit/react-core';
+import { CopilotKit, useCopilotAction } from '@copilotkit/react-core';
 import { useEffect, useState } from 'react';
 
 import Card from '../../components/discussion/Card';
@@ -15,7 +15,7 @@ interface Exam {
 }
 
 export default function Page(): JSX.Element {
-  const [showDiscussion, setShowDiscussion] = useState(2);
+  const [showDiscussion, setShowDiscussion] = useState(3);
   const [exams, setExams] = useState<Exam[]>([]);
 
   useEffect(() => {
@@ -100,44 +100,46 @@ export default function Page(): JSX.Element {
   });
 
   return (
-    <div>
-      <h1 className='text-center mt-20 mb-7'>Discussions</h1>
-      <p className='text-center mb-8'>
-        Now it's time to show what you're capable off! <br />
-        Here are 3 opponents. Your mission is to show that you understand your
-        subject!
-      </p>
+    <CopilotKit url='/api/copilotkit/opposition'>
+      <div>
+        <h1 className='text-center mt-20 mb-7'>Discussions</h1>
+        <p className='text-center mb-8'>
+          Now it's time to show what you're capable off! <br />
+          Here are 3 opponents. Your mission is to show that you understand your
+          subject!
+        </p>
 
-      <div className='flex'>
-        {getPersonas('', '', '').map((persona, index) => {
-          const exam = exams.filter((e) => e.examNr === index + 1);
+        <div className='flex'>
+          {getPersonas('', '', '').map((persona, index) => {
+            const exam = exams.filter((e) => e.examNr === index + 1);
 
-          return (
-            <div className='w-1/3 bg-gray-400 p-5' key={index}>
-              <Card
-                title={persona.name}
-                src={persona.image}
-                description={persona.description}
-                success={exam[0]?.passed}
-                onClick={() => setShowDiscussion(index + 1)}
-              />
-              <DiscussionPopup
-                show={showDiscussion === index + 1}
-                title={persona.discussionTitle}
-                onClose={() => setShowDiscussion(0)}
-              >
-                <EmbeddedAssistent
-                  id='discussion_assistant'
-                  instructions={persona.instructions}
-                  firstMessage={persona.firstMessage}
-                  enableVoice={true}
+            return (
+              <div className='w-1/3 bg-gray-400 p-5' key={index}>
+                <Card
+                  title={persona.name}
+                  src={persona.image}
+                  description={persona.description}
+                  success={exam[0]?.passed}
+                  onClick={() => setShowDiscussion(index + 1)}
                 />
-              </DiscussionPopup>
-            </div>
-          );
-        })}
+                <DiscussionPopup
+                  show={showDiscussion === index + 1}
+                  title={persona.discussionTitle}
+                  onClose={() => setShowDiscussion(0)}
+                >
+                  <EmbeddedAssistent
+                    id='discussion_assistant'
+                    instructions={persona.instructions}
+                    firstMessage={persona.firstMessage}
+                    enableVoice={true}
+                  />
+                </DiscussionPopup>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </CopilotKit>
   );
 }
 function getPersonas(

@@ -14,7 +14,12 @@ const nextConfig = {
   //   ],
   // },
 
-  webpack(config) {
+  webpack(config, { isServer }) {
+     // Only run this workaround on the server
+    if (!isServer) {
+      config.resolve.fallback.fs = false;
+    }
+
     // Grab the existing rule that handles SVG imports
     const fileLoaderRule = config.module.rules.find((rule) =>
       rule.test?.test?.('.svg')
