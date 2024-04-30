@@ -1,11 +1,11 @@
-import {  useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
-    items:{[key: string]: string[]};
-    onSelected: (id: string) => void;
+  items: { [key: string]: string[] };
+  onSelected: (id: string) => void;
 }
 
-export default function HomePage({items, onSelected}: Props) {
+export default function HomePage({ items, onSelected }: Props) {
   const [openAccordion, setOpenAccordion] = useState('');
   const [selectedEntry, setSelectedEntry] = useState('');
 
@@ -18,20 +18,19 @@ export default function HomePage({items, onSelected}: Props) {
 
   return (
     <div>
-      <h1>Accordion Example</h1>
+      {/* <h1>Accordion Example</h1> */}
 
-
-        {Object.keys(items).map((key, index) => (
-            <AccordionList
-            key={index}
-            title={key}
-            close={openAccordion !== `${index}`}
-            onSelected={handleEntryClick}
-            selectionIndex={selectedEntry}
-            items={items[key]}
-            id={`${index}`}
-            />
-        ))}
+      {Object.keys(items).map((key, index) => (
+        <AccordionList
+          key={index}
+          title={key}
+          close={openAccordion !== `${index}`}
+          onSelected={handleEntryClick}
+          selectionIndex={selectedEntry}
+          items={items[key]}
+          id={`${index}`}
+        />
+      ))}
       {/* <AccordionList
         title='Accordion 1'
         close={openAccordion !== '0'}
@@ -70,12 +69,15 @@ function AccordionList({
     <div className='accordion'>
       <div className='accordion-header'>
         <div className='accordion-icon' onClick={() => setIsOpen(!isOpen)}>
-          <p
-            className={`title ${selectionIndex === `${id}-title` ? 'selected bg-blue-600' : ''}`}
-            onClick={() => onSelected(`${id}-title`)}
-          >
-            (toggle icon here)
-          </p>
+          {items.length > 0 ? (
+            <MyButton
+              titleSelected={selectionIndex === `${id}-title`}
+              id={id}
+              onSelected={(value:string) => onSelected(value)}
+            />
+          ) : (
+            ''
+          )}
         </div>
         <p
           className={`title ${selectionIndex === `${id}-title` ? 'selected bg-blue-600' : ''}`}
@@ -99,5 +101,21 @@ function AccordionList({
         })}
       </div>
     </div>
+  );
+}
+
+function MyButton({
+  titleSelected,
+  onSelected,
+  id,
+}: any
+) {
+  return (
+    <p
+      className={`title ${titleSelected ? 'selected bg-blue-600' : ''}`}
+      onClick={() => onSelected(`${id}-title`)}
+    >
+      (toggle icon here)
+    </p>
   );
 }

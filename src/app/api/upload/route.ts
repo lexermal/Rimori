@@ -1,6 +1,7 @@
 import { createCanvas, Image } from 'canvas';
 import pdf2md from '@opendocsg/pdf2md';
 
+// needed for pdf2md
 (global as any).window = {
   Image,
   document: {
@@ -25,25 +26,32 @@ import fs from 'fs';
 export const POST = async (req:any) => {
   const formData = await req.formData();
 
-  const file = formData.get("file");
-  if (!file) {
+  const files = formData.getAll("file");
+  if (!files.length) {
     return NextResponse.json({ error: "No files received." }, { status: 400 });
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const filename =  file.name.replaceAll(" ", "_");
-  console.log(filename);
-  try {
-    await writeFile(
-      path.join(process.cwd(), "assets/" + filename),
-      buffer
-    );
-    // convert(path.join(process.cwd(), "assets/" + filename));
-    return NextResponse.json({ Message: "Success", status: 201 });
-  } catch (error) {
-    console.log("Error occured ", error);
-    return NextResponse.json({ Message: "Failed", status: 500 });
+  const filenames = [];
+  for (const file of files) {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const filename =  file.name.replaceAll(" ", "_");
+    console.log(filename);
+    filenames.push(filename);
+    try {
+      await writeFile(
+        path.join(process.cwd(), "assets/" + filename),
+        buffer
+      );
+    } catch (error) {
+      console.log("Error occured ", error);
+      return NextResponse.json({ Message: "Failed", status: 500 });
+    }
   }
+
+  //list all files in the directory
+  const allFiles = fs.readdirSync(path.join(process.cwd(), "assets/"))
+
+  return NextResponse.json({ Message: "Success", status: 201, files: filenames, allFiles });
 };
 
 
@@ -52,6 +60,7 @@ async function convert(filePath: string) {
   // To extract images from the PDF file, we need to do the parsing ourselves.
   // I think all page elements are in either getStructTree, getOperatorList or getXfa
   // then extract images with https://github.com/mozilla/pdf.js/issues/14542 (but this way seams to be deprecated)
+  // maybe this can help: https://codepen.io/TeoM/pen/abOzEor
 
   console.log("Think about how to get the images from the PDF file and convert them to markdown.")
 

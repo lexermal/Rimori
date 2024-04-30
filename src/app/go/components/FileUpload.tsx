@@ -2,6 +2,7 @@ import { useEffect, InputHTMLAttributes } from 'react';
 import { useDropzone, DropzoneRootProps } from 'react-dropzone';
 interface Props {
   onFileUpload: (fileNames: string[]) => void;
+  onFilesUploaded: (fileNames: string[]) => void;
 }
 export function FileUpload(props: Props) {
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
@@ -30,6 +31,7 @@ export function FileUpload(props: Props) {
       })
         .then((response) => response.json())
         .then((data) => {
+          props.onFilesUploaded(data.allFiles);
           console.log('Success:', data);
         })
         .catch((error) => {

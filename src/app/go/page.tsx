@@ -13,13 +13,21 @@ const MyDropzone: React.FC = () => {
     <div>
       <FileUpload
         onFileUpload={(fileNames) => {
-          const documentCopy = { ...documents };
+          // const documentCopy = { ...documents };
 
+          // fileNames.forEach((fileName) => {
+          //   documentCopy[fileName] = [];
+          // });
+
+          // setDocuments(documentCopy);
+        }}
+        onFilesUploaded={(fileNames) => {
+          console.log('Files uploaded:', fileNames);
+          const newObject={} as any;
           fileNames.forEach((fileName) => {
-            documentCopy[fileName] = [];
+            newObject[fileName] = [];
           });
-
-          setDocuments(documentCopy);
+          setDocuments(newObject);
         }}
       />
       <DocumentSelection
