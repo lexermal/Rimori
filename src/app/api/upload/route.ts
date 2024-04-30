@@ -1,25 +1,57 @@
+import { createCanvas, Image } from 'canvas';
 import pdf2md from '@opendocsg/pdf2md';
+
+(global as any).window = {
+  Image,
+  document: {
+    createElement: (nodeName: string) => {
+      if (nodeName === 'canvas') return createCanvas(200, 200);
+    },
+  },
+  location: {
+    protocol: 'http:',
+    // Add other properties if needed
+  },
+};
+
+import { NextResponse } from "next/server";
+import path from "path";
+import { writeFile } from "fs/promises";
+
 import fs from 'fs';
-import { NextApiRequest, NextApiResponse } from 'next';
-import path from 'path';
+// import { NextApiRequest, NextApiResponse } from 'next';
+// import path from 'path';
 
-export default async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const data = req.body;
-  const file = data.files[0];
+export const POST = async (req:any) => {
+  const formData = await req.formData();
 
-  const filePath = path.join(process.cwd(), '/home/mconvert/Code/RIAU-MVP/files/', file.originalName);
+  const file = formData.get("file");
+  if (!file) {
+    return NextResponse.json({ error: "No files received." }, { status: 400 });
+  }
 
-  fs.writeFile(filePath, file.content, 'binary', function (err) {
-    if (err) {
-      return res.status(500).json({ success: false, message: err.message });
-    }
-    convert(filePath);
-    return res.status(200).json({ success: true, path: filePath });
-  });
-}
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const filename =  file.name.replaceAll(" ", "_");
+  console.log(filename);
+  try {
+    await writeFile(
+      path.join(process.cwd(), "assets/" + filename),
+      buffer
+    );
+    // convert(path.join(process.cwd(), "assets/" + filename));
+    return NextResponse.json({ Message: "Success", status: 201 });
+  } catch (error) {
+    console.log("Error occured ", error);
+    return NextResponse.json({ Message: "Failed", status: 500 });
+  }
+};
 
 
-function convert(filePath: string) {
+async function convert(filePath: string) {
+  // TODO: Convert does not work. It only extracts text from the PDF file.
+  // To extract images from the PDF file, we need to do the parsing ourselves.
+  // I think all page elements are in either getStructTree, getOperatorList or getXfa
+  // then extract images with https://github.com/mozilla/pdf.js/issues/14542 (but this way seams to be deprecated)
 
   console.log("Think about how to get the images from the PDF file and convert them to markdown.")
 
@@ -28,14 +60,14 @@ function convert(filePath: string) {
       console.log('pages:', pages)
     },
     documentParsed: (document, pages) => {
-      console.log('document:', document)
-      console.log('document pages:', pages)
+      // console.log('document:', document)
+      // console.log('document pages:', pages)
     }
 
   })
     .then(text => {
 
-      console.log('text:', text)
+      // console.log('text:', text)
 
       console.log('Done.')
     })
