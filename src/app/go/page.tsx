@@ -4,10 +4,11 @@ import { useState } from 'react';
 
 import DocumentSelection from './components/DocumentSelection';
 import { FileUpload } from './components/FileUpload';
-import { CustomNavbar } from './components/Navbar';
 
-const MyDropzone: React.FC = () => {
+const Page: React.FC = () => {
   const [documents, setDocuments] = useState<{ [key: string]: string[] }>({});
+
+  const [selectedFile, setSelectedFile] = useState<string>("");
 
   return (
     <div>
@@ -31,21 +32,30 @@ const MyDropzone: React.FC = () => {
         }}
       />
       <DocumentSelection
-        onSelected={(id) => console.log(id)}
+        onSelected={(id) => setSelectedFile(id)}
         items={documents}
       />
+      <TrainingButtons selectedFile={selectedFile}  />
     </div>
   );
 };
 
-const Page: React.FC = () => (
-  <div>
-    <CustomNavbar />
 
+
+function TrainingButtons({selectedFile}: any) {
+  const enableButtons = selectedFile !== "";
+
+  console.log('enableButtons:', enableButtons);
+  return (
     <div>
-      <MyDropzone />
+      <button disabled={!enableButtons} onClick={() => console.log('Training button clicked')}>Discussion</button>
+      <button disabled={!enableButtons} onClick={() => console.log('Training button clicked')}>Story</button>
+      <button disabled={true}>Summary Creation</button>
+      <button disabled={true}>Flashcard Generation (coming soon)</button>
     </div>
-  </div>
-);
+  );
+
+
+}
 
 export default Page;
