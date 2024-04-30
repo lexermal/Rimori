@@ -23,6 +23,7 @@
     "@copilotkit/react-ui": "^0.18.0",
     "@langchain/community": "^0.0.53",
     "@langchain/langgraph": "^0.0.12",
+    "@opendocsg/pdf2md": "^0.1.29",
     "clsx": "^2.0.0",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.7.5",
