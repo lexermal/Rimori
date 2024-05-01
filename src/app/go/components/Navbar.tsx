@@ -5,9 +5,9 @@ import { Avatar, Dropdown, Navbar } from "flowbite-react";
 
 export function CustomNavbar() {
   return (
-    <Navbar fluid rounded>
-      <Navbar.Brand href="/go">
-        <div className="mr-3 h-20 w-40 overflow-hidden" style={{
+    <Navbar fluid rounded className="">
+      <Navbar.Brand href="/go" className="h-20">
+        <div className="mr-3 h-20 w-40 overflow-hidden fixed " style={{
           backgroundImage: 'url("/logo.svg")',
           backgroundSize: '320px',
           backgroundPosition: 'center',
@@ -17,7 +17,7 @@ export function CustomNavbar() {
         {/* <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span> */}
       </Navbar.Brand>
       <div className="flex md:order-2">
-        <img src="/qr.png" className=" h-36 absolute right-2 top-2 rounded-lg"/>
+        <img src="/qr.png" className=" h-36 fixed right-2 top-2 rounded-lg"/>
 
         {/* <Dropdown
           arrowIcon={false}
