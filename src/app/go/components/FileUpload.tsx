@@ -41,9 +41,9 @@ export function FileUpload(props: Props) {
   }, [acceptedFiles]);
 
   return (
-    <div className='bg-blue-300' {...(getRootProps() as DropzoneRootProps)}>
+    <div className='bg-blue-300 w-2/4 mx-auto p-20 rounded-xl mb-10 border-dashed border-4 border-spacing-8 border-purple-900 ' {...(getRootProps() as DropzoneRootProps)}>
       <input {...(getInputProps() as InputHTMLAttributes<HTMLInputElement>)} />
-      <p>Drag 'n' drop some files here, or click to select files</p>
+      <p className='text-center'>Drag your documents in here.</p>
     </div>
   );
 }
