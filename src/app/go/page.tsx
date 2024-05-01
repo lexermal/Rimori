@@ -11,7 +11,7 @@ const Page: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<string>('');
 
   return (
-    <div>
+    <div className='pb-40'>
       {Object.keys(documents).length === 0 && (
         <FileUpload
           onFileUpload={() => true}
@@ -64,7 +64,7 @@ function TrainingButtons({ selectedFile }: any) {
   ];
 
   return (
-    <div className='absolute bottom-0 right-0 left-0 h-36 bg-red-200 p-3 flex justify-center items-center space-x-10'>
+    <div className='fixed bottom-0 right-0 left-0 h-36 bg-red-200 p-3 flex justify-center items-center space-x-10'>
       {buttons.map((button, index) => (
         <button
           key={index}
@@ -77,7 +77,7 @@ function TrainingButtons({ selectedFile }: any) {
       ))}
       <button
         key={5}
-        className='bg-blue-500 hover:bg-blue-700 text-white font-bold text-xl py-4 px-10 rounded-lg border-2'
+        className='bg-blue-500 hover:bg-blue-700 text-white font-bold text-lg py-4 px-10 rounded-lg border-2'
         style={{ height: '95px' }}
         disabled={true}
       >

@@ -18,8 +18,6 @@ export default function HomePage({ items, onSelected }: Props) {
 
   return (
     <div>
-      {/* <h1>Accordion Example</h1> */}
-
       {Object.keys(items).map((key, index) => (
         <AccordionList
           key={index}
@@ -31,22 +29,6 @@ export default function HomePage({ items, onSelected }: Props) {
           id={`${index}`}
         />
       ))}
-      {/* <AccordionList
-        title='Accordion 1'
-        close={openAccordion !== '0'}
-        onSelected={handleEntryClick}
-        selectionIndex={selectedEntry}
-        items={['Entry 1', 'Entry 2']}
-        id='0'
-      />
-      <AccordionList
-        title='Accordion 2'
-        close={openAccordion !== '1'}
-        onSelected={handleEntryClick}
-        selectionIndex={selectedEntry}
-        items={['Entry 1', 'Entry 2', 'Entry 3']}
-        id='1'
-      /> */}
     </div>
   );
 }
@@ -66,7 +48,7 @@ function AccordionList({
   }, [close]);
 
   return (
-    <div className='accordion'>
+    <div className='accordion mb-1'>
       <div className='accordion-header'>
         <div className='accordion-icon' onClick={() => setIsOpen(!isOpen)}>
           {items.length > 0 ? (
@@ -80,7 +62,7 @@ function AccordionList({
           )}
         </div>
         <p
-          className={`title ${selectionIndex === `${id}-title` ? 'selected bg-blue-600' : ''}`}
+          className={`title cursor-pointer px-5 py-1 ${selectionIndex === `${id}-title` ? 'selected bg-blue-600 font-bold rounded-lg' : ''}`}
           onClick={() => onSelected(`${id}-title`)}
         >
           {title}
