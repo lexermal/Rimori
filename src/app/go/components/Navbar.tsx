@@ -6,12 +6,20 @@ import { Avatar, Dropdown, Navbar } from "flowbite-react";
 export function CustomNavbar() {
   return (
     <Navbar fluid rounded>
-      <Navbar.Brand href="https://flowbite-react.com">
-        <img src="/favicon.svg" className="mr-3 h-6 sm:h-9" alt="Flowbite React Logo" />
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span>
+      <Navbar.Brand href="/go">
+        <div className="mr-3 h-20 w-40 overflow-hidden" style={{
+          backgroundImage: 'url("/logo.svg")',
+          backgroundSize: '320px',
+          backgroundPosition: 'center',
+        }}>
+        {/* <img src="/logo.svg" className="mr-3 h-40" alt="Flowbite React Logo" /> */}
+          </div>
+        {/* <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span> */}
       </Navbar.Brand>
       <div className="flex md:order-2">
-        <Dropdown
+        <img src="/qr.png" className=" h-36 absolute right-2 top-2 rounded-lg"/>
+
+        {/* <Dropdown
           arrowIcon={false}
           inline
           label={
@@ -19,25 +27,26 @@ export function CustomNavbar() {
           }
         >
           <Dropdown.Header>
-            <span className="block text-sm">Bonnie Green</span>
-            <span className="block truncate text-sm font-medium">name@flowbite.com</span>
+            <span className="block text-sm">Alexander Weixler</span>
+            <span className="block truncate text-sm font-medium">alexander@riau.ai</span>
           </Dropdown.Header>
-          <Dropdown.Item>Dashboard</Dropdown.Item>
-          <Dropdown.Item>Settings</Dropdown.Item>
-          <Dropdown.Item>Earnings</Dropdown.Item>
-          <Dropdown.Divider />
+          {/* <Dropdown.Item>Dashboard</Dropdown.Item> */}
+          {/* <Dropdown.Item>Settings</Dropdown.Item> */}
+          {/* <Dropdown.Item>Earnings</Dropdown.Item> */}
+          {/* <Dropdown.Divider />
           <Dropdown.Item>Sign out</Dropdown.Item>
-        </Dropdown>
+        </Dropdown> */}
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link href="#" active>
+        {/* <Navbar.Link href="#" active>
           Home
-        </Navbar.Link>
-        <Navbar.Link href="#">About</Navbar.Link>
-        <Navbar.Link href="#">Services</Navbar.Link>
-        <Navbar.Link href="#">Pricing</Navbar.Link>
-        <Navbar.Link href="#">Contact</Navbar.Link>
+        </Navbar.Link> */}
+        <Navbar.Link href="/go">Study</Navbar.Link>
+        <Navbar.Link target="_blank" href="http://www.educationplanner.org/students/self-assessments/learning-styles">Study Type</Navbar.Link>
+        <Navbar.Link disabled href="#">Plan your study</Navbar.Link>
+        {/* <Navbar.Link href="#">Pricing</Navbar.Link> */}
+        {/* <Navbar.Link href="#">Contact</Navbar.Link> */}
       </Navbar.Collapse>
     </Navbar>
   );

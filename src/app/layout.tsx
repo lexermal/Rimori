@@ -7,6 +7,7 @@ import '@/styles/globals.css';
 import '@/styles/colors.css';
 
 import { GlobalProvider } from '@/components/GlobalContext';
+import { CustomNavbar } from './go/components/Navbar';
 
 export default function RootLayout({
   children,
@@ -16,6 +17,8 @@ export default function RootLayout({
   return (
     <html>
       <body>
+        <CustomNavbar />
+
         <GlobalProvider>
           <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
         </GlobalProvider>
