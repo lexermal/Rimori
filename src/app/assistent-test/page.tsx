@@ -10,6 +10,7 @@ export default function Page(): JSX.Element {
   const CustomInput = (props: any) => {
     return (
       <Input
+        id="4"
         inProgress={props.inProgress}
         onSend={(text) => {
           props.onSend(text);

@@ -18,6 +18,8 @@ export default function RootLayout({
     <html>
       <body>
         <CustomNavbar />
+        <div className='h-28'>
+          </div>
 
         <GlobalProvider>
           <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>

@@ -5,18 +5,21 @@ import { Avatar, Dropdown, Navbar } from "flowbite-react";
 
 export function CustomNavbar() {
   return (
-    <Navbar fluid rounded className="">
-      <Navbar.Brand href="/go" className="h-20">
+    <Navbar  rounded className="fixed w-full top-0" >
+      <Navbar.Brand href="/go">
         <div className="mr-3 h-20 w-40 overflow-hidden fixed " style={{
           backgroundImage: 'url("/logo.svg")',
           backgroundSize: '320px',
           backgroundPosition: 'center',
+          backgroundColor: 'white',
+          top: '0',
+          left: '0',
         }}>
         {/* <img src="/logo.svg" className="mr-3 h-40" alt="Flowbite React Logo" /> */}
           </div>
         {/* <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span> */}
       </Navbar.Brand>
-      <div className="flex md:order-2">
+      <div className="flex md:order-2 mb-16">
         <img src="/qr.png" className=" h-36 fixed right-2 top-2 rounded-lg"/>
 
         {/* <Dropdown
