@@ -26,7 +26,7 @@ export default function HomePage({ items, onSelected }: Props) {
           onSelected={handleEntryClick}
           selectionIndex={selectedEntry}
           items={items[key]}
-          id={`${index}`}
+          id={key}
         />
       ))}
     </div>

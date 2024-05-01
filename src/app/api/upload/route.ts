@@ -23,7 +23,7 @@ import fs from 'fs';
 // import { NextApiRequest, NextApiResponse } from 'next';
 // import path from 'path';
 
-export const POST = async (req:any) => {
+export const POST = async (req: any) => {
   const formData = await req.formData();
 
   const files = formData.getAll("file");
@@ -34,7 +34,7 @@ export const POST = async (req:any) => {
   const filenames = [];
   for (const file of files) {
     const buffer = Buffer.from(await file.arrayBuffer());
-    const filename =  file.name.replaceAll(" ", "_");
+    const filename = file.name.replaceAll(" ", "_");
     console.log(filename);
     filenames.push(filename);
     try {
@@ -50,7 +50,9 @@ export const POST = async (req:any) => {
 
   //list all files in the directory
   const allFiles = fs.readdirSync(path.join(process.cwd(), "assets/"))
-
+    .map((file) => {
+      return file.substring(0, file.lastIndexOf("."));
+    });
   return NextResponse.json({ Message: "Success", status: 201, files: filenames, allFiles });
 };
 

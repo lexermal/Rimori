@@ -12,7 +12,7 @@ import PomodoroCounter from './components/PomodoroCounter';
 export default function Page() {
 const [webSiteLoaded, setWebSiteLoaded] = useState(false);
 const [assistenIsOpen, setAssistenIsOpen] = useState(true);
-const [content, setContent] = useState<string>("hello world");
+const [content, setContent] = useState<string>("");
 
 useEffect(() => {
     setWebSiteLoaded(true);
@@ -67,7 +67,7 @@ async function getContent() {
     return '';
   }
 
-  const response = await fetch(`/api/markdown?filename=${encodeURIComponent(fileName)}`);
+  const response = await fetch(`/api/markdown?filename=${encodeURIComponent(fileName.replace("-title", ""))}`);
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);

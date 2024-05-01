@@ -22,9 +22,11 @@ export function FileUpload(props: Props) {
     if (acceptedFiles.length > 0) {
       props.onFileUpload(acceptedFiles.map((file) => file.name));
 
-      const file = acceptedFiles[0];
       const formData = new FormData();
-      formData.append('file', file);
+      acceptedFiles.forEach((file) => {
+        formData.append('file', file);
+      });
+
       fetch('/api/upload', {
         method: 'POST',
         body: formData,

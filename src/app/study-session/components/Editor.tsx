@@ -1,12 +1,10 @@
 import { Remirror, ThemeProvider, useRemirror } from '@remirror/react';
-import { useEffect } from 'react';
 import {
   BlockquoteExtension,
   BoldExtension,
   BulletListExtension,
   CodeBlockExtension,
   CodeExtension,
-  CollaborationExtension,
   DropCursorExtension,
   GapCursorExtension,
   HardBreakExtension,
@@ -27,7 +25,7 @@ import {
 } from 'remirror/extensions';
 
 export function Editor(props:{content:string}) {
-  const { manager, state, onChange, setState } = useRemirror({
+  const { manager, state, onChange } = useRemirror({
     extensions: () => [
       new BoldExtension({}),
       new ItalicExtension(),

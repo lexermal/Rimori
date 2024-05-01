@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import DocumentSelection from './components/DocumentSelection';
 import { FileUpload } from './components/FileUpload';
+import { useRouter } from 'next/navigation';
 
 const Page: React.FC = () => {
   const [documents, setDocuments] = useState<{ [key: string]: string[] }>({});
@@ -45,22 +46,22 @@ const Page: React.FC = () => {
 };
 
 function TrainingButtons({ selectedFile }: any) {
-  const enableButtons = selectedFile !== '';
+  // router for pushing to the next page
+  const router = useRouter();
 
-  console.log('enableButtons:', enableButtons);
   const buttons = [
     {
       text: 'Discussion',
-      onClick: () => console.log('Training button clicked'),
-      disabled: !enableButtons,
+      onClick: () => router.push(`/discussion?file=${selectedFile}`),
     },
     {
       text: 'Story',
-      onClick: () => console.log('Training button clicked'),
-      disabled: !enableButtons,
+      onClick: () => router.push(`/story?file=${selectedFile}`),
     },
-    // { text: 'Summary Creation', disabled: true },
-    // { text: 'Flashcard Generation', disabled: true },
+    {
+      text: 'Study Session',
+      onClick: () => router.push(`/study-session?file=${selectedFile}`),
+    },
   ];
 
   return (
@@ -69,7 +70,6 @@ function TrainingButtons({ selectedFile }: any) {
         <button
           key={index}
           className='bg-blue-500 hover:bg-blue-700 text-white font-bold text-xl py-8 px-12 rounded-lg border-2'
-          disabled={button.disabled}
           onClick={button.onClick}
         >
           {button.text}
