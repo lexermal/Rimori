@@ -53,7 +53,7 @@ function AccordionList({
         <div className='accordion-icon' onClick={() => setIsOpen(!isOpen)}>
           {items.length > 0 ? (
             <MyButton
-              titleSelected={selectionIndex === `${id}-title`}
+              titleSelected={selectionIndex === id}
               id={id}
               onSelected={(value:string) => onSelected(value)}
             />
@@ -63,7 +63,7 @@ function AccordionList({
         </div>
         <p
           className={`title cursor-pointer px-5 py-1 ${selectionIndex === `${id}-title` ? 'selected bg-blue-400 font-bold rounded-lg' : ''}`}
-          onClick={() => onSelected(`${id}-title`)}
+          onClick={() => onSelected(id)}
         >
           {title}
         </p>

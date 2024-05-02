@@ -187,7 +187,7 @@
     @apply w-full;
     text-align: left;
   }
-  th{
+  th {
     font-weight: normal;
   }
 }
@@ -197,5 +197,5 @@
 }
 
 .css-1lrqz9v .remirror-editor.ProseMirror {
- overflow-y: auto !important;
+  overflow-y: auto !important;
 }

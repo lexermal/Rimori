@@ -24,14 +24,16 @@ function model() {
     });
 }
 
+let pdffile = "";
+
 async function search({ context }: AgentContext): Promise<AgentContext> {
     // this function is based on https://js.langchain.com/docs/integrations/document_loaders/file_loaders/pdf
 
     // Load the PDF data
-    const pdfpath = "/home/mconvert/Code/RIAU-MVP/src/app/api/copilotkit/opposition/pdf-decision-making.pdf";
-    // console.log("pdfpath:", pdfpath);
+    // const pdfpath = "/home/mconvert/Code/RIAU-MVP/src/app/api/copilotkit/opposition/pdf-decision-making.pdf";
+    console.log("pdfpath:", pdffile);
 
-    const loader = new PDFLoader(pdfpath, {
+    const loader = new PDFLoader("/home/mconvert/Code/RIAU-MVP/assets/" + pdffile + ".pdf", {
         parsedItemSeparator: "",
     });
     const docs2 = await loader.load();
@@ -203,9 +205,9 @@ const workflow = new StateGraph({
     },
 });
 
-workflow.addNode("search", new RunnableLambda({ func: search }) );
-workflow.addNode("curate", new RunnableLambda({ func: curate }) );
-workflow.addNode("write", new RunnableLambda({ func: write }) );
+workflow.addNode("search", new RunnableLambda({ func: search }));
+workflow.addNode("curate", new RunnableLambda({ func: curate }));
+workflow.addNode("write", new RunnableLambda({ func: write }));
 workflow.addNode("critique", new RunnableLambda({ func: critique }));
 workflow.addNode("revise", new RunnableLambda({ func: revise }));
 
@@ -239,14 +241,16 @@ workflow.addEdge("revise", "critique");
 workflow.setEntryPoint("search");
 const app = workflow.compile();
 
-export async function researchWithLangGraph(topic: string) {
+export async function researchWithLangGraph(file: string, topic: string) {
+    pdffile = file;
+
     const inputs = {
         context: {
             topic,
         },
     };
     const result = await app.invoke(inputs);
-    const result2= result.context.article;
+    const result2 = result.context.article;
     console.log("--------------------")
     console.log("result:", result2);
     return result2;
