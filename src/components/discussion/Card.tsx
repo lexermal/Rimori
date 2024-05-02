@@ -12,7 +12,7 @@ export default function Card(props: Props): JSX.Element {
   return (
     <div
       className={
-        'max-w-sm rounded overflow-hidden shadow-lg ' +
+        'max-w-sm overflow-hidden shadow-lg bg-gray-400 p-3 rounded-lg ' +
         (props.success ? '' : 'cursor-pointer')
       }
       onClick={props.success ? undefined : props.onClick}
@@ -36,7 +36,7 @@ export default function Card(props: Props): JSX.Element {
         </div>
       )}
       <Image
-        className={'w-full' + (props.success ? ' opacity-50' : '')}
+        className={'w-full rounded-lg ' + (props.success ? ' opacity-50' : '')}
         src={props.src}
         alt='image'
         width={500}

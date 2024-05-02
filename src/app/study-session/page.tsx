@@ -56,10 +56,8 @@ function Assistent(props: { onToogle: (open: boolean) => void }) {
       />
     );
   };
-  {
-    /* @ts-ignore */
-  }
   return (
+    /* @ts-ignore */
     <div style={{ '--copilot-kit-primary-color': '#7D5BA6' }}>
       <CopilotSidebar
         key={7}

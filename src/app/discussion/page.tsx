@@ -15,23 +15,23 @@ interface Exam {
 }
 
 export default function Page(): JSX.Element {
-  const [showDiscussion, setShowDiscussion] = useState(3);
+  const [showDiscussion, setShowDiscussion] = useState(0);
   const [exams, setExams] = useState<Exam[]>([]);
 
   useEffect(() => {
     setExams([
-      {
-        examNr: 1,
-        passed: true,
-        reason: 'I understood the explanation',
-        improvementHints: 'none',
-      },
-      {
-        examNr: 2,
-        passed: false,
-        reason: 'I did not understand the explanation',
-        improvementHints: 'none',
-      },
+      // {
+      //   examNr: 1,
+      //   passed: true,
+      //   reason: 'I understood the explanation',
+      //   improvementHints: 'none',
+      // },
+      // {
+      //   examNr: 2,
+      //   passed: false,
+      //   reason: 'I did not understand the explanation',
+      //   improvementHints: 'none',
+      // },
     ]);
   }, []);
 
@@ -102,19 +102,17 @@ export default function Page(): JSX.Element {
   return (
     <CopilotKit url='/api/copilotkit/opposition'>
       <div>
-        <h1 className='text-center mt-20 mb-7'>Discussions</h1>
-        <p className='text-center mb-8'>
-          Now it's time to show what you're capable off! <br />
-          Here are 3 opponents. Your mission is to show that you understand your
-          subject!
+        <h1 className='text-center mb-3'>Time to shine</h1>
+        <p className='text-center mb-4'>
+          <b>Here are 3 opponents. Your mission is to beat them!</b>
         </p>
 
-        <div className='flex'>
+        <div className='flex mx-auto w-3/4'>
           {getPersonas('', '', '').map((persona, index) => {
             const exam = exams.filter((e) => e.examNr === index + 1);
 
             return (
-              <div className='w-1/3 bg-gray-400 p-5' key={index}>
+              <div className='w-full max-w-96 p-5' key={index}>
                 <Card
                   title={persona.name}
                   src={persona.image}
@@ -151,11 +149,11 @@ function getPersonas(
 ) {
   return [
     {
-      name: 'Leo',
-      discussionTitle: 'Leo the curious kid',
+      name: 'Leo (10)',
+      discussionTitle: 'Leo (10)',
       image: '/images/opponents/kid-1.webp',
       description:
-        "He heared the first time about your subject. It's confusing but he wants to undstand it. Can you explain it in easy terms?",
+        "He loves to tease people by asking tons of questions. Can you explain your topic in an way that he forgets his mission?",
       firstMessage: 'Leo is a student who wants to know everything.',
       instructions: `
     Context: You have a conversation with the user who should explain you a topic in easy terms.
@@ -173,11 +171,11 @@ function getPersonas(
     `,
     },
     {
-      name: 'Clarence',
+      name: 'Clarence (fixed mindset)',
       discussionTitle: 'Clarence with the fixed mindset',
       image: '/images/opponents/mindset-1.webp',
       description:
-        'He has a fixed oppinion about your subject that is outdated. Can you convince him how it really looks like?',
+        'He has a fixed oppinion but it\'s outdated. Can you convince him to check for himself that his oppinion is not valid anymore?',
       firstMessage:
         'Clarence has a fixed mindset and wants to know more about AI.',
       instructions: `
@@ -198,11 +196,11 @@ function getPersonas(
     `,
     },
     {
-      name: 'Elena',
+      name: 'Elena (entrepreneur)',
       discussionTitle: 'Elena the entrepreneur',
       image: '/images/opponents/inventor-1.webp',
       description:
-        'She is excited about your subject and thinks one step further. She wants to apply it in a different field. Can you explain her how it would be possible?',
+        'She is asking you for an advice on how to apply something in her setting. Can you explain her how it would be possible?',
       firstMessage: 'Elena is an entrepreneur and wants to know more about AI.',
       instructions:
         'Act as an entrepreneur. You just got to know AI can help prople to translate voice into text. Now you want to know how it can help your elderly equipment business. Anwer only questions related to your business. Your name is Elena.',
