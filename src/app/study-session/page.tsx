@@ -28,7 +28,7 @@ export default function Page() {
   return (
     <div>
       <Assistent onToogle={setAssistenIsOpen} />
-      <div className='fixed w-28 bottom-0 left-1'>
+      <div className='fixed w-28 bottom-1 left-1'>
         <PomodoroCounter onEnd={() => router.push('/go')} />
       </div>
       <div
@@ -61,6 +61,7 @@ function Assistent(props: { onToogle: (open: boolean) => void }) {
     <div style={{ '--copilot-kit-primary-color': '#7D5BA6' }}>
       <CopilotSidebar
         key={7}
+        labels={{title:"AI Assistent", initial:"Hey, let's study together. You memorize and I help you understand :)"}}
         defaultOpen={true}
         Input={CustomInput}
         clickOutsideToClose={false}
