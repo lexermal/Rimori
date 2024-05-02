@@ -17,7 +17,7 @@ export default function HomePage({ items, onSelected }: Props) {
   };
 
   return (
-    <div>
+    <div className='bg-gray-300 rounded-lg p-4'>
       {Object.keys(items).map((key, index) => (
         <AccordionList
           key={index}
@@ -62,7 +62,7 @@ function AccordionList({
           )}
         </div>
         <p
-          className={`title cursor-pointer px-5 py-1 ${selectionIndex === `${id}-title` ? 'selected bg-blue-600 font-bold rounded-lg' : ''}`}
+          className={`title cursor-pointer px-5 py-1 ${selectionIndex === `${id}-title` ? 'selected bg-blue-400 font-bold rounded-lg' : ''}`}
           onClick={() => onSelected(`${id}-title`)}
         >
           {title}

@@ -1,5 +1,5 @@
-import { createCanvas, Image } from 'canvas';
 import pdf2md from '@opendocsg/pdf2md';
+import { createCanvas, Image } from 'canvas';
 
 // needed for pdf2md
 (global as any).window = {
@@ -15,13 +15,10 @@ import pdf2md from '@opendocsg/pdf2md';
   },
 };
 
+import fs from 'fs';
+import { writeFile } from "fs/promises";
 import { NextResponse } from "next/server";
 import path from "path";
-import { writeFile } from "fs/promises";
-
-import fs from 'fs';
-// import { NextApiRequest, NextApiResponse } from 'next';
-// import path from 'path';
 
 export const POST = async (req: any) => {
   const formData = await req.formData();
@@ -48,12 +45,7 @@ export const POST = async (req: any) => {
     }
   }
 
-  //list all files in the directory
-  const allFiles = fs.readdirSync(path.join(process.cwd(), "assets/"))
-    .map((file) => {
-      return file.substring(0, file.lastIndexOf("."));
-    });
-  return NextResponse.json({ Message: "Success", status: 201, files: filenames, allFiles });
+  return NextResponse.json({ Message: "Success", status: 201, files: filenames, allFiles:getAllFiles() });
 };
 
 
@@ -89,6 +81,8 @@ async function convert(filePath: string) {
 
 
 import { OpenAI } from 'openai';
+import { get } from 'remirror';
+import { getAllFiles } from '../files/route';
 
 async function improveTextWithAI(unpretty_markdown_text: string) {
   const systemPrompt = "Format and send the text entered by the user in an easy-to-read Markdown format. Make use of headings and lists. Do not change the content.";

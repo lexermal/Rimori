@@ -6,7 +6,7 @@ import { Avatar, Dropdown, Navbar } from "flowbite-react";
 export function CustomNavbar() {
   return (
     <Navbar  rounded className="fixed w-full top-0" >
-      <Navbar.Brand href="/go">
+      <Navbar.Brand href="/go?empty">
         <div className="mr-3 h-20 w-40 overflow-hidden fixed " style={{
           backgroundImage: 'url("/logo.svg")',
           backgroundSize: '320px',
