@@ -50,7 +50,9 @@ function VoiceRecorder(props: Props) {
     // play the blob
     const audioUrl = URL.createObjectURL(audioBlob);
     const audio = new Audio(audioUrl);
-    audio.play();
+    //TODO: improve audio recording
+    // disabled audio play for demo
+    // audio.play();
   };
 
   function triggerChunkFetching() {

@@ -46,7 +46,7 @@ export default function CustomMessages({
     if (!enableVoice) return;
 
     const assistentMessages = messages.filter(
-      (message) => message.role === 'assistant',
+      (message) => message.role === 'assistant'
     );
 
     const lastMessage =
@@ -82,7 +82,7 @@ export default function CustomMessages({
   function sendMessage(lastMessage: string, everything = false) {
     let newSubstring = lastMessage.replace(
       prefLastAssistentMessage.current || '',
-      '',
+      ''
     );
 
     if (everything) {
@@ -100,6 +100,13 @@ export default function CustomMessages({
     //check if newSubstring constains a sentence ending like . or ! or ?
     //if it does, send each part separately
     const parts2 = newSubstring.split(/(?<=[.?!])/);
+    if (parts2.length > 1) {
+      console.log('found sentence ending, will send parts separately');
+      //send a break before the next part
+      // shit it makes such a difference now the voice sounds smooth!!!
+      parts2[2] = parts2[1];
+      parts2[1] = '   ';
+    }
     parts2.forEach((part) => {
       tts?.sendMessage(part);
     });
