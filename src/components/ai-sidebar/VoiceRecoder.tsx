@@ -7,6 +7,7 @@ interface Props {
 
 let mediaRecorder: MediaRecorder;
 let audioChunks: { data: Blob; timespamp: number }[] = [];
+let speechEventHandler: hark.Harker;
 
 function VoiceRecorder(props: Props) {
   const [isRecording, setIsRecording] = useState(false);
@@ -22,7 +23,7 @@ function VoiceRecorder(props: Props) {
     console.log('Recording stopped.');
     const startTimestamp = voiceStartTimestampRef.current;
     const startChunkIndex = audioChunks.findIndex(
-      (chunk) => chunk.timespamp > startTimestamp,
+      (chunk) => chunk.timespamp > startTimestamp
     );
     console.log('Start chunk index: ', startChunkIndex);
     console.log('Audio chunks amount: ', audioChunks.length);
@@ -62,7 +63,7 @@ function VoiceRecorder(props: Props) {
     }, 100);
   }
 
-  const startRecording = async () => {
+  const startRecordingSession = async () => {
     console.log('Start recording...');
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     mediaRecorder = new MediaRecorder(stream, {
@@ -70,6 +71,8 @@ function VoiceRecorder(props: Props) {
       audioBitsPerSecond: 128000,
     });
     const speechEvents = hark(stream, { interval: 50 });
+
+    speechEventHandler = speechEvents;
 
     speechEvents.on('speaking', () => {
       console.log('Speaking...');
@@ -95,21 +98,32 @@ function VoiceRecorder(props: Props) {
     triggerChunkFetching();
   };
 
-  const stopRecording = () => {
-    console.log('Stop recording...');
-    if (mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
-    }
+  const stopRecordingSession = () => {
+    console.log('Stop recording session...');
+    speechEventHandler.stop();
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach((track) => {
+      track.stop();
+    });
+    mediaRecorder.ondataavailable = null;
+
     setIsRecording(false);
   };
 
   return (
     <div>
-      <button onClick={startRecording} disabled={isRecording}>
-        Start Recording
-      </button>
-      <button onClick={stopRecording} disabled={!isRecording}>
-        Stop Recording
+      <button
+        onClick={isRecording ? stopRecordingSession : startRecordingSession}
+      >
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          viewBox='0 0 384 512'
+          className='h-6 mr-2'
+          style={{ fill: isRecording ? 'red' : 'black' }}
+        >
+          {/* <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
+          <path d='M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z' />
+        </svg>
       </button>
     </div>
   );
