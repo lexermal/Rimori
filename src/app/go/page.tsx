@@ -68,16 +68,16 @@ function TrainingButtons({ selectedFile }: any) {
 
   const buttons = [
     {
-      text: 'Discussion',
+      text: 'Study Session',
+      onClick: () => router.push(`/study-session?file=${selectedFile}`),
+    },
+    {
+      text: 'Opposition',
       onClick: () => router.push(`/discussion?file=${selectedFile}`),
     },
     {
       text: 'Story',
       onClick: () => router.push(`/story?file=${selectedFile}`),
-    },
-    {
-      text: 'Study Session',
-      onClick: () => router.push(`/study-session?file=${selectedFile}`),
     },
   ];
 
