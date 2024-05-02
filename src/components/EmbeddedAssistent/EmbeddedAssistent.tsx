@@ -67,12 +67,8 @@ function renderMessageReceiver(enableVoice: boolean, CustomMessageComponent: Rea
     return (props3: MessagesProps) => <CustomMessageComponent {...props3} />;
   }
   
-  if (!enableVoice) {
-    return undefined;
-  }
-
   return (props3: MessagesProps) => (
-    <CustomMessages inProgress={props3.inProgress} messages={props3.messages} />
+    <CustomMessages inProgress={props3.inProgress} messages={props3.messages} enableVoice={enableVoice} />
   );
 }
 

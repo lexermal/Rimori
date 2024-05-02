@@ -16,6 +16,10 @@ export default function RootLayout({
 }) {
   return (
     <html>
+      <head>
+        <title>RIAU</title>
+        <link rel='icon' href='/favicon.ico' />
+      </head>
       <body>
         <CustomNavbar />
         <div className='h-28'>

@@ -128,8 +128,8 @@ export default function Page(): JSX.Element {
                   <EmbeddedAssistent
                     id='discussion_assistant'
                     //temporarely disabled
-                    instructions={""}
-                    // instructions={persona.instructions}
+                    // instructions={""}
+                    instructions={persona.instructions}
                     firstMessage={persona.firstMessage}
                     enableVoice={true}
                   />
@@ -172,7 +172,7 @@ function getPersonas(
     },
     {
       name: 'Clarence (fixed mindset)',
-      discussionTitle: 'Clarence with the fixed mindset',
+      discussionTitle: 'Clarence (fixed mindset)',
       image: '/images/opponents/mindset-1.webp',
       description:
         'He has a fixed oppinion but it\'s outdated. Can you convince him to check for himself that his oppinion is not valid anymore?',
