@@ -1,4 +1,5 @@
 import { Remirror, ThemeProvider, useRemirror } from '@remirror/react';
+import { AllStyledComponent } from '@remirror/styles/emotion';
 import {
   BlockquoteExtension,
   BoldExtension,
@@ -24,7 +25,9 @@ import {
   UnderlineExtension,
 } from 'remirror/extensions';
 
-export function Editor(props:{content:string}) {
+// import 'remirror/styles/all.css';
+
+export function Editor(props: { content: string }) {
   const { manager, state, onChange } = useRemirror({
     extensions: () => [
       new BoldExtension({}),
@@ -32,7 +35,7 @@ export function Editor(props:{content:string}) {
       new UnderlineExtension(),
       new StrikeExtension(),
       new CodeExtension(),
-      new HeadingExtension({ levels: [1, 2, 3,4,5]}),
+      new HeadingExtension({ levels: [1, 2, 3, 4, 5] }),
       new BulletListExtension({}),
       new OrderedListExtension(),
       new ListItemExtension({}),
@@ -48,24 +51,24 @@ export function Editor(props:{content:string}) {
       new DropCursorExtension({}),
       new PlaceholderExtension({}),
       new HistoryExtension({}),
-    //   new CollaborationExtension({}),
+      //   new CollaborationExtension({}),
       new MarkdownExtension({}),
-    //   new BaseKeymapExtension(),
+      //   new BaseKeymapExtension(),
     ],
     content: props.content,
     stringHandler: 'markdown',
-
   });
 
   return (
-    <ThemeProvider className='bg-blue-300' >
-      <Remirror
-        manager={manager}
-        state={state}
-        onChange={onChange}
-        autoRender='start'
-        
-      />
-    </ThemeProvider>
+    <AllStyledComponent>
+      <ThemeProvider className='bg-blue-300'>
+        <Remirror
+          manager={manager}
+          state={state}
+          onChange={onChange}
+          autoRender='start'
+        />
+      </ThemeProvider>
+    </AllStyledComponent>
   );
 }

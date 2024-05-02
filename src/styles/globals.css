@@ -42,9 +42,7 @@
   }
 
   .cursor-newtab {
-    cursor:
-      url('/images/new-tab.png') 10 10,
-      pointer;
+    cursor: url('/images/new-tab.png') 10 10, pointer;
   }
 
   /* #region  /**=========== Typography =========== */
@@ -102,12 +100,8 @@
         var(--color-primary-400),
         var(--color-primary-500)
       );
-    background-size:
-      100% 2px,
-      0 2px;
-    background-position:
-      100% 100%,
-      0 100%;
+    background-size: 100% 2px, 0 2px;
+    background-position: 100% 100%, 0 100%;
     background-repeat: no-repeat;
   }
   @media (prefers-reduced-motion: no-preference) {
@@ -119,8 +113,89 @@
   }
   .animated-underline:hover,
   .animated-underline:focus-visible {
-    background-size:
-      0 2px,
-      100% 2px;
+    background-size: 0 2px, 100% 2px;
   }
+}
+
+.remirror-theme {
+  /* overwrite tailwindcss defaults for how markdown should be formatted */
+  @apply text-base text-gray-700;
+
+  h1 {
+    @apply text-3xl font-bold;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold;
+  }
+
+  h3 {
+    @apply text-xl font-semibold;
+  }
+
+  h4,
+  h5,
+  h6 {
+    @apply text-lg font-medium;
+  }
+
+  * {
+    p {
+      margin-bottom: 10px !important;
+    }
+  }
+
+  a {
+    @apply text-blue-500 underline;
+  }
+
+  blockquote {
+    @apply border-l-4 border-gray-200 pl-4 italic;
+  }
+
+  ul,
+  ol {
+    padding-left: 2rem;
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  li {
+    @apply my-0; /* reset vertical margins */
+  }
+
+  li > p {
+    @apply my-0; /* reset vertical margins */
+  }
+
+  code {
+    @apply p-1 bg-gray-200 rounded text-sm;
+  }
+
+  pre {
+    @apply p-4 bg-gray-200 rounded text-sm overflow-auto;
+  }
+
+  img {
+    @apply mx-auto;
+  }
+
+  table {
+    @apply w-full;
+    text-align: left;
+  }
+  th{
+    font-weight: normal;
+  }
+}
+
+.css-1lrqz9v .remirror-theme .ProseMirror {
+  box-shadow: none !important;
+}
+
+.css-1lrqz9v .remirror-editor.ProseMirror {
+ overflow-y: auto !important;
 }

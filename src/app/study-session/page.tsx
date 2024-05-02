@@ -35,6 +35,9 @@ export default function Page() {
         style={{
           width: `calc(100% - ${assistenIsOpen ? 500 : 80}px)`,
           marginRight: assistenIsOpen ? 500 : 'auto',
+          height: "550px",
+          overflowY: "auto",
+          marginTop: "60px",
         }}
         className='p-4 mt-8 max-w-3xl mx-auto'
       >
