@@ -6,7 +6,7 @@ import * as React from 'react';
 export default function HomePage() {
   //forward to /go
   React.useEffect(() => {
-    window.location.href = '/go';
+    window.location.href = '/go?empty';
   }, []);
   return (
     <main>

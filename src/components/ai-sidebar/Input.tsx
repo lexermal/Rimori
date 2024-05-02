@@ -13,7 +13,8 @@ export const Input = React.memo(
     onSend,
     children,
     isVisible = false,
-  }: InputProps & { id: string }) => {
+    otherFeatures = undefined,
+  }: InputProps & { id: string; otherFeatures?: React.JSX.Element }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { subscribe, publish } = useGlobalContext();
 
@@ -37,7 +38,7 @@ export const Input = React.memo(
 
         textareaRef.current?.focus();
       },
-      [text, inProgress, onSend],
+      [text, inProgress, onSend]
     );
 
     useEffect(() => {
@@ -55,10 +56,9 @@ export const Input = React.memo(
                 clearInterval(interval);
                 unsubscribe();
               }
-            }
-            , 1000);
+            }, 1000);
           }, 1000);
-        },
+        }
       ) as Destructor;
 
       // Unsubscribe when the component unmounts
@@ -81,6 +81,7 @@ export const Input = React.memo(
     return (
       <div className='copilotKitInput' onClick={handleDivClick}>
         <span>{children}</span>
+        {otherFeatures}
         <VoiceRecorder
           onVoiceRecorded={(m: string) => {
             sendRef.current?.(m);
@@ -98,7 +99,7 @@ export const Input = React.memo(
           placeholder='Type a message...'
           autoFocus={true}
           maxRows={5}
-          // value={text}
+          value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
@@ -109,5 +110,5 @@ export const Input = React.memo(
         />
       </div>
     );
-  },
+  }
 );
