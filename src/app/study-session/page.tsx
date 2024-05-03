@@ -83,6 +83,11 @@ async function getContent() {
     return '';
   }
 
+  if(fileName==="new"){
+    // now file
+    return "";
+  }
+
   const response = await fetch(
     `/api/markdown?filename=${encodeURIComponent(
       fileName.replace('-title', '')

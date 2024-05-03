@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 interface Props {
   items: { [key: string]: string[] };
   onSelected: (id: string) => void;
+  onNewDocument: () => void;
 }
 
-export default function HomePage({ items, onSelected }: Props) {
+export default function HomePage({ items, onSelected, onNewDocument }: Props) {
   const [openAccordion, setOpenAccordion] = useState('');
   const [selectedEntry, setSelectedEntry] = useState('');
 
@@ -29,6 +30,9 @@ export default function HomePage({ items, onSelected }: Props) {
           id={key}
         />
       ))}
+      <button onClick={onNewDocument}>
+        <i>Create new document</i>
+      </button>
     </div>
   );
 }
@@ -55,14 +59,18 @@ function AccordionList({
             <MyButton
               titleSelected={selectionIndex === id}
               id={id}
-              onSelected={(value:string) => onSelected(value)}
+              onSelected={(value: string) => onSelected(value)}
             />
           ) : (
             ''
           )}
         </div>
         <p
-          className={`title cursor-pointer px-5 py-1 ${selectionIndex === `${id}-title` ? 'selected bg-blue-400 font-bold rounded-lg' : ''}`}
+          className={`title cursor-pointer px-5 py-1 ${
+            selectionIndex === id
+              ? 'selected bg-blue-400 font-bold rounded-lg'
+              : ''
+          }`}
           onClick={() => onSelected(id)}
         >
           {title}
@@ -74,7 +82,9 @@ function AccordionList({
           return (
             <p
               key={index}
-              className={`entry ${selectionIndex === entryID ? 'selected bg-blue-600' : ''}`}
+              className={`entry ${
+                selectionIndex === entryID ? 'selected bg-blue-600' : ''
+              }`}
               onClick={() => onSelected(entryID)}
             >
               {item}
@@ -86,16 +96,11 @@ function AccordionList({
   );
 }
 
-function MyButton({
-  titleSelected,
-  onSelected,
-  id,
-}: any
-) {
+function MyButton({ titleSelected, onSelected, id }: any) {
   return (
     <p
       className={`title ${titleSelected ? 'selected bg-blue-600' : ''}`}
-      onClick={() => onSelected(`${id}-title`)}
+      onClick={() => onSelected(id)}
     >
       (toggle icon here)
     </p>

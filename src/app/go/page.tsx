@@ -11,6 +11,8 @@ const Page: React.FC = () => {
 
   const [selectedFile, setSelectedFile] = useState<string>('');
 
+  const router=useRouter();
+
   useEffect(() => {
     //page might have set parameter ?empty  if not set load files from /api/files
     if (window.location.search !== '?empty') {
@@ -49,6 +51,7 @@ const Page: React.FC = () => {
           <DocumentSelection
             onSelected={(id) => setSelectedFile(id)}
             items={documents}
+            onNewDocument={()=>router.push("/study-session?file=new")}
           />
         )}
         <p className='mt-2 text-gray-400 font-bold'>
