@@ -1,5 +1,6 @@
 'use client';
 
+import { Spinner } from 'flowbite-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -8,10 +9,11 @@ import { FileUpload } from './components/FileUpload';
 
 const Page: React.FC = () => {
   const [documents, setDocuments] = useState<{ [key: string]: string[] }>({});
+  const [loading, setLoading] = useState(true);
 
   const [selectedFile, setSelectedFile] = useState<string>('');
 
-  const router=useRouter();
+  const router = useRouter();
 
   useEffect(() => {
     //page might have set parameter ?empty  if not set load files from /api/files
@@ -24,13 +26,21 @@ const Page: React.FC = () => {
             newDocuments[file] = [];
           });
           setDocuments(newDocuments);
+          setLoading(false);
         });
+    } else {
+      setLoading(false);
     }
   }, []);
 
   return (
     <div className='pb-40'>
-      {Object.keys(documents).length === 0 && (
+      {loading && (
+        <div className='text-center'>
+          <Spinner className='h-24 w-24 mt-64' />
+        </div>
+      )}
+      {Object.keys(documents).length === 0 && !loading && (
         <FileUpload
           onFileUpload={() => true}
           onFilesUploaded={(fileNames) => {
@@ -43,22 +53,22 @@ const Page: React.FC = () => {
           }}
         />
       )}
-      <div className='w-2/4 mx-auto'>
-        <h2 className='text-center mb-3'>
+      <div className='w-2/4 mx-auto pt-28'>
+        <h2 className='text-center mb-5'>
           {Object.keys(documents).length === 0 ? '' : 'Study documents'}
         </h2>
         {Object.keys(documents).length > 0 && (
           <DocumentSelection
             onSelected={(id) => setSelectedFile(id)}
             items={documents}
-            onNewDocument={()=>router.push("/study-session?file=new")}
+            onNewDocument={() => router.push('/study-session?file=new')}
           />
         )}
-        <p className='mt-2 text-gray-400 font-bold'>
+        {/* <p className='mt-2 text-gray-400 font-bold'>
           {Object.keys(documents).length === 0
             ? ''
             : 'Select one document to start training!'}
-        </p>
+        </p> */}
       </div>
       {selectedFile && <TrainingButtons selectedFile={selectedFile} />}
     </div>
