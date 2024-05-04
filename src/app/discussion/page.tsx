@@ -19,9 +19,9 @@ export default function Page(): JSX.Element {
   const [exams, setExams] = useState<Exam[]>([]);
   const [file, setFile] = useState('');
   const [topics, setTopics] = useState({
-    kid: [] as string[],
-    oldy: [] as string[],
-    visionary: [] as string[],
+    kid: [] as Instructions[],
+    oldy: [] as Instructions[],
+    visionary: [] as Instructions[],
   });
 
   useEffect(() => {
@@ -149,7 +149,10 @@ export default function Page(): JSX.Element {
                     onClose={() => setShowDiscussion(0)}
                   >
                     {topics.kid.length === 0 ? (
-                      <p>Loading...</p>
+                      <p className='text-center mt-52 mb-52 font-bold'>
+                        You opponent is getting ready. <br /> Be prepared for
+                        tough discussion!
+                      </p>
                     ) : (
                       <EmbeddedAssistent
                         id='discussion_assistant'
@@ -169,11 +172,23 @@ export default function Page(): JSX.Element {
     </CopilotKit>
   );
 }
+
+interface Instructions {
+  topic: string;
+  firstMessage: string;
+}
+
 function getPersonas(
-  kidTopic: string,
-  mindsetTopic: string,
-  entrepreneurTopic: string
+  kid: Instructions,
+  oldy: Instructions,
+  visionary: Instructions
 ) {
+  if (!kid) {
+    kid = { firstMessage: '', topic: '' };
+    oldy = { firstMessage: '', topic: '' };
+    visionary = { firstMessage: '', topic: '' };
+  }
+
   return [
     {
       name: 'Leo (10)',
@@ -181,11 +196,11 @@ function getPersonas(
       image: '/images/opponents/kid-1.webp',
       description:
         'He loves to tease people by asking tons of questions. Can you explain your topic in an way that he forgets his mission?',
-      firstMessage: kidTopic,
+      firstMessage: kid.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should explain you a topic in easy terms.
     Your Persona: Act as a happy currious 6 years old kid who wants to know everything about the topic.
-    Topic: "${kidTopic}". 
+    Topic: "${kid.topic}". 
     Goal: 
     - Before the conversation starts you research the topic.
     - After 10 messages assess if the user explained it in easy terms or not by calling the action "explanationUnderstood" and tell the user if you understood it or not.
@@ -204,11 +219,11 @@ function getPersonas(
       image: '/images/opponents/mindset-1.webp',
       description:
         "He has a fixed oppinion but it's outdated. Can you convince him to check for himself that his oppinion is not valid anymore?",
-      firstMessage: mindsetTopic,
+      firstMessage: oldy.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should convince you to change your oppinion about a topic.
     Your Persona: Act as a old guy with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it.
-    Your Oppinion: "${mindsetTopic}". 
+    Your Oppinion: "${oldy.topic}". 
     Goal: 
     - After 10 messages assess if the user managed you to change your oppinion or not by calling the action "oppinionChanged" and tell the user if you changed your oppinion.
     - If the user explained something right about the topic challenge him with your arguments to explain more about the topic.
@@ -227,11 +242,11 @@ function getPersonas(
       image: '/images/opponents/inventor-1.webp',
       description:
         'She is asking you for an advice on how to apply something in her setting. Can you explain her how it would be possible?',
-      firstMessage: entrepreneurTopic,
+      firstMessage: visionary.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should convince you to change your oppinion about a topic.
     Your Persona: Act as a old guy with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it.
-    Your Oppinion: "${entrepreneurTopic}". 
+    Your Oppinion: "${visionary.topic}". 
     Goal: 
     - After 10 messages assess if the user managed you to change your oppinion or not by calling the action "oppinionChanged" and tell the user if you changed your oppinion.
     - If the user explained something right about the topic challenge him with your arguments to explain more about the topic.

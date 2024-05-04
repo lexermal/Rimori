@@ -14,9 +14,11 @@ export interface MessagesProps {
   onlyShowLastAssistantMessage?: boolean;
   spinner?: React.ReactNode;
   enableVoice?: boolean;
+  initialMessage?: string;
 }
 
 export default function CustomMessages({
+  initialMessage,
   messages,
   inProgress,
   hideUserMessages,
@@ -41,6 +43,16 @@ export default function CustomMessages({
   useEffect(() => {
     scrollToBottom();
   }, [messages, inProgress]);
+
+  if (initialMessage) {
+    messages = [
+      {
+        id: 'initial-1',
+        role: 'assistant' as any,
+        content: initialMessage!,
+      },
+    ].concat(messages);
+  }
 
   useEffect(() => {
     if (!enableVoice) return;

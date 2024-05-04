@@ -195,9 +195,9 @@ async function getData(file: string) {
 
     let fileContent = await getFileContent(file);
     //replace all markdown images
-    fileContent=fileContent.replaceAll(/!\[.*\]\(.*\)/g, "");
+    fileContent = fileContent.replaceAll(/!\[.*\]\(.*\)/g, "");
     //replace all html images
-    fileContent=fileContent.replaceAll(/<img.*>/g, "");
+    fileContent = fileContent.replaceAll(/<img.*>/g, "");
 
     const completion = await openai.chat.completions.create({
         messages: [
@@ -225,6 +225,7 @@ async function getData(file: string) {
     - Oldy: The question should be skeptical and savage.
     - Visionary: The question should be curious and innovative. The new setting should be a concrete example of how the concept can be applied.
     
+    For every persona, you should provide 1 question.
     
     The instructions should be clear and concise. `
             },
@@ -236,5 +237,7 @@ async function getData(file: string) {
         model: "gpt-4-1106-preview",
         response_format: { type: "json_object" }
     });
-    return JSON.parse(completion.choices[0].message.content!);
+    return JSON.parse(completion.choices[0].message.content!
+        .replaceAll("opposition_starting_text", "firstMessage")
+        .replaceAll("opposition_win_instructions", "topic"));
 }

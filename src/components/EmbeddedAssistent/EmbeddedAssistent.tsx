@@ -14,7 +14,7 @@ const EmbeddedAssistent = (props: {
   customMessageComponent?: React.ComponentType<MessagesProps>;
 }): JSX.Element => {
   const [voiceEnabled, setVoiceEnabled] = React.useState(false);
-  console.log('voiceEnabled: ', voiceEnabled);
+  // console.log('voiceEnabled: ', voiceEnabled);
   return (
     <div>
       <CopilotSidebar
@@ -38,7 +38,8 @@ const EmbeddedAssistent = (props: {
         )}
         Messages={renderMessageReceiver(
           voiceEnabled,
-          props.customMessageComponent
+          props.customMessageComponent,
+          props.firstMessage && props.firstMessage
         )}
         hitEscapeToClose={false}
         clickOutsideToClose={false}
@@ -90,17 +91,21 @@ function RenderSpeaker(props: {
 
 function renderMessageReceiver(
   enableVoice: boolean,
-  CustomMessageComponent: React.ComponentType<MessagesProps> | undefined
+  CustomMessageComponent: React.ComponentType<MessagesProps> | undefined,
+  initialMessage?: string
 ) {
   if (CustomMessageComponent) {
-    return (props3: MessagesProps) => <CustomMessageComponent {...props3} />;
+    return (props: MessagesProps) => (
+      <CustomMessageComponent initialMessage={initialMessage} {...props} />
+    );
   }
 
-  return (props3: MessagesProps) => (
+  return (props: MessagesProps) => (
     <CustomMessages
-      inProgress={props3.inProgress}
-      messages={props3.messages}
+      inProgress={props.inProgress}
+      messages={props.messages}
       enableVoice={enableVoice}
+      initialMessage={initialMessage}
     />
   );
 }
