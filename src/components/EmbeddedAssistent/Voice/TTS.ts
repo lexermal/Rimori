@@ -2,7 +2,9 @@ import ChunkedAudioPlayer from "./Player";
 
 export enum VoiceId {
     OLD_MAN = "t0jbNlBVZ17f02VDIeMI",
+    KID = "jBpfuIE2acCO8z3wKNLl",
     // Add more voice IDs here...
+    VISIONARY = "TBD"
 }
 
 export default class TTS {

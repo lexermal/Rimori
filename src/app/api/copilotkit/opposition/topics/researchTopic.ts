@@ -204,7 +204,7 @@ async function getData(file: string) {
             {
                 "role": "system", "content": `Your goal is to prepare guiding questions for an opposition between a student an AI.
             The AI takes in 2 different personas and the student has to beat them:
-            - Kid: 6 years old, loves to tease people by asking tons of questions. The student should explain a topic in an way that the kid forgets to tease the student.
+            - Kid: 10 years old, loves to tease people by asking tons of questions. The student should explain a concept in an way that the kid forgets to tease the student.
             - Oldy: 70 years old, has a fixed mindset and believes that he knows everything. The student should explain a topic in a way that the oldy is convinced that he is wrong.
             - Visionary: Wants to know how a concept can be applied in a different setting. The student should explain a topic in a way that the visionary is convinced that the concept can be applied in a different setting.
 
@@ -221,7 +221,7 @@ async function getData(file: string) {
     }
 
     The question should sound like the opponent is asking it which means:
-    - Kid: The question should be playful and teasing from a 6 year old. It uses the vocabulary of a 6 year old.
+    - Kid: The question should be be about a concept using vocabulary of a 10 year old and being missunderstood by the kid.
     - Oldy: The oppinion should very savage, be about a big concept of the summary and end with a thetorical question.
     - Visionary: The question should be curious and innovative. The new setting should be a concrete example of how the concept can be applied.
     

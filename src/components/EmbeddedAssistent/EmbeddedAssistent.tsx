@@ -8,6 +8,7 @@ import styles from './EmbeddedAssistent.module.css';
 import { Input } from '@/components/ai-sidebar/Input';
 
 import CustomMessages, { MessagesProps } from './CustomMessages';
+import { VoiceId } from './Voice/TTS';
 
 const EmbeddedAssistent = (props: {
   id: string;
@@ -15,6 +16,7 @@ const EmbeddedAssistent = (props: {
   firstMessage?: string;
   customMessageComponent?: React.ComponentType<MessagesProps>;
   actions?: FrontendAction[];
+  voiceId?: VoiceId;
 }): JSX.Element => {
   const [voiceEnabled, setVoiceEnabled] = React.useState(true);
   // console.log('voiceEnabled: ', voiceEnabled);
@@ -49,7 +51,8 @@ const EmbeddedAssistent = (props: {
         Messages={renderMessageReceiver(
           voiceEnabled,
           props.customMessageComponent,
-          props.firstMessage && props.firstMessage
+          props.firstMessage && props.firstMessage,
+          props.voiceId
         )}
         hitEscapeToClose={false}
         clickOutsideToClose={false}
@@ -102,7 +105,8 @@ function RenderSpeaker(props: {
 function renderMessageReceiver(
   enableVoice: boolean,
   CustomMessageComponent: React.ComponentType<MessagesProps> | undefined,
-  initialMessage?: string
+  initialMessage?: string,
+  voiceId?: VoiceId
 ) {
   if (CustomMessageComponent) {
     return (props: MessagesProps) => (
@@ -116,6 +120,7 @@ function renderMessageReceiver(
       messages={props.messages}
       enableVoice={enableVoice}
       initialMessage={initialMessage}
+      voiceId={voiceId}
     />
   );
 }

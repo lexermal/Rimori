@@ -8,6 +8,7 @@ import DiscussionPopup from '../../components/discussion/DiscussionPopup';
 import EmbeddedAssistent from '../../components/EmbeddedAssistent/EmbeddedAssistent';
 import { FrontendAction } from '@copilotkit/react-core/dist/types/frontend-action';
 import { set } from 'zod';
+import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 
 interface Exam {
   examNr: number;
@@ -80,13 +81,28 @@ export default function Page(): JSX.Element {
         },
       ],
       handler: async (params: any) => {
-        const newExam = {
-          examNr: 1,
-          passed: params.explanationUnderstood,
-          reason: params.explanation,
-          improvementHints: params.improvementHints,
-        };
-        setExams([...exams, newExam]);
+        console.log('params of explanationUnderstood Result: ', params);
+
+        //temporary disabled failing for demo purposes
+        if (params.explanationUnderstood) {
+          const newExam = {
+            examNr: 1,
+            passed: true,
+            reason: params.explanation,
+            improvementHints: params.improvementHints,
+          };
+          setExams([...exams, newExam]);
+        }
+        // const newExam = {
+        //   examNr: 1,
+        //   passed: params.explanationUnderstood,
+        //   reason: params.explanation,
+        //   improvementHints: params.improvementHints,
+        // };
+        // setExams([...exams, newExam]);
+        setTimeout(() => {
+          setShowDiscussion(0);
+        }, 20000);
       },
     },
     {
@@ -112,13 +128,24 @@ export default function Page(): JSX.Element {
       ],
       handler: async (params: any) => {
         console.log('params of oppinionChanged Result: ', params);
-        const newExam = {
-          examNr: 2,
-          passed: params.studentKnowsTopic,
-          reason: params.explanation,
-          improvementHints: params.improvementHints,
-        };
-        setExams([...exams, newExam]);
+
+        //temporary disabled failing for demo purposes
+        if (params.studentKnowsTopic) {
+          const newExam = {
+            examNr: 3,
+            passed: true,
+            reason: params.explanation,
+            improvementHints: params.improvementHints,
+          };
+          setExams([...exams, newExam]);
+        }
+        // const newExam = {
+        //   examNr: 2,
+        //   passed: params.studentKnowsTopic,
+        //   reason: params.explanation,
+        //   improvementHints: params.improvementHints,
+        // };
+        // setExams([...exams, newExam]);
         setTimeout(() => {
           setShowDiscussion(0);
         }, 20000);
@@ -166,6 +193,7 @@ export default function Page(): JSX.Element {
                         // instructions={''}
                         instructions={persona.instructions}
                         firstMessage={persona.firstMessage}
+                        voiceId={persona.voiceId}
                       />
                     )}
                   </DiscussionPopup>
@@ -199,30 +227,36 @@ function getPersonas(
     {
       name: 'Leo (10)',
       discussionTitle: 'Leo (10)',
+      voiceId: VoiceId.KID,
       image: '/images/opponents/kid-1.webp',
       description:
         'He loves to tease people by asking tons of questions. Can you explain your topic in an way that he forgets his mission?',
       firstMessage: kid.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should explain you a topic in easy terms.
-    Your Persona: Act as a happy currious 6 years old kid who wants to know everything about the topic.
+    Your Persona: Act as a little brat who is 10 years old and wants to tease people through asking many stupid questions.
     Topic: "${kid.topic}". 
     Goal: 
-    - Before the conversation starts you research the topic.
-    - After 10 messages assess if the user explained it in easy terms or not by calling the action "explanationUnderstood" and tell the user if you understood it or not.
+    - After 10 messages call the action "explanationUnderstood" and tell the user if their formulations were understandable and entertaining.
+    - If the user explained something right about the topic challenge him with your arguments to explain more about the topic.
+    - The earliest you call the function, if the user is on the right track, is after 5 messages.
+    - Whenever the user is on the right track, tease him.
+    - If the user manages to explain the concept right and entertaining, call the function "explanationUnderstood" and tell the user you understand and found it entertaining.
     Restrictions: 
-    - Not answering any questions connected with the topic.
-    - Not explaining anything, only asking questions that help clarifying the context.
-    - If the user uses terms a 6 years old kid wouldn't understand, tell you understand these complicated words.
-    - You are now allowed to fall out of the role of a 6 years old kid.
-    - If the user returns short answers, ask for more details. If he still doesn't provide enough information, he failed the explanation.
-    - Don't help the user to explain the topic. Tell them as 6 year old kid you don't know it but hoped they could explain it to you.
-    - Your answers are not allowed to be longer then 100 words.
+    - Not answering any questions not related to the topic.
+    - Not explaining anything apart from your oppinion on the topic.
+    - If the user insults you he failed the conversation. Trigger the function "explanationUnderstood" and tell them to come back when he is majour enough and that you thought grown ups are smarter after more then 13 years of education.
+    - You are now allowed to fall out of the role of a young kid who loves to tease people.
+    - Your answers are not allowed to be longer then 80 words.
+    - If the user uses terms a 10 years old kid wouldn't understand, tell you understand these complicated words.
+    - Don't help the user to explain the topic. Tell them as 10 year old kid you don't know it but they as adults should have learned in their 13 years of education.
+    - Your answers are not allowed to be longer then 80 words.
     `,
     },
     {
       name: 'Clarence (fixed mindset)',
       discussionTitle: 'Clarence (fixed mindset)',
+      voiceId: VoiceId.OLD_MAN,
       image: '/images/opponents/mindset-1.webp',
       description:
         "He has a fixed oppinion but it's outdated. Can you convince him to check for himself that his oppinion is not valid anymore?",
@@ -249,6 +283,7 @@ function getPersonas(
     {
       name: 'Elena (entrepreneur)',
       discussionTitle: 'Elena the entrepreneur',
+      voiceId: VoiceId.VISIONARY,
       image: '/images/opponents/inventor-1.webp',
       description:
         'She is asking you for an advice on how to apply something in her setting. Can you explain her how it would be possible?',

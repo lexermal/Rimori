@@ -15,6 +15,7 @@ export interface MessagesProps {
   spinner?: React.ReactNode;
   enableVoice?: boolean;
   initialMessage?: string;
+  voiceId?: VoiceId;
 }
 
 export default function CustomMessages({
@@ -26,6 +27,7 @@ export default function CustomMessages({
   onlyShowLastAssistantMessage,
   spinner,
   enableVoice,
+  voiceId,
 }: MessagesProps) {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const [tts, setTTS] = React.useState<TTS | null>(null);
@@ -43,6 +45,10 @@ export default function CustomMessages({
   useEffect(() => {
     scrollToBottom();
   }, [messages, inProgress]);
+
+  if (enableVoice && !voiceId) {
+    throw new Error('VoiceId is required when enableVoice is true');
+  }
 
   if (initialMessage) {
     messages = [
@@ -65,7 +71,7 @@ export default function CustomMessages({
       assistentMessages[assistentMessages.length - 1]?.content;
 
     if (inProgress && !tts) {
-      TTS.createAsync(VoiceId.OLD_MAN).then((tts) => {
+      TTS.createAsync(voiceId!).then((tts) => {
         console.log('TTS created');
         setTTS(tts);
       });
