@@ -12,7 +12,7 @@ export async function GET(req: NextApiRequest, res: NextApiResponse) {
     }
 
     try {
-        return NextResponse.json(getFileContent(file));
+        return NextResponse.json({ data: await getFileContent(file) });
     } catch (err: any) {
         return NextResponse.json({ error: err.message });
     }

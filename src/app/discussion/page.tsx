@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import Card from '../../components/discussion/Card';
 import DiscussionPopup from '../../components/discussion/DiscussionPopup';
 import EmbeddedAssistent from '../../components/EmbeddedAssistent/EmbeddedAssistent';
+import { FrontendAction } from '@copilotkit/react-core/dist/types/frontend-action';
+import { set } from 'zod';
 
 interface Exam {
   examNr: number;
@@ -56,71 +58,74 @@ export default function Page(): JSX.Element {
     ]);
   }, []);
 
-  useCopilotAction({
-    name: 'explanationUnderstood',
-    description: 'Evaluate the explanation of a topic in easy terms.',
-    parameters: [
-      {
-        name: 'explanationUnderstood',
-        type: 'boolean',
-        description: 'if the explanation was understood',
+  const actions = [
+    {
+      name: 'explanationUnderstood',
+      description: 'Evaluate the explanation of a topic in easy terms.',
+      parameters: [
+        {
+          name: 'explanationUnderstood',
+          type: 'boolean',
+          description: 'if the explanation was understood',
+        },
+        {
+          name: 'explanation',
+          type: 'string',
+          description: 'the explanation why it was understood or not',
+        },
+        {
+          name: 'improvementHints',
+          type: 'string',
+          description: 'hints for improvement',
+        },
+      ],
+      handler: async (params: any) => {
+        const newExam = {
+          examNr: 1,
+          passed: params.explanationUnderstood,
+          reason: params.explanation,
+          improvementHints: params.improvementHints,
+        };
+        setExams([...exams, newExam]);
       },
-      {
-        name: 'explanation',
-        type: 'string',
-        description: 'the explanation why it was understood or not',
-      },
-      {
-        name: 'improvementHints',
-        type: 'string',
-        description: 'hints for improvement',
-      },
-    ],
-    handler: async (params: any) => {
-      const newExam = {
-        examNr: 1,
-        passed: params.explanationUnderstood,
-        reason: params.explanation,
-        improvementHints: params.improvementHints,
-      };
-      setExams([...exams, newExam]);
     },
-  });
-
-  useCopilotAction({
-    name: 'oppinionChanged',
-    description: 'Evaluate if the user managed to change your oppinion.',
-    parameters: [
-      {
-        name: 'studentKnowsTopic',
-        type: 'boolean',
-        description:
-          'if the student knows the topic in depth and explained it right',
+    {
+      name: 'oppinionChanged',
+      description: 'Evaluate if the user managed to change your oppinion.',
+      parameters: [
+        {
+          name: 'studentKnowsTopic',
+          type: 'boolean',
+          description:
+            'if the student knows the topic in depth and explained it right',
+        },
+        {
+          name: 'explanation',
+          type: 'string',
+          description: 'the explanation why the oppinion was changed or not',
+        },
+        {
+          name: 'improvementHints',
+          type: 'string',
+          description: 'hints for improvement',
+        },
+      ],
+      handler: async (params: any) => {
+        console.log('params of oppinionChanged Result: ', params);
+        const newExam = {
+          examNr: 2,
+          passed: params.studentKnowsTopic,
+          reason: params.explanation,
+          improvementHints: params.improvementHints,
+        };
+        setExams([...exams, newExam]);
+        setTimeout(() => {
+          setShowDiscussion(0);
+        }, 20000);
       },
-      {
-        name: 'explanation',
-        type: 'string',
-        description: 'the explanation why the oppinion was changed or not',
-      },
-      {
-        name: 'improvementHints',
-        type: 'string',
-        description: 'hints for improvement',
-      },
-    ],
-    handler: async (params: any) => {
-      console.log('params of oppinionChanged Result: ', params);
-      const newExam = {
-        examNr: 1,
-        passed: params.studentKnowsTopic,
-        reason: params.explanation,
-        improvementHints: params.improvementHints,
-      };
-      setExams([...exams, newExam]);
     },
-  });
+  ] as unknown as FrontendAction[];
 
-  console.log('file', file);
   return (
     <CopilotKit url='/api/copilotkit/opposition' headers={{ file }}>
       <div>
@@ -151,13 +156,14 @@ export default function Page(): JSX.Element {
                     {topics.kid.length === 0 ? (
                       <p className='text-center mt-52 mb-52 font-bold'>
                         You opponent is getting ready. <br /> Be prepared for
-                        tough discussion!
+                        a tough discussion!
                       </p>
                     ) : (
                       <EmbeddedAssistent
                         id='discussion_assistant'
+                        actions={actions}
                         //temporarely disabled
-                        // instructions={""}
+                        // instructions={''}
                         instructions={persona.instructions}
                         firstMessage={persona.firstMessage}
                       />
@@ -211,6 +217,7 @@ function getPersonas(
     - You are now allowed to fall out of the role of a 6 years old kid.
     - If the user returns short answers, ask for more details. If he still doesn't provide enough information, he failed the explanation.
     - Don't help the user to explain the topic. Tell them as 6 year old kid you don't know it but hoped they could explain it to you.
+    - Your answers are not allowed to be longer then 100 words.
     `,
     },
     {
@@ -222,18 +229,21 @@ function getPersonas(
       firstMessage: oldy.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should convince you to change your oppinion about a topic.
-    Your Persona: Act as a old guy with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it.
+    Your Persona: Act as a old guy with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it. You love to roast the user.
     Your Oppinion: "${oldy.topic}". 
     Goal: 
-    - After 10 messages assess if the user managed you to change your oppinion or not by calling the action "oppinionChanged" and tell the user if you changed your oppinion.
+    - After 10 messages call the action "oppinionChanged" and tell the user if you changed your oppinion.
     - If the user explained something right about the topic challenge him with your arguments to explain more about the topic.
     - The earliest you call the function, if the user is on the right track, is after 5 messages.
+    - Whenever the user is on the right track, roast him with your arguments.
+    - If the user manages to change your oppinion, call the function "oppinionChanged" and tell the user you changed your oppinion.
     Restrictions: 
     - Not answering any questions not related to the topic.
     - Not explaining anything apart from your oppinion on the topic.
     - If the user says your oppinion is wrong he failed the conversation. Trigger the function "oppinionChanged". Then tell him to come back when he is majour enough.
     - You are now allowed to fall out of the role of a old guy with a fixed mindset.
     - Don't help the user to explain the  topic. Tell them they should have done their homework before coming here. 
+    - Your answers are not allowed to be longer then 80 words.
     `,
     },
     {

@@ -18,7 +18,7 @@ export default function Page() {
 
   useEffect(() => {
     setWebSiteLoaded(true);
-    getContent().then((value) => setContent(value));
+      getContent().then((value) => setContent(value));
   }, []);
 
   if (!webSiteLoaded) {
@@ -35,9 +35,9 @@ export default function Page() {
         style={{
           width: `calc(100% - ${assistenIsOpen ? 500 : 80}px)`,
           marginRight: assistenIsOpen ? 500 : 'auto',
-          height: "550px",
-          overflowY: "auto",
-          marginTop: "60px",
+          height: '550px',
+          overflowY: 'auto',
+          marginTop: '60px',
         }}
         className='p-4 mt-8 max-w-3xl mx-auto'
       >
@@ -64,7 +64,11 @@ function Assistent(props: { onToogle: (open: boolean) => void }) {
     <div style={{ '--copilot-kit-primary-color': '#7D5BA6' }}>
       <CopilotSidebar
         key={7}
-        labels={{title:"AI Assistent", initial:"Hey, let's study together. You memorize and I help you understand :)"}}
+        labels={{
+          title: 'AI Assistent',
+          initial:
+            "Hey, let's study together. You memorize and I help you understand :)",
+        }}
         defaultOpen={true}
         Input={CustomInput}
         clickOutsideToClose={false}
@@ -83,15 +87,13 @@ async function getContent() {
     return '';
   }
 
-  if(fileName==="new"){
+  if (fileName === 'new') {
     // now file
-    return "";
+    return '';
   }
 
   const response = await fetch(
-    `/api/markdown?filename=${encodeURIComponent(
-      fileName.replace('-title', '')
-    )}`
+    `/api/markdown?filename=${encodeURIComponent(fileName)}`
   );
 
   if (!response.ok) {

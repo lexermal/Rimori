@@ -1,3 +1,5 @@
+import { useCopilotAction } from '@copilotkit/react-core';
+import { FrontendAction } from '@copilotkit/react-core/dist/types/frontend-action';
 import { CopilotSidebar } from '@copilotkit/react-ui';
 import React from 'react';
 
@@ -12,9 +14,17 @@ const EmbeddedAssistent = (props: {
   instructions: string;
   firstMessage?: string;
   customMessageComponent?: React.ComponentType<MessagesProps>;
+  actions?: FrontendAction[];
 }): JSX.Element => {
-  const [voiceEnabled, setVoiceEnabled] = React.useState(false);
+  const [voiceEnabled, setVoiceEnabled] = React.useState(true);
   // console.log('voiceEnabled: ', voiceEnabled);
+
+  props.actions &&
+    props.actions.forEach((action) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      useCopilotAction(action);
+    });
+
   return (
     <div>
       <CopilotSidebar

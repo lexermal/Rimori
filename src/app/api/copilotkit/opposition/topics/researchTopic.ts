@@ -222,7 +222,7 @@ async function getData(file: string) {
 
     The question should sound like the opponent is asking it which means:
     - Kid: The question should be playful and teasing from a 6 year old. It uses the vocabulary of a 6 year old.
-    - Oldy: The question should be skeptical and savage.
+    - Oldy: The oppinion should very savage, be about a big concept of the summary and end with a thetorical question.
     - Visionary: The question should be curious and innovative. The new setting should be a concrete example of how the concept can be applied.
     
     For every persona, you should provide 1 question.
@@ -230,7 +230,7 @@ async function getData(file: string) {
     The instructions should be clear and concise. `
             },
             {
-                "role": "user", "content": `Here is a list of source information to curate from:
+                "role": "user", "content": `Here is a summary to curate from:
             ${fileContent}`
             },
         ],
