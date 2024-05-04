@@ -7,10 +7,10 @@ export async function GET(req: NextRequest) {
     const { query } = parse(req.url, true);
     const { file, topic } = query;
 
-    const data = fakeResponses[file as string] as any;
-    if (data) {
-        return NextResponse.json(data);
-    }
+    // const data = fakeResponses[file as string] as any;
+    // if (data) {
+    //     return NextResponse.json(data);
+    // }
     return NextResponse.json(await getTopics(file!.toString(), topic!.toString()));
 };
 
