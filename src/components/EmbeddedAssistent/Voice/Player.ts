@@ -5,6 +5,7 @@ export default class ChunkedAudioPlayer {
     private chunkSplit: number[] = [];
     private currentChunkIndex = 0;
     private isPlaying = false;
+    private chunksReceived = 0;
 
     constructor() {
         this.audioContext = new AudioContext();
@@ -13,12 +14,13 @@ export default class ChunkedAudioPlayer {
     async addChunk(chunk: ArrayBufferLike, chunkSplit: number[]): Promise<void> {
         this.chunkQueue.push(chunk);
         this.chunkSplit = chunkSplit;
+        this.chunksReceived++;
 
         if (this.chunkQueue.length >= this.chunkSplit[this.currentChunkIndex]) {
             const combinedBuffer = await this.combineChunks();
             this.combinedChunks.push(combinedBuffer);
             this.currentChunkIndex++;
-            if (!this.isPlaying) {
+            if (!this.isPlaying && this.chunksReceived >= 5) {
                 this.playChunks();
             }
         }
@@ -36,10 +38,10 @@ export default class ChunkedAudioPlayer {
             console.log('Playing chunk ' + this.combinedChunks.length);
             this.isPlaying = true;
             // setTimeout(() => {
-                this.playChunk(this.combinedChunks.shift()!).then(() => {
-                    this.isPlaying = false;
-                    this.playChunks();
-                });
+            this.playChunk(this.combinedChunks.shift()!).then(() => {
+                this.isPlaying = false;
+                this.playChunks();
+            });
             // }, 500); // Delay of 100ms
         }
     }
