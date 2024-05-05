@@ -4,7 +4,7 @@ export enum VoiceId {
     OLD_MAN = "t0jbNlBVZ17f02VDIeMI",
     KID = "jBpfuIE2acCO8z3wKNLl",
     // Add more voice IDs here...
-    VISIONARY = "TBD"
+    VISIONARY = "EXAVITQu4vr4xnSDxMaL"
 }
 
 export default class TTS {

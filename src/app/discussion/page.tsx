@@ -1,14 +1,14 @@
 'use client';
 
-import { CopilotKit, useCopilotAction } from '@copilotkit/react-core';
+import { CopilotKit } from '@copilotkit/react-core';
+import { FrontendAction } from '@copilotkit/react-core/dist/types/frontend-action';
 import { useEffect, useState } from 'react';
+
+import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 
 import Card from '../../components/discussion/Card';
 import DiscussionPopup from '../../components/discussion/DiscussionPopup';
 import EmbeddedAssistent from '../../components/EmbeddedAssistent/EmbeddedAssistent';
-import { FrontendAction } from '@copilotkit/react-core/dist/types/frontend-action';
-import { set } from 'zod';
-import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 
 interface Exam {
   examNr: number;
@@ -16,6 +16,8 @@ interface Exam {
   reason: string;
   improvementHints: string;
 }
+
+let currentlyFetchingTopics = false;
 
 export default function Page(): JSX.Element {
   const [showDiscussion, setShowDiscussion] = useState(0);
@@ -32,6 +34,10 @@ export default function Page(): JSX.Element {
       new URLSearchParams(window.location.search).get('file') || '';
     setFile(filename);
 
+    if (currentlyFetchingTopics) {
+      return;
+    }
+    currentlyFetchingTopics = true;
     fetch(`/api/copilotkit/opposition/topics?file=${filename}&topic=ai`)
       .then((res) => res.json())
       .then((data) => {
@@ -39,6 +45,9 @@ export default function Page(): JSX.Element {
       })
       .catch((err) => {
         console.error(err);
+      })
+      .finally(() => {
+        currentlyFetchingTopics = false;
       });
   }, []);
 
@@ -132,6 +141,54 @@ export default function Page(): JSX.Element {
         //temporary disabled failing for demo purposes
         if (params.studentKnowsTopic) {
           const newExam = {
+            examNr: 2,
+            passed: true,
+            reason: params.explanation,
+            improvementHints: params.improvementHints,
+          };
+          setExams([...exams, newExam]);
+        }
+        // const newExam = {
+        //   examNr: 2,
+        //   passed: params.studentKnowsTopic,
+        //   reason: params.explanation,
+        //   improvementHints: params.improvementHints,
+        // };
+        // setExams([...exams, newExam]);
+        setTimeout(() => {
+          setShowDiscussion(0);
+        }, 20000);
+      },
+    },
+    {
+      name: 'conceptApplied',
+      description:
+        'Evaluate if the user managed to apply the concept in the given setting.',
+      parameters: [
+        {
+          name: 'studentKnowsTopic',
+          type: 'boolean',
+          description:
+            'if the student knows the topic in depth and explained it right',
+        },
+        {
+          name: 'explanation',
+          type: 'string',
+          description:
+            'the explanation how well or not he applied the concept in the setting',
+        },
+        {
+          name: 'improvementHints',
+          type: 'string',
+          description: 'hints for improvement',
+        },
+      ],
+      handler: async (params: any) => {
+        console.log('params of oppinionChanged Result: ', params);
+
+        //temporary disabled failing for demo purposes
+        if (params.studentKnowsTopic) {
+          const newExam = {
             examNr: 3,
             passed: true,
             reason: params.explanation,
@@ -182,8 +239,8 @@ export default function Page(): JSX.Element {
                   >
                     {topics.kid.length === 0 ? (
                       <p className='text-center mt-52 mb-52 font-bold'>
-                        You opponent is getting ready. <br /> Be prepared for
-                        a tough discussion!
+                        You opponent is getting ready. <br /> Be prepared for a
+                        tough discussion!
                       </p>
                     ) : (
                       <EmbeddedAssistent
@@ -276,34 +333,35 @@ function getPersonas(
     - Not explaining anything apart from your oppinion on the topic.
     - If the user says your oppinion is wrong he failed the conversation. Trigger the function "oppinionChanged". Then tell him to come back when he is majour enough.
     - You are now allowed to fall out of the role of a old guy with a fixed mindset.
-    - Don't help the user to explain the  topic. Tell them they should have done their homework before coming here. 
+    - Don't help the user to explain the topic. Tell them they should have done their homework before coming here. 
     - Your answers are not allowed to be longer then 80 words.
     `,
     },
     {
-      name: 'Elena (entrepreneur)',
-      discussionTitle: 'Elena the entrepreneur',
+      name: 'Elena (visionary)',
+      discussionTitle: 'Elena (visionary)',
       voiceId: VoiceId.VISIONARY,
       image: '/images/opponents/inventor-1.webp',
       description:
-        'She is asking you for an advice on how to apply something in her setting. Can you explain her how it would be possible?',
+        'She is asking you for an advice on how to apply a concept in her setting. Can you explain her how it would be possible?',
       firstMessage: visionary.firstMessage,
       instructions: `
-    Context: You have a conversation with the user who should convince you to change your oppinion about a topic.
-    Your Persona: Act as a old guy with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it.
-    Your Oppinion: "${visionary.topic}". 
+    Context: You have a conversation with the user who should explain you detailed how a topic can be applied in a different setting.
+    Your Persona: Act as a 35 year old woman who inspires people to think out of the box and has a natural charm.
+    The Topic and setting: "${visionary.topic}". 
     Goal: 
-    - After 10 messages assess if the user managed you to change your oppinion or not by calling the action "oppinionChanged" and tell the user if you changed your oppinion.
-    - If the user explained something right about the topic challenge him with your arguments to explain more about the topic.
-    - The earliest you call the function, if the user is on the right track, is after 5 messages.
+    - After 10 messages assess if the user managed to explain well how the concept can be applied in the setting by calling the action "conceptApplied" and tell the user if you are now convinced that the concept can work in the provided setting.
+    - If the user explained something right about the topic talk about it a bit as if you understood now and then ask 1 question further to deep dive into how the concept can be applied in the setting. Sound exciting.
+    - The earliest you call the function is after 5 messages.
     Restrictions: 
     - Not answering any questions not related to the topic.
-    - Not explaining anything apart from your oppinion on the topic.
-    - If the user says your oppinion is wrong he failed the conversation. Trigger the function "oppinionChanged". Then tell him to come back when he is majour enough.
-    - You are now allowed to fall out of the role of a old guy with a fixed mindset.
-    - Don't help the user to explain the  topic. Tell them they should have done their homework before coming here. 
+    - Not explaining anything apart from the setting in which you want the concept to be applied.
+    - If the user says applying it is not possible he failed the conversation. Trigger the function "conceptApplied". Then tell him to come back when he did his homework.
+    - You are now allowed to fall out of the role of a 35 year old woman who is a inspireing visionary.
+    - Don't help the user to explain the topic. Tell them they should have done their homework before coming here. 
+    - Your answers are not allowed to be longer then 80 words.
+    - You are now allowed to ask more then two questions per response.
     `,
-      // 'Act as an entrepreneur. You just got to know AI can help prople to translate voice into text. Now you want to know how it can help your elderly equipment business. Anwer only questions related to your business. Your name is Elena.',
     },
   ];
 }

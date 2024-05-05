@@ -204,9 +204,9 @@ async function getData(file: string) {
             {
                 "role": "system", "content": `Your goal is to prepare guiding questions for an opposition between a student an AI.
             The AI takes in 2 different personas and the student has to beat them:
-            - Kid: 10 years old, loves to tease people by asking tons of questions. The student should explain a concept in an way that the kid forgets to tease the student.
-            - Oldy: 70 years old, has a fixed mindset and believes that he knows everything. The student should explain a topic in a way that the oldy is convinced that he is wrong.
-            - Visionary: Wants to know how a concept can be applied in a different setting. The student should explain a topic in a way that the visionary is convinced that the concept can be applied in a different setting.
+            - Kid: called Leo, 10 years old, loves to tease people by asking tons of questions. The student should explain a concept in an way that the kid forgets to tease the student.
+            - Oldy: called Clarance, 70 years old, has a fixed mindset and believes that he knows everything. The student should explain a topic in a way that the oldy is convinced that he is wrong.
+            - Visionary: Called Elena. Wants to know how a concept can be applied in a different setting. The student should explain a topic in a way that the visionary is convinced that the concept can be applied in a different setting.
 
      Your sole task is to go through the provided information and create the guiding questions needed for the oppositions a JSON list of strings
      in this format:
@@ -219,6 +219,8 @@ async function getData(file: string) {
      ...
     ]
     }
+
+    The opposition_starting_text is the sentence opening a conversation and the question or statement the kid will ask. Open the conversation with an introduction about yourself and then everything else. Explain the setting a bit.
 
     The question should sound like the opponent is asking it which means:
     - Kid: The question should be be about a concept using vocabulary of a 10 year old and being missunderstood by the kid.
