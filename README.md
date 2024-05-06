@@ -1,12 +1,20 @@
 # RIAU MVP
 
+## Current PDF to markdown conversion
+
+1. Upload the PDF to the server
+2. Open pdf in word
+3. Save as doc
+4. Convert with https://word2md.com/
+5. Copy the markdown to the markdown file
+
 ## Todo
 
 * Audio recording works well at beginning but is cut off when I say a second sentence after a pause.
 
 ## Possible future features
-* Simulations where students can simulate their knowledge based on the content they have learned through stories where they can make decisions and see the consequences of their decisions.
 
+* Simulations where students can simulate their knowledge based on the content they have learned through stories where they can make decisions and see the consequences of their decisions.
 * Studyplan creation
 * Flashcards
 * Plugin system
