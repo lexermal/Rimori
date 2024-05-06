@@ -1,4 +1,9 @@
-import { Remirror, ThemeProvider, useRemirror } from '@remirror/react';
+import {
+  MarkdownToolbar,
+  Remirror,
+  ThemeProvider,
+  useRemirror,
+} from '@remirror/react';
 import { AllStyledComponent } from '@remirror/styles/emotion';
 import {
   BlockquoteExtension,
@@ -66,8 +71,10 @@ export function Editor(props: { content: string }) {
           manager={manager}
           state={state}
           onChange={onChange}
-          autoRender='start'
-        />
+          autoRender='end'
+        >
+          <MarkdownToolbar  />
+        </Remirror>
       </ThemeProvider>
     </AllStyledComponent>
   );
