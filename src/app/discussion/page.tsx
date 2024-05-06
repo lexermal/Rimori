@@ -256,8 +256,8 @@ export default function Page(): JSX.Element {
                       />
                     </a>
                     {topics.kid.length === 0 ? (
-                      <p className='text-center mt-52 mb-52 font-bold'>
-                        <Spinner size={'xl'} />
+                      <p className='text-center pt-48 pb-48 font-bold'>
+                        <Spinner size="xl"  className='mb-4'/>
                         <br />
                         Your opponent is getting ready.
                       </p>
