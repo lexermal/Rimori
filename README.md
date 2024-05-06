@@ -18,9 +18,8 @@
   * Click on text in assistent to copy it
   * Create flashcard option
   * After pomodoro session the user gets asked what they learned and the AI will create a flashcard for them
-  * Formatting buttons for editable text
   * PDF to MD conversion with images being included and their information being stored in the image tag
   * AI assistent accessing the internet for finding useful websites/videos
   * Selection of other files study session
   * Automatic scientific paper summary creation
-  
+* Implement markdown editor how it should be https://remirror.io/docs/showcase/markdown/ 
