@@ -238,11 +238,28 @@ export default function Page(): JSX.Element {
                     title={persona.discussionTitle}
                     onClose={() => setShowDiscussion(0)}
                   >
+                    <div
+                      className='mr-3 h-20 w-40 overflow-hidden fixed rounded-lg m-2'
+                      style={{
+                        backgroundImage: 'url("/logo.svg")',
+                        backgroundSize: '320px',
+                        backgroundPosition: 'center',
+                        backgroundColor: 'white',
+                        top: '0',
+                        left: '0',
+                      }}
+                    ></div>
+                    <a target='_blank' href='https://riau.fuca-prime.se'>
+                      <img
+                        src='/qr.png'
+                        className=' h-36 fixed right-2 top-2 rounded-lg'
+                      />
+                    </a>
                     {topics.kid.length === 0 ? (
                       <p className='text-center mt-52 mb-52 font-bold'>
-                        <Spinner size={"xl"} />
+                        <Spinner size={'xl'} />
                         <br />
-                        Your opponent is getting ready. 
+                        Your opponent is getting ready.
                       </p>
                     ) : (
                       <EmbeddedAssistent
