@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
 import { CopilotSidebar } from '@copilotkit/react-ui';
+import { Spinner } from 'flowbite-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -17,12 +18,18 @@ export default function Page() {
   const router = useRouter();
 
   useEffect(() => {
-    setWebSiteLoaded(true);
-      getContent().then((value) => setContent(value));
+    getContent().then((value) => {
+      setWebSiteLoaded(true);
+      setContent(value);
+    });
   }, []);
 
   if (!webSiteLoaded) {
-    return <div></div>;
+    return (
+      <div className='mx-auto w-20 mt-72'>
+        <Spinner size={'xl'} />
+      </div>
+    );
   }
 
   return (
@@ -35,11 +42,12 @@ export default function Page() {
         style={{
           width: `calc(100% - ${assistenIsOpen ? 500 : 80}px)`,
           marginRight: assistenIsOpen ? 500 : 'auto',
-          height: '550px',
+          height: '680px',
           overflowY: 'auto',
-          marginTop: '60px',
+          padding: '5px',
+          boxShadow:"0px 0px 25px 11px rgba(0,0,0,0.27)"
         }}
-        className='p-4 mt-8 max-w-3xl mx-auto'
+        className='p-4 max-w-3xl mx-auto rounded-lg overflow-hidden'
       >
         <Editor content={content} key={content.substring(0, 10)} />
       </div>
