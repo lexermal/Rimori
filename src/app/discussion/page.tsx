@@ -9,6 +9,7 @@ import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 import Card from '../../components/discussion/Card';
 import DiscussionPopup from '../../components/discussion/DiscussionPopup';
 import EmbeddedAssistent from '../../components/EmbeddedAssistent/EmbeddedAssistent';
+import { Spinner } from 'flowbite-react';
 
 interface Exam {
   examNr: number;
@@ -239,8 +240,9 @@ export default function Page(): JSX.Element {
                   >
                     {topics.kid.length === 0 ? (
                       <p className='text-center mt-52 mb-52 font-bold'>
-                        You opponent is getting ready. <br /> Be prepared for a
-                        tough discussion!
+                        <Spinner size={"xl"} />
+                        <br />
+                        Your opponent is getting ready. 
                       </p>
                     ) : (
                       <EmbeddedAssistent

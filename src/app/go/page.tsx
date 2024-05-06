@@ -107,7 +107,7 @@ function TrainingButtons({ selectedFile }: any) {
       ))}
       <button
         key={5}
-        className='bg-blue-500 text-white font-bold text-lg py-4 px-10 rounded-lg border-2'
+        className='bg-blue-500 text-white font-bold text-lg py-4 px-10 rounded-lg border-2 cursor-not-allowed'
         style={{ height: '95px' }}
         disabled={true}
       >

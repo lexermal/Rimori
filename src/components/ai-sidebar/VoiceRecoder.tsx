@@ -72,29 +72,39 @@ function VoiceRecorder(props: Props) {
       mimeType: 'audio/webm',
       audioBitsPerSecond: 128000,
     });
-    const speechEvents = hark(stream, { interval: 50 });
+    //increased interval from 50 for demo
+    const speechEvents = hark(stream, { interval: 150 });
 
     speechEventHandler = speechEvents;
+    //TODO: improve recording by also allowing continuous chitchatting with assistent without stoping hark
+    //The lines in this function are disabled for demo and allow a push to talk recording with automatic stopping, also a convinient feature
 
-    speechEvents.on('speaking', () => {
-      console.log('Speaking...');
+    // speechEvents.on('speaking', () => {
+    console.log('Speaking...');
 
-      if (mediaRecorder.state === 'inactive') {
-        mediaRecorder.start();
-      }
+    if (mediaRecorder.state === 'inactive') {
+      mediaRecorder.start();
+    }
 
-      voiceStartTimestampRef.current = Date.now();
-      console.log('Voice start timestamp: ', voiceStartTimestampRef);
-    });
+    voiceStartTimestampRef.current = Date.now();
+    console.log('Voice start timestamp: ', voiceStartTimestampRef);
+    // });
     speechEvents.on('stopped_speaking', () => {
       console.log('Silence detected...');
       if (mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
+
+        //temporary stop recording for demo
+        //TODO improve recording
+        setTimeout(() => {
+          stopRecordingSession();
+          console.log('Recording stopped...');
+        }, 500);
       }
     });
     mediaRecorder.ondataavailable = handleDataAvailable;
     mediaRecorder.onstop = handleStop;
-    mediaRecorder.start();
+    // mediaRecorder.start();
     setIsRecording(true);
 
     triggerChunkFetching();
@@ -110,6 +120,7 @@ function VoiceRecorder(props: Props) {
     mediaRecorder.ondataavailable = null;
 
     setIsRecording(false);
+    audioChunks = [];
   };
 
   return (
