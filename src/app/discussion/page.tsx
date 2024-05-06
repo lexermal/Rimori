@@ -306,7 +306,7 @@ function getPersonas(
       voiceId: VoiceId.KID,
       image: '/images/opponents/kid-1.webp',
       description:
-        'He loves to tease people by asking tons of questions. Can you explain your topic in an way that he forgets his mission?',
+        'He loves to tease people by asking tons of questions. Can you explain your topic in a way that he forgets his mission?',
       firstMessage: kid.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should explain you a topic in easy terms.
@@ -335,7 +335,7 @@ function getPersonas(
       voiceId: VoiceId.OLD_MAN,
       image: '/images/opponents/mindset-1.webp',
       description:
-        "He has a fixed oppinion but it's outdated. Can you convince him to check for himself that his oppinion is not valid anymore?",
+        "He has a fixed opinion, but it's outdated. Can you convince him to check if his opinion is still valid?",
       firstMessage: oldy.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should convince you to change your oppinion about a topic.
@@ -362,7 +362,7 @@ function getPersonas(
       voiceId: VoiceId.VISIONARY,
       image: '/images/opponents/inventor-1.webp',
       description:
-        'She is asking you for an advice on how to apply a concept in her setting. Can you explain her how it would be possible?',
+        'She is asking you for advice on how to apply a concept in her setting. Can you explain to her how it would be possible?',
       firstMessage: visionary.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should explain you detailed how a topic can be applied in a different setting.

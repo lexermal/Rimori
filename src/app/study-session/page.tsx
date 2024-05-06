@@ -13,7 +13,7 @@ import PomodoroCounter from './components/PomodoroCounter';
 
 export default function Page() {
   const [webSiteLoaded, setWebSiteLoaded] = useState(false);
-  const [assistenIsOpen, setAssistenIsOpen] = useState(true);
+  const [assistantIsOpen, setAssistantIsOpen] = useState(true);
   const [content, setContent] = useState<string>('');
   const router = useRouter();
 
@@ -34,14 +34,14 @@ export default function Page() {
 
   return (
     <div>
-      <Assistent onToogle={setAssistenIsOpen} />
+      <Assistant onToogle={setAssistantIsOpen} />
       <div className='fixed w-28 bottom-1 left-1'>
         <PomodoroCounter onEnd={() => router.push('/go')} />
       </div>
       <div
         style={{
-          width: `calc(100% - ${assistenIsOpen ? 500 : 80}px)`,
-          marginRight: assistenIsOpen ? 500 : 'auto',
+          width: `calc(100% - ${assistantIsOpen ? 500 : 80}px)`,
+          marginRight: assistantIsOpen ? 500 : 'auto',
           height: '680px',
           overflowY: 'auto',
           padding: '5px',
@@ -55,7 +55,7 @@ export default function Page() {
   );
 }
 
-function Assistent(props: { onToogle: (open: boolean) => void }) {
+function Assistant(props: { onToogle: (open: boolean) => void }) {
   const CustomInput = (props: any) => {
     return (
       <Input
@@ -73,7 +73,7 @@ function Assistent(props: { onToogle: (open: boolean) => void }) {
       <CopilotSidebar
         key={7}
         labels={{
-          title: 'AI Assistent',
+          title: 'AI Assistant',
           initial:
             "Hey, let's study together. You memorize and I help you understand :)",
         }}
