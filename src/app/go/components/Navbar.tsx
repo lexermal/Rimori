@@ -5,7 +5,7 @@ import { Avatar, Dropdown, Navbar } from 'flowbite-react';
 export function CustomNavbar() {
   return (
     <Navbar rounded className='fixed w-full top-0'>
-      <Navbar.Brand href='/go?empty'>
+      <Navbar.Brand href='/go'>
         <div
           className='mr-3 h-20 w-40 overflow-hidden fixed '
           style={{
@@ -22,7 +22,7 @@ export function CustomNavbar() {
         {/* <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span> */}
       </Navbar.Brand>
       <div className='flex md:order-2 mb-16'>
-        <a href='https://riau.fuca-prime.se'>
+        <a target='_blank' href='https://riau.fuca-prime.se'>
           <img src='/qr.png' className=' h-36 fixed right-2 top-2 rounded-lg' />
         </a>
         {/* <Dropdown
@@ -49,12 +49,12 @@ export function CustomNavbar() {
           Home
         </Navbar.Link> */}
         <Navbar.Link href='/go'>Study</Navbar.Link>
-        <Navbar.Link
+        {/* <Navbar.Link
           target='_blank'
           href='http://www.educationplanner.org/students/self-assessments/learning-styles'
         >
           Study Type
-        </Navbar.Link>
+        </Navbar.Link> */}
         <Navbar.Link disabled href='#'>
           Plan your study
         </Navbar.Link>

@@ -88,10 +88,10 @@ function TrainingButtons({ selectedFile }: any) {
       text: 'Opposition',
       onClick: () => router.push(`/discussion?file=${selectedFile}`),
     },
-    {
-      text: 'Story',
-      onClick: () => router.push(`/story?file=${selectedFile}`),
-    },
+    // {
+    //   text: 'Story',
+    //   onClick: () => router.push(`/story?file=${selectedFile}`),
+    // },
   ];
 
   return (
@@ -111,7 +111,7 @@ function TrainingButtons({ selectedFile }: any) {
         style={{ height: '95px' }}
         disabled={true}
       >
-        Summary Creation <br /> (Coming Soon)
+        Story <br /> (Coming Soon)
       </button>
     </div>
   );
