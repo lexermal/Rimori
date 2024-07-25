@@ -29,8 +29,8 @@ class AppwriteService {
         return AppwriteService.instance;
     }
 
-    public async createDocument(fileName: string): Promise<string> {
-        const data = { status: "in_progress", name: fileName }
+    public async createDocument(fileName: string, email: string): Promise<string> {
+        const data = { status: "in_progress", name: fileName, email }
         return this.databases.createDocument(this.databaseId, this.collectionId, ID.unique(), data)
             .then(response => response.$id)
             .catch(error => {

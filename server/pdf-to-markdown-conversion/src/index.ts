@@ -1,9 +1,9 @@
 import 'dotenv/config';
+import jwt from 'jsonwebtoken';
 
 import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 
 import { extractPdfToHtml } from './Converter/PdfToHtml';
@@ -15,7 +15,23 @@ const app = express();
 const upload = multer({ dest: './upload' });
 const awService = AppwriteService.getInstance();
 
-app.post('/upload', upload.single('file'), async (req, res) => {
+// Validate JWT token and extract email address
+app.use((req: any, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET || '') as { email: string };
+    req.email = decodedToken.email;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+app.post('/upload', upload.single('file'), async (req: any, res) => {
   // Handle the uploaded file here
   const file = req.file;
   if (!file) {
@@ -25,7 +41,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   // Extract the file extension from the request object
   const fileExtension = path.extname(file.originalname);
 
-  const fileId = await awService.createDocument(file.originalname);
+  const fileId = await awService.createDocument(file.originalname, req.email);
 
   fs.mkdirSync(`./upload/${fileId}`);
 
