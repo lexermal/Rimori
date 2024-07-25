@@ -14,3 +14,30 @@ export async function improveTextWithAI(unpretty_markdown_text: string) {
 
   return gptResponse.choices[0].message.content;
 }
+
+// export async function imageContentLookup(base64: string) {
+
+//   const openai = new OpenAI();
+
+//   const response = await openai.chat.completions.create({
+//     model: "gpt-4-turbo",
+//     messages: [
+//       {
+//         role: "user",
+//         content: [
+//           { type: "text", text: "What is this picture about and then give the text written on it." },
+//           {
+//             type: "image_url",
+//             image_url: {
+//               "url": "data:image/jpeg;base64," + base64
+//             },
+//           },
+//         ],
+//       },
+//     ],
+//   });
+//   console.log(response.choices[0]);
+// }
+
+
+
