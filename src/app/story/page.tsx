@@ -5,7 +5,7 @@ import React, { memo, useEffect } from 'react';
 
 import EmbeddedAssistent from '@/components/EmbeddedAssistent/EmbeddedAssistent';
 
-import { useGlobalContext } from '@/components/GlobalContext';
+import { useGlobalContext } from '@/context/GlobalContext';
 import CustomMessages from '@/components/EmbeddedAssistent/CustomMessages';
 
 const Page = memo(() => {

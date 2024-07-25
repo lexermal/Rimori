@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIcon, SendIcon } from './Icons';
 import AutoResizingTextarea from './Textarea';
 import VoiceRecorder from './VoiceRecoder';
-import { Destructor, useGlobalContext } from '../GlobalContext';
+import { Destructor, useGlobalContext } from '../../context/GlobalContext';
 
 export const Input = React.memo(
   ({

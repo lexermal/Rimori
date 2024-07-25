@@ -13,8 +13,8 @@ export type Destructor = () => void;
 
 // Create the context with default values
 const GlobalContext = createContext<IGlobalContext>({
-  subscribe: () => {},
-  publish: () => {},
+  subscribe: () => { },
+  publish: () => { },
 });
 
 const listeners: {

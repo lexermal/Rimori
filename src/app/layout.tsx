@@ -6,7 +6,9 @@ import '@copilotkit/react-ui/styles.css';
 import '@/styles/globals.css';
 import '@/styles/colors.css';
 
-import { GlobalProvider } from '@/components/GlobalContext';
+import { GlobalProvider } from '@/context/GlobalContext';
+import { UserProvider } from '@/context/UserContext';
+
 import { CustomNavbar } from './go/components/Navbar';
 
 export default function RootLayout({
@@ -23,10 +25,12 @@ export default function RootLayout({
       <body>
         <CustomNavbar />
         <div className='h-28'>
-          </div>
+        </div>
 
         <GlobalProvider>
-          <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
+          <UserProvider>
+            <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
+          </UserProvider>
         </GlobalProvider>
       </body>
     </html>
