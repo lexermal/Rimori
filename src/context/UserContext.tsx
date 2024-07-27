@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { Models } from 'appwrite';
 import { useRouter } from 'next/navigation';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
@@ -17,10 +17,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const router = useRouter();
 
   useEffect(() => {
+    const allowedDomains = process.env.NEXT_PUBLIC_ALLOWED_DOMAINS?.split(',') || [];
+
     const fetchUser = async () => {
       try {
         const userData = await account.get();
-        if (userData.email && !userData.email.endsWith('@lu.se')) {
+        const userDomain = userData.email.split('@')[1];
+
+        if (!allowedDomains.includes(userDomain)) {
           await account.deleteSession('current');
           router.push('/waitlist');
         } else {
@@ -32,7 +36,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     fetchUser();
-  }, []);
+  }, [router]);
 
   const logout = async () => {
     try {
