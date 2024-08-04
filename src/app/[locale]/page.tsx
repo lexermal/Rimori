@@ -1,6 +1,7 @@
 'use client';
 
 import Head from 'next/head';
+import { useTranslations } from 'next-intl';
 import * as React from 'react';
 
 import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
@@ -9,6 +10,8 @@ import { useUser } from '@/context/UserContext';
 
 export default function HomePage() {
   const { user, logout } = useUser();
+  const t = useTranslations('Index')
+
 
   return (
     <main className="flex flex-col min-h-screen bg-gray-100">
@@ -18,7 +21,7 @@ export default function HomePage() {
 
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-4">Welcome to RIAU</h2>
+          <h2 className="text-2xl font-semibold mb-4">{t('title')}</h2>
           <p className="text-gray-700 mb-4">{user ? `Welcome back ${user.name}` : "Please log in or sign up to continue."}</p>
 
           {user ? <div className="flex justify-center items-center space-x-4">

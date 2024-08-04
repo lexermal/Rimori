@@ -2,6 +2,7 @@
 
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
 const WaitlistPage = () => {
@@ -10,6 +11,7 @@ const WaitlistPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const router = useRouter();
+  const t = useTranslations('Index')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +44,7 @@ const WaitlistPage = () => {
       <Head>
         <title>Join Our Waitlist</title>
       </Head>
-      <h1 className="text-3xl font-bold mb-4">Join Our Waitlist</h1>
+      <h1 className="text-3xl font-bold mb-4">{t('Join Our Waitlist')}</h1>
       <p className="text-lg mb-6">Be the first to know when our service gets available for your university!</p>
 
       <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">

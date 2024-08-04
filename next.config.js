@@ -1,7 +1,14 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const createNextIntlPlugin = require('next-intl/plugin');
+const withNextIntl = createNextIntlPlugin();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
     dirs: ['src'],
+  },
+  experimental: {
+    esmExternals: 'loose',
   },
 
   reactStrictMode: true,
@@ -15,7 +22,7 @@ const nextConfig = {
   // },
 
   webpack(config, { isServer }) {
-     // Only run this workaround on the server
+    // Only run this workaround on the server
     if (!isServer) {
       config.resolve.fallback.fs = false;
     }
@@ -52,4 +59,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withNextIntl(nextConfig);
