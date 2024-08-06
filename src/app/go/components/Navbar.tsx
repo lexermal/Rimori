@@ -1,11 +1,14 @@
 'use client';
 
-import { Avatar, Dropdown, Navbar } from 'flowbite-react';
+import { Navbar } from 'flowbite-react';
+import { useLocale } from 'next-intl';
 
 export function CustomNavbar() {
+  const locale = useLocale();
+
   return (
     <Navbar rounded className='fixed w-full top-0'>
-      <Navbar.Brand href='/go'>
+      <Navbar.Brand href={'/' + locale}>
         <div
           className='mr-3 h-20 w-40 overflow-hidden fixed '
           style={{
@@ -48,7 +51,7 @@ export function CustomNavbar() {
         {/* <Navbar.Link href="#" active>
           Home
         </Navbar.Link> */}
-        <Navbar.Link href='/go'>Study</Navbar.Link>
+        <Navbar.Link href={'/' + locale + '/go'}> Study</Navbar.Link>
         {/* <Navbar.Link
           target='_blank'
           href='http://www.educationplanner.org/students/self-assessments/learning-styles'
@@ -61,6 +64,6 @@ export function CustomNavbar() {
         {/* <Navbar.Link href="#">Pricing</Navbar.Link> */}
         {/* <Navbar.Link href="#">Contact</Navbar.Link> */}
       </Navbar.Collapse>
-    </Navbar>
+    </Navbar >
   );
 }
