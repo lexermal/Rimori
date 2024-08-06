@@ -2,6 +2,12 @@
   "Index": {
     "title" : "Welcome to RIUA English",
     "Welcome": "Welcome to RIUA",
-    "Join Our Waitlist": "Join Our Waitlist"
+    "Join Our Waitlist": "Join Our Waitlist",
+    "RIAU will soon be available at your university!": "RIAU will soon be available at your university!",
+    "Till then, how about staying updated?" : "Till then, how about staying updated?",
+    "Sign me up!" : "Sign me up!",
+    "An error occurred Please try again": "An error occurred. Please try again.",
+    "Failed to add you to the waitlist Please try again" : "Failed to add you to the waitlist. Please try again.",
+    "You have been added to the waitlist!": "You have been added to the waitlist!"
   }
 }

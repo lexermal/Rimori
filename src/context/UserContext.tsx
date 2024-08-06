@@ -37,7 +37,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         if (!allowedDomains.includes(userDomain)) {
           await account.deleteSession('current');
-          router.push(`/${locale}/waitlist`);
+          router.push(`/${locale}/waitlist?email=${encodeURIComponent(userData.email)}`);
         } else {
           setUser(userData);
         }

@@ -1,74 +1,104 @@
 "use client";
 
 import Head from 'next/head';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+enum Status {
+  Idle,
+  Loading,
+  Success,
+  Error,
+}
 
 const WaitlistPage = () => {
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const router = useRouter();
-  const t = useTranslations('Index')
+  const searchParams = useSearchParams();
+  const emailParam = searchParams.get('email');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccess('');
+  const [email, setEmail] = useState(emailParam || '');
+  const [status, setStatus] = useState<Status>(Status.Idle);
+  const [message, setMessage] = useState('');
+  const t = useTranslations('Index');
+
+  const handleClick = async () => {
+    if (!email) {
+      setMessage(t('Please enter a valid email address.'));
+      return;
+    }
+
+    setStatus(Status.Loading);
+    setMessage('');
 
     try {
-      const response = await fetch('/api/waitlist', {
+      const response = await fetch('/api/appwrite/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
 
       if (response.ok) {
-        setSuccess('You have been added to the waitlist!');
+        setStatus(Status.Success);
+        setMessage(t('You have been added to the waitlist!'));
         setEmail('');
       } else {
-        setError('Failed to add you to the waitlist. Please try again.');
+        setStatus(Status.Error);
+        setMessage(t('Failed to add you to the waitlist. Please try again.'));
       }
     } catch (error) {
-      setError('An error occurred. Please try again.');
-    } finally {
-      setLoading(false);
+      setStatus(Status.Error);
+      setMessage(t('An error occurred. Please try again.'));
     }
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <Head>
-        <title>Join Our Waitlist</title>
-      </Head>
-      <h1 className="text-3xl font-bold mb-4">{t('Join Our Waitlist')}</h1>
-      <p className="text-lg mb-6">Be the first to know when our service gets available for your university!</p>
+  useEffect(() => {
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [emailParam]);
 
-      <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email Address:</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-300 p-2 w-full rounded-lg"
-            required
-          />
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#406d46] to-[#5e6b20] p-4">
+      <Head>
+        <title>{t('Join Our Waitlist')}</title>
+      </Head>
+      <h1 className="text-4xl font-bold mb-4 text-white">{t('RIAU will soon be available at your university!')}</h1>
+      <p className="text-lg mb-6 text-gray-300 font-semibold">{t('Till then, how about staying updated?')}</p>
+
+      <div className="w-full max-w-md p-8">
+        {!emailParam && (
+          <div className="mb-4">
+            <input
+              id="email"
+              type="email"
+              placeholder="john.doe@university.edu"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="border border-gray-300 p-2 w-full rounded-lg"
+              required
+            />
+          </div>
+        )}
+        {status === Status.Error && <p className="text-red-500 text-sm mb-4">{message}</p>}
+        {status === Status.Success && <p className="text-green-500 text-sm mb-4">{message}</p>}
+
+        <div className="flex justify-center align-middle space-x-4 mt-6">
+          <button
+            className="bg-white text-black font-semibold p-2 rounded-lg hover:bg-gray-100 transition duration-300"
+            onClick={handleClick}
+          >
+            {t('Sign me up!')}
+          </button>
+          <button
+            type="button"
+            className="bg-gray-400 text-white p-2 rounded-lg hover:bg-gray-100 transition duration-300"
+            onClick={() => router.push('/learn-more')}
+          >
+            Learn More
+          </button>
         </div>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-        {success && <p className="text-green-500 text-sm mb-4">{success}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition duration-300"
-        >
-          {loading ? 'Adding...' : 'Add to Waitlist'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 };
