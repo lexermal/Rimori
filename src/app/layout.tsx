@@ -15,10 +15,14 @@ type Props = {
 
 export default function RootLayout({ children }: Props) {
   return (
+    <html>
+      <body>
     <GlobalProvider>
-      <UserProvider>
+      {/* // <UserProvider> */}
         <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
-      </UserProvider>
+      {/* // </UserProvider> */}
     </GlobalProvider>
+    </body>
+    </html>
   );
 }
