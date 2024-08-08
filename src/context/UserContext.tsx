@@ -1,6 +1,7 @@
 'use client';
 import { Models } from 'appwrite';
 import cookie from 'cookie';
+import CryptoJS from 'crypto-js';
 import { useRouter } from 'next/navigation';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
@@ -17,6 +18,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
   const router = useRouter();
+  const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || 'test123';
 
   const getLocaleFromCookie = (): string => {
     if (typeof document !== 'undefined') {
@@ -40,6 +42,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           router.push(`/${locale}/waitlist?email=${encodeURIComponent(userData.email)}`);
         } else {
           setUser(userData);
+
+          const encryptedUserData = CryptoJS.AES.encrypt(JSON.stringify(userData), encryptionKey).toString();
+          document.cookie = cookie.serialize('user_session', encryptedUserData, {
+            httpOnly: false,
+            secure: true,
+            maxAge: 24 * 60 * 60, // 1 day
+            path: '/',
+          });
         }
       } catch (error) {
         console.error('Failed to fetch user data', error);
@@ -53,6 +63,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       await account.deleteSession('current');
       setUser(null);
+
+      document.cookie = cookie.serialize('user_session', '', {
+        httpOnly: false,
+        secure: true,
+        expires: new Date(0),
+        path: '/',
+      });
       // router.push('/');
     } catch (error) {
       console.error('Failed to log out', error);
