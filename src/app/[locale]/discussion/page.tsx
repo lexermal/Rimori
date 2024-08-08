@@ -6,9 +6,9 @@ import { useEffect, useState } from 'react';
 
 import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 
-import Card from '../../components/discussion/Card';
-import DiscussionPopup from '../../components/discussion/DiscussionPopup';
-import EmbeddedAssistent from '../../components/EmbeddedAssistent/EmbeddedAssistent';
+import Card from '../../../components/discussion/Card';
+import DiscussionPopup from '../../../components/discussion/DiscussionPopup';
+import EmbeddedAssistent from '../../../components/EmbeddedAssistent/EmbeddedAssistent';
 import { Spinner } from 'flowbite-react';
 
 interface Exam {
@@ -257,7 +257,7 @@ export default function Page(): JSX.Element {
                     </a>
                     {topics.kid.length === 0 ? (
                       <p className='text-center pt-48 pb-48 font-bold'>
-                        <Spinner size="xl"  className='mb-4'/>
+                        <Spinner size="xl" className='mb-4' />
                         <br />
                         Your opponent is getting ready.
                       </p>

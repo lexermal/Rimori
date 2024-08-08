@@ -17,12 +17,12 @@ export default function RootLayout({ children }: Props) {
   return (
     <html>
       <body>
-    <GlobalProvider>
-      {/* // <UserProvider> */}
-        <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
-      {/* // </UserProvider> */}
-    </GlobalProvider>
-    </body>
+        <GlobalProvider>
+          <UserProvider>
+            <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
+          </UserProvider>
+        </GlobalProvider>
+      </body>
     </html>
   );
 }

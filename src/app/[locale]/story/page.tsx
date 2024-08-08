@@ -5,10 +5,10 @@ import { Message, useChat } from 'ai/react';
 import React, { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-import { CustomNavbar } from '@/app/go/components/Navbar';
-import AnswerComponent from '@/app/story/ChoiceForm';
-import getMarkdownContent from '@/app/story/markdownContent';
-import Feedback, { StoryFeedback } from '@/app/story/Feedback';
+import { CustomNavbar } from '@/app/[locale]/go/components/Navbar';
+import AnswerComponent from '@/app/[locale]/story/ChoiceForm';
+import getMarkdownContent from '@/app/[locale]/story/markdownContent';
+import Feedback, { StoryFeedback } from '@/app/[locale]/story/Feedback';
 import { set } from 'zod';
 import { useRouter } from 'next/navigation';
 
@@ -30,7 +30,7 @@ function Story() {
     useChat({
       maxToolRoundtrips: 5,
       initialMessages: [{ id: '1', role: 'system', content: context }],
-      api:"/api/story",
+      api: "/api/story",
 
       // run client-side tools that are automatically executed:
       // async onToolCall({ toolCall }) {

@@ -2,7 +2,7 @@ import { openai } from '@ai-sdk/openai';
 import { convertToCoreMessages, generateText } from 'ai';
 import { NextResponse } from 'next/server';
 
-import getMarkdownContent from '@/app/story/markdownContent';
+import getMarkdownContent from '@/app/[locale]/story/markdownContent';
 
 export const maxDuration = 30;
 

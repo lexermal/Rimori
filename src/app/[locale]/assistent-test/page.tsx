@@ -4,7 +4,7 @@
 import { CopilotSidebar } from '@copilotkit/react-ui';
 import React from 'react';
 
-import { Input } from '../../components/ai-sidebar/Input';
+import { Input } from '../../../components/ai-sidebar/Input';
 
 export default function Page(): JSX.Element {
   const CustomInput = (props: any) => {
