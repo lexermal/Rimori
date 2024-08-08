@@ -8,7 +8,7 @@ import AppwriteService from '@/app/api/appwrite/documents/AppwriteConnector';
 const cache = new NodeCache();
 const db = AppwriteService.getInstance();
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   let token = request.headers.get('Authorization');
   if (!token) {
     return NextResponse.json({ error: 'JWT token missing' }, { status: 401 });
@@ -17,22 +17,27 @@ export async function POST(request: NextRequest) {
   token = token.replace('Bearer ', '');
 
   try {
-    if (!jwt.verify(token, process.env.JWT_SECRET!)) {
+    const jwtValid = await db.verifyToken(token);
+    // console.log('JWT valid:', jwtValid);
+    if (!jwtValid) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const { email } = jwt.decode(token) as { email: string };
+    const { userId } = jwt.decode(token) as { userId: string };
+    console.log('User ID:', userId);
 
-    let documents = cache.get(email) as any | undefined;
+    let documents = cache.get(userId) as any | undefined;
     if (!documents) {
-      documents = (await db.getDocuments(email)).documents;
+      documents = (await db.getDocuments(userId)).documents;
 
-      console.log('Retrieving documents for cache', email);
+      console.log('Retrieving documents for cache', userId);
 
-      cache.set(email, documents, 30 * 60);
+      cache.set(userId, documents, 2 * 60);
     }
 
-    const { documentId, onlyTitle } = await request.json().catch(() => ({}));
+    const url = new URL(request.url);
+    const params = new URLSearchParams(url.search);
+    const { documentId, onlyTitle } = Object.fromEntries(params.entries());;
 
     if (documentId) {
       const document = documents.find((doc: any) => doc.$id === documentId);
@@ -44,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (onlyTitle) {
-      const titles = documents.map((doc: any) => ({ $id: doc.$id, name: doc.name }));
+      const titles = documents.map((doc: any) => ({ id: doc.$id, name: doc.name }));
       return NextResponse.json({ success: true, data: titles }, { status: 201 });
     }
 

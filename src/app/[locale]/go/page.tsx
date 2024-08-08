@@ -4,34 +4,42 @@ import { Spinner } from 'flowbite-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { useUser } from '@/context/UserContext';
+
 import DocumentSelection from './components/DocumentSelection';
 import { FileUpload } from './components/FileUpload';
 
+export interface MarkdownDocument {
+  id: string;
+  name: string;
+  content: string;
+  topics?: string[];
+}
+
 const Page: React.FC = () => {
-  const [documents, setDocuments] = useState<{ [key: string]: string[] }>({});
+  const [documents, setDocuments] = useState<MarkdownDocument[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [selectedFile, setSelectedFile] = useState<string>('');
 
   const router = useRouter();
+  const { user } = useUser();
+  // @ts-ignore
+  const jwt = user?.jwt;
 
   useEffect(() => {
-    //page might have set parameter ?empty  if not set load files from /api/files
-    if (window.location.search !== '?empty') {
-      fetch('/api/files')
-        .then((response) => response.json())
-        .then((data) => {
-          const newDocuments = {} as any;
-          data.allFiles.forEach((file: string) => {
-            newDocuments[file] = [];
-          });
-          setDocuments(newDocuments);
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
+    if (!jwt) {
+      return;
     }
-  }, []);
+
+    fetch('/api/appwrite/documents?onlyTitle=true', { headers: { Authorization: `Bearer ${jwt}` } })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Data:', data);
+        setDocuments(data.data);
+        setLoading(false);
+      });
+  }, [jwt]);
 
   return (
     <div className='pb-40'>

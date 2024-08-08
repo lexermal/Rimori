@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 
+import { MarkdownDocument } from '@/app/[locale]/go/page';
+
 interface Props {
-  items: { [key: string]: string[] };
+  items: MarkdownDocument[];
   onSelected: (id: string) => void;
   onNewDocument: () => void;
 }
@@ -19,15 +21,17 @@ export default function HomePage({ items, onSelected, onNewDocument }: Props) {
 
   return (
     <div className='bg-gray-300 rounded-lg p-4'>
-      {Object.keys(items).map((key, index) => (
+      {items.map((key, index) => (
         <AccordionList
           key={index}
-          title={key}
+          title={key.name}
+          id={key.id}
           close={openAccordion !== `${index}`}
           onSelected={handleEntryClick}
           selectionIndex={selectedEntry}
-          items={items[key]}
-          id={key}
+          //change items to key.topics to enable subtopics
+          // items={items[index].topics||[]}
+          items={[]}
         />
       ))}
       <button onClick={onNewDocument}>

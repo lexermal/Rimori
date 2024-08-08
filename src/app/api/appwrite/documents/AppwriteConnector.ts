@@ -27,6 +27,36 @@ class AppwriteService {
         return AppwriteService.instance;
     }
 
+    public async verifyToken(token: string): Promise<boolean> {
+        try {
+            const client = new Client()
+                .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT || 'https://cloud.appwrite.io/v1')
+                .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || 'project_id_is_missing')
+                .setJWT(token);
+
+            const databases = new Databases(client);
+
+            await databases.listDocuments(
+                this.databaseId,
+                this.collectionId,
+                [Query.equal('userId', "not an email")]
+            );
+
+            return true;
+        } catch (error: any) {
+            if (error.message === "Failed to verify JWT. Invalid token: Incomplete segments") {
+                return false;
+            }
+            if (error.message === "The current user is not authorized to perform the requested action.") {
+                return true;
+            }
+            //other errors
+            console.error('Error verifying token:', error);
+            return false;
+
+        }
+    }
+
     // public async createDocument(fileName: string, email: string): Promise<string> {
     //     const data = { status: "in_progress", name: fileName, email }
     //     return this.databases.createDocument(this.databaseId, this.collectionId, ID.unique(), data)
@@ -58,14 +88,14 @@ class AppwriteService {
     //         });
     // }
 
-    public async getDocuments(email: string): Promise<any> {
-     const docs= await this.databases.listDocuments(
-        this.databaseId,
-        this.collectionId,
-        [Query.equal('email', email)]
-      );
+    public async getDocuments(userId: string): Promise<any> {
+        const docs = await this.databases.listDocuments(
+            this.databaseId,
+            this.collectionId,
+            [Query.equal('userId', userId)]
+        );
 
-      return docs;
+        return docs;
     }
 }
 
