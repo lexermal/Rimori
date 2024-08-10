@@ -5,25 +5,14 @@ import { Message, useChat } from 'ai/react';
 import React, { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-import { CustomNavbar } from '@/app/[locale]/go/components/Navbar';
 import AnswerComponent from '@/app/[locale]/story/ChoiceForm';
-import getMarkdownContent from '@/app/[locale]/story/markdownContent';
 import Feedback, { StoryFeedback } from '@/app/[locale]/story/Feedback';
-import { set } from 'zod';
-import { useRouter } from 'next/navigation';
+import getMarkdownContent from '@/app/[locale]/story/markdownContent';
+import { useRouter } from '@/i18n';
 
 let kickOffStory = false;
 
-export default function Page() {
-  return (
-    <div className='p-5'>
-      {/* <CustomNavbar/> */}
-      <Story />
-    </div>
-  );
-}
-
-function Story() {
+export default function Story() {
   const [feedback, setFeedback] = React.useState<StoryFeedback | null>(null);
   const [chapterResult, setChapterResult] = React.useState<StoryFeedback[]>([]);
   const { messages, addToolResult, append, isLoading } =

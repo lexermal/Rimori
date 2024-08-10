@@ -3,10 +3,11 @@
 
 import { CopilotSidebar } from '@copilotkit/react-ui';
 import { Spinner } from 'flowbite-react';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { Input } from '@/components/ai-sidebar/Input';
+
+import { useRouter } from '@/i18n';
 
 import { Editor } from './components/Editor';
 import PomodoroCounter from './components/PomodoroCounter';
@@ -27,7 +28,7 @@ export default function Page() {
   if (!webSiteLoaded) {
     return (
       <div className='mx-auto w-20 mt-72'>
-        <Spinner size={'xl'} />
+        <Spinner size="xl" />
       </div>
     );
   }

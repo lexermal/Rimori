@@ -1,10 +1,10 @@
 'use client';
 
 import { Spinner } from 'flowbite-react';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { useUser } from '@/context/UserContext';
+import { useRouter } from '@/i18n';
 
 import DocumentSelection from './components/DocumentSelection';
 import { FileUpload } from './components/FileUpload';
@@ -96,10 +96,10 @@ function TrainingButtons({ selectedFile }: any) {
       text: 'Opposition',
       onClick: () => router.push(`/discussion?file=${selectedFile}`),
     },
-    // {
-    //   text: 'Story',
-    //   onClick: () => router.push(`/story?file=${selectedFile}`),
-    // },
+    {
+      text: 'Story',
+      onClick: () => router.push(`/story?file=${selectedFile}`),
+    },
   ];
 
   return (
@@ -113,14 +113,6 @@ function TrainingButtons({ selectedFile }: any) {
           {button.text}
         </button>
       ))}
-      <button
-        key={5}
-        className='bg-blue-500 text-white font-bold text-lg py-4 px-10 rounded-lg border-2 cursor-not-allowed'
-        style={{ height: '95px' }}
-        disabled={true}
-      >
-        Story <br /> (Coming Soon)
-      </button>
     </div>
   );
 }
