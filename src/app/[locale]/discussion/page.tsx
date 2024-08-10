@@ -2,6 +2,7 @@
 
 import { CopilotKit } from '@copilotkit/react-core';
 import { FrontendAction } from '@copilotkit/react-core/dist/types/frontend-action';
+import { Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 
 import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
@@ -9,7 +10,7 @@ import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 import Card from '../../../components/discussion/Card';
 import DiscussionPopup from '../../../components/discussion/DiscussionPopup';
 import EmbeddedAssistent from '../../../components/EmbeddedAssistent/EmbeddedAssistent';
-import { Spinner } from 'flowbite-react';
+import { useUser } from '@/context/UserContext';
 
 interface Exam {
   examNr: number;
@@ -30,7 +31,13 @@ export default function Page(): JSX.Element {
     visionary: [] as Instructions[],
   });
 
+  const { user } = useUser();
+  // @ts-ignore
+  const jwt = user?.jwt;
+
   useEffect(() => {
+    if (!jwt) return;
+
     const filename =
       new URLSearchParams(window.location.search).get('file') || '';
     setFile(filename);
@@ -39,7 +46,12 @@ export default function Page(): JSX.Element {
       return;
     }
     currentlyFetchingTopics = true;
-    fetch(`/api/copilotkit/opposition/topics?file=${filename}&topic=ai`)
+    fetch(`/api/copilotkit/opposition/topics?file=${filename}&topic=ai`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    }
+    )
       .then((res) => res.json())
       .then((data) => {
         setTopics(data);
@@ -50,7 +62,7 @@ export default function Page(): JSX.Element {
       .finally(() => {
         currentlyFetchingTopics = false;
       });
-  }, []);
+  }, [jwt]);
 
   useEffect(() => {
     setExams([
@@ -249,12 +261,6 @@ export default function Page(): JSX.Element {
                         left: '0',
                       }}
                     ></div>
-                    <a target='_blank' href='https://riau.fuca-prime.se'>
-                      <img
-                        src='/qr.png'
-                        className=' h-36 fixed right-2 top-2 rounded-lg'
-                      />
-                    </a>
                     {topics.kid.length === 0 ? (
                       <p className='text-center pt-48 pb-48 font-bold'>
                         <Spinner size="xl" className='mb-4' />

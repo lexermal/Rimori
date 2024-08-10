@@ -47,7 +47,7 @@ export default function DiscussionPopup(props: Props) {
                 <span className='sr-only'>Close modal</span>
               </button>
             </div>
-            <div className='p-4 md:p-5 space-y-4'>{props.children}</div>
+            <div className=''>{props.children}</div>
             {/* <div className='flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600'>
               <button
                 data-modal-hide='default-modal'

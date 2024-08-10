@@ -1,26 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
+import { OpenAI } from 'openai';
 import { parse } from 'url';
+
+import AppwriteService from "@/app/api/appwrite/documents/AppwriteConnector";
 
 export async function GET(req: NextRequest) {
     const { query } = parse(req.url, true);
     const { file, topic } = query;
+    //jwt from header
+    const jwt = req.headers.get("authorization")?.replace("Bearer ", "");
 
-    return NextResponse.json(await getData(file!.toString(), topic!.toString()));
+    return NextResponse.json(await getData(file!.toString(), topic!.toString(), jwt!));
 };
 
-
-
-import { OpenAI } from 'openai';
-
-function getFileContent(file: string) {
+async function getFileContent(file: string, jwt: string) {
     console.log("mocked file reading. Needs to be implemented properly!");
-    return "";
+    const db = AppwriteService.getInstance();
+    const docus = await db.getDocuments(jwt);
+    // console.log("found documents", docus);
+    const doc = docus.documents.find((doc: any) => doc.$id === file);
+    if (!doc) {
+        throw new Error("Document not found");
+    }
+
+    console.log("found document", doc);
+
+    return doc.content;
 }
 
-async function getData(file: string, topic: string) {
+async function getData(file: string, topic: string, jwt: string) {
     const openai = new OpenAI();
 
-    let fileContent = await getFileContent(file);
+    let fileContent = await getFileContent(file, jwt);
     //replace all markdown images
     fileContent = fileContent.replaceAll(/!\[.*\]\(.*\)/g, "");
     //replace all html images
