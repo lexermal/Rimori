@@ -3,16 +3,18 @@ import React from "react";
 
 interface Props {
   messages: any
+  jwt: string
+  fileId: string
   question: string,
   possibilties: string[],
   onSubmit: (value: string, choice: string) => void,
 }
 
-async function fetchDataFromBackend(messages: any[]) {
+async function fetchDataFromBackend(messages: any[], jwt: string, fileId: string) {
   return await fetch('/api/story-answer-validation', {
     method: 'POST',
-    body: JSON.stringify({ messages }),
-    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, fileId }),
+    headers: { 'Content-Type': 'application/json', 'Authorization': jwt },
   })
     .then((response) => response.text())
     .then((response) => JSON.parse(response).result)
@@ -60,7 +62,7 @@ export default function AnswerComponent(props: Props) {
         const assistentChoiceMessage = { role: "assistant", content: `Question: '${props.question}', answer possibilities: \n- ${props.possibilties.join("\n- ")}` };
         const userMessage = { role: "user", content: `Choice: '${selected}', reason: '${reason}'` };
 
-        fetchDataFromBackend([...props.messages, assistentChoiceMessage, userMessage]).then((data) => {
+        fetchDataFromBackend([...props.messages, assistentChoiceMessage, userMessage], props.jwt, props.fileId).then((data) => {
           console.log("data", data);
           props.onSubmit(data, selected!);
         });

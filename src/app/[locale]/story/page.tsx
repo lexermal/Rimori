@@ -7,37 +7,58 @@ import ReactMarkdown from 'react-markdown';
 
 import AnswerComponent from '@/app/[locale]/story/ChoiceForm';
 import Feedback, { StoryFeedback } from '@/app/[locale]/story/Feedback';
-import getMarkdownContent from '@/app/[locale]/story/markdownContent';
+import { useUser } from '@/context/UserContext';
 import { useRouter } from '@/i18n';
 
-let kickOffStory = false;
+let kickedOffStory = false;
 
 export default function Story() {
   const [feedback, setFeedback] = React.useState<StoryFeedback | null>(null);
   const [chapterResult, setChapterResult] = React.useState<StoryFeedback[]>([]);
-  const { messages, addToolResult, append, isLoading } =
-    useChat({
-      maxToolRoundtrips: 5,
-      initialMessages: [{ id: '1', role: 'system', content: context }],
-      api: "/api/story",
+  const [context, setContext] = React.useState<string | null>(null);
+  const [fileId, setFileId] = React.useState<string | null>(null);
+  const router = useRouter();
 
-      // run client-side tools that are automatically executed:
-      // async onToolCall({ toolCall }) {
-      //   if (toolCall.toolName === 'storyEnded') {
-      //     setStoryEnded(true);
-      //     return true;
-      //   }
-      // },
-    });
+  const { user } = useUser();
+  // @ts-ignore
+  const jwt = user?.jwt;
+
+  const { messages, addToolResult, append, isLoading, setMessages } = useChat({
+    maxToolRoundtrips: 5,
+    api: "/api/story",
+
+    // run client-side tools that are automatically executed:
+    // async onToolCall({ toolCall }) {
+    //   if (toolCall.toolName === 'storyEnded') {
+    //     setStoryEnded(true);
+    //     return true;
+    //   }
+    // },
+  });
 
   console.log("messages", messages);
 
   useEffect(() => {
-    if (!kickOffStory) {
-      kickOffStory = true;
-      append({ id: '2', role: 'user', content: 'Generate first chapter.' });
+    if (jwt) {
+      const fileId = new URLSearchParams(window.location.search).get("file");
+      if (!fileId) {
+        router.push('/');
+        return;
+      }
+      setFileId(fileId);
+      console.log("fileId", fileId);
+      getAssistentInstructions(jwt, fileId).then(content => {
+        setContext(content);
+
+        if (!kickedOffStory) {
+          kickedOffStory = true;
+          setMessages([{ id: '1', role: 'system', content: content }]);
+          append({ id: '2', role: 'user', content: 'Generate first chapter.' });
+        }
+      });
     }
-  }, []);
+  }, [jwt]);
+
 
   const agentMessages = messages?.filter((m: Message) => !["system", "user"].includes(m.role));
   const lastAgentMessage = agentMessages[agentMessages.length - 1];
@@ -80,6 +101,8 @@ export default function Story() {
 
           // render confirmation tool (client-side tool with user interaction)
           return <RenderToolInovation
+            jwt={jwt}
+            fileId={fileId || ""}
             key={toolCallId}
             messages={messages}
             toolInvocation={invocation}
@@ -94,7 +117,7 @@ export default function Story() {
   )
 }
 
-function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?: string }, messages: Message[], onSubmit: (result: StoryFeedback) => void, chapterResult: StoryFeedback[] }) {
+function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?: string }, messages: Message[], onSubmit: (result: StoryFeedback) => void, chapterResult: StoryFeedback[], fileId: string, jwt: string }) {
   console.log("toolInvocation", props.toolInvocation);
   const { toolCallId, toolName, args, result } = props.toolInvocation;
 
@@ -107,6 +130,8 @@ function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?
     return (
       <div key={toolCallId} className='mt-5'>
         <AnswerComponent
+          jwt={props.jwt}
+          fileId={props.fileId}
           messages={props.messages}
           question={args.question as string}
           possibilties={[args.possibility1, args.possibility2, args.possibility3]}
@@ -169,9 +194,8 @@ function OtherToolRendering(props: { toolInvocation: ToolInvocation }) {
   );
 }
 
-
-
-const context = `
+async function getAssistentInstructions(jwt: string, documentId: string) {
+  return `
 Act like a storyteller who creates an entertaining story, based on the background information, for the user "Tim".
 
 Your tasks:
@@ -189,7 +213,25 @@ You are not allowed to say things like "Let's ask the user how the story should 
 
 Background information: 
 \`\`\`markdown
-`+ getMarkdownContent() + `
+`+ await getMarkdownContent(jwt, documentId) + `
 \`\`\`
-
 `;
+}
+
+async function getMarkdownContent(jwt: string, id: string) {
+  //fetch to /api/appwrite/document?id=
+  //return the content
+
+  return fetch("/api/appwrite/documents?documentId=" + id, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': jwt
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log("getMarkdownContent", data);
+      return data.data[0].content;
+    });
+}
+

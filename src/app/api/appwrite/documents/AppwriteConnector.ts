@@ -1,4 +1,7 @@
-import { Client, Databases, Storage, ID, Query } from 'node-appwrite';
+import jwt from 'jsonwebtoken';
+import { Client, Databases, ID, Query, Storage } from 'node-appwrite';
+import NodeCache from 'node-cache';
+
 
 class AppwriteService {
     private static instance: AppwriteService;
@@ -8,6 +11,7 @@ class AppwriteService {
     private databaseId = process.env.APPWRITE_DATABASE_ID || 'database_id_is_missing';
     private collectionId = process.env.APPWRITE_DOCUMENT_COLLECTION_ID || 'document_collection_id_is_missing';
     private documentBucketId = process.env.APPWRITE_DOCUMENT_BUCKET_ID || 'document_bucket_id_is_missing';
+    private cache = new NodeCache();
 
     private constructor() {
         this.client = new Client();
@@ -88,14 +92,34 @@ class AppwriteService {
     //         });
     // }
 
-    public async getDocuments(userId: string): Promise<any> {
+    public async getDocuments(token: string): Promise<any> {
+        if (!await this.verifyToken(token)) {
+            throw new Error('JWT token missing or ivalid.');
+        }
+
+        const userId = this.getUserId(token);
+        const documents = this.cache.get(userId) as any | undefined;
+
+        if (documents) {
+            return documents;
+        }
+
         const docs = await this.databases.listDocuments(
             this.databaseId,
             this.collectionId,
             [Query.equal('userId', userId)]
         );
 
+        console.log('Retrieving documents for cache', userId);
+
+        this.cache.set(userId, documents, 2 * 60);
+
         return docs;
+    }
+
+    getUserId(token: string): string {
+        const { userId } = jwt.decode(token) as { userId: string };
+        return userId;
     }
 }
 

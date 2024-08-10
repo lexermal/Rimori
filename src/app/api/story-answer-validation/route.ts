@@ -2,12 +2,14 @@ import { openai } from '@ai-sdk/openai';
 import { convertToCoreMessages, generateText } from 'ai';
 import { NextResponse } from 'next/server';
 
-import getMarkdownContent from '@/app/[locale]/story/markdownContent';
+import AppwriteService from '@/app/api/appwrite/documents/AppwriteConnector';
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  const { messages, fileId } = await req.json();
+  //extract jwt token from request
+  const jwt = req.headers.get('Authorization')?.replace('Bearer ', '') as string;
 
   const assistentMessages = messages.filter((m: any) => m.role === 'assistant').map((m: any) => m.content).join('\n');
 
@@ -43,7 +45,7 @@ export async function POST(req: Request) {
 
     The book content the student is supposed to be familiar with is as follows:
 \`\`\`markdown
-`+ getMarkdownContent() + `
+`+ await getMarkdownContent(jwt, fileId) + `
 \`\`\`
 
 The studycase is as follows:
@@ -51,6 +53,8 @@ The studycase is as follows:
 `+ assistentMessages + `
 \`\`\`
     `};
+
+    console.log("instructions", instructions);
 
 
   const userMessage = messages.filter((m: any) => m.role === 'user').slice(-1);
@@ -67,4 +71,15 @@ The studycase is as follows:
   console.log("result", result.text);
 
   return NextResponse.json({ result: JSON.parse(result.text) });
+}
+
+async function getMarkdownContent(jwt: string, fileId: string) {
+  const db = AppwriteService.getInstance();
+  const documents = (await db.getDocuments(jwt)).documents;
+  console.log("documents", documents);
+  const document = documents.find((doc: any) => doc.$id === fileId);
+  if (!document) {
+    throw new Error('Document not found');
+  }
+  return document.content;
 }
