@@ -1,4 +1,5 @@
-import { Client, Databases, Storage, ID } from 'node-appwrite';
+import jwt from 'jsonwebtoken';
+import { Client, Databases, ID, Query,Storage } from 'node-appwrite';
 
 import { InputFile } from './tmp_InputFile';
 
@@ -29,8 +30,8 @@ class AppwriteService {
         return AppwriteService.instance;
     }
 
-    public async createDocument(fileName: string, email: string): Promise<string> {
-        const data = { status: "in_progress", name: fileName, email }
+    public async createDocument(fileName: string, userId: string): Promise<string> {
+        const data = { status: "in_progress", name: fileName, userId }
         return this.databases.createDocument(this.databaseId, this.collectionId, ID.unique(), data)
             .then(response => response.$id)
             .catch(error => {
@@ -58,6 +59,41 @@ class AppwriteService {
                 console.error('Error uploading file:', error);
                 throw error;
             });
+    }
+
+    public async verifyToken(token: string): Promise<boolean> {
+        try {
+            const client = new Client()
+                .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT || 'https://cloud.appwrite.io/v1')
+                .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || 'project_id_is_missing')
+                .setJWT(token);
+
+            const databases = new Databases(client);
+
+            await databases.listDocuments(
+                this.databaseId,
+                this.collectionId,
+                [Query.equal('userId', "not an email")]
+            );
+
+            return true;
+        } catch (error: any) {
+            if (error.message === "Failed to verify JWT. Invalid token: Incomplete segments") {
+                return false;
+            }
+            if (error.message === "The current user is not authorized to perform the requested action.") {
+                return true;
+            }
+            //other errors
+            console.error('Error verifying token:', error);
+            return false;
+
+        }
+    }
+
+    getUserId(token: string): string {
+        const { userId } = jwt.decode(token) as { userId: string };
+        return userId;
     }
 }
 

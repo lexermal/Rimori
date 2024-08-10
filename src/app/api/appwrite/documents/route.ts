@@ -14,11 +14,10 @@ export async function GET(request: NextRequest) {
   token = token.replace('Bearer ', '');
 
   try {
-    const documents = (await db.getDocuments(token)).documents;
-
     const url = new URL(request.url);
     const params = new URLSearchParams(url.search);
-    const { documentId, onlyTitle } = Object.fromEntries(params.entries());;
+    const { documentId, onlyTitle, refresh } = Object.fromEntries(params.entries());;
+    const documents = (await db.getDocuments(token, !!refresh)).documents;
 
     if (documentId) {
       const document = documents.find((doc: any) => doc.$id === documentId);

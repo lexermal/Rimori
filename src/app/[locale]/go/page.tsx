@@ -27,18 +27,22 @@ const Page: React.FC = () => {
   // @ts-ignore
   const jwt = user?.jwt;
 
-  useEffect(() => {
-    if (!jwt) {
-      return;
-    }
-
-    fetch('/api/appwrite/documents?onlyTitle=true', { headers: { Authorization: `Bearer ${jwt}` } })
+  const fetchDocuments = async (refreshIndex?: boolean) => {
+    fetch('/api/appwrite/documents?onlyTitle=true' + (refreshIndex ? "&refresh=true" : ""), { headers: { Authorization: `Bearer ${jwt}` } })
       .then((response) => response.json())
       .then((data) => {
         console.log('Data:', data);
         setDocuments(data.data);
         setLoading(false);
       });
+  }
+
+  useEffect(() => {
+    if (!jwt) {
+      return;
+    }
+
+    fetchDocuments();
   }, [jwt]);
 
   return (
@@ -47,19 +51,6 @@ const Page: React.FC = () => {
         <div className='text-center'>
           <Spinner className='h-24 w-24 mt-64' />
         </div>
-      )}
-      {Object.keys(documents).length === 0 && !loading && (
-        <FileUpload
-          onFileUpload={() => true}
-          onFilesUploaded={(fileNames) => {
-            console.log('Files uploaded:', fileNames);
-            const newObject = {} as any;
-            fileNames.forEach((fileName) => {
-              newObject[fileName] = [];
-            });
-            setDocuments(newObject);
-          }}
-        />
       )}
       <div className='w-2/4 mx-auto pt-28'>
         <h2 className='text-center mb-5'>
@@ -78,6 +69,15 @@ const Page: React.FC = () => {
             : 'Select one document to start training!'}
         </p> */}
       </div>
+      {!loading && (
+        <FileUpload
+          jwt={jwt}
+          onFileUpload={() => true}
+          onFilesUploaded={() => {
+            fetchDocuments(true);
+          }}
+        />
+      )}
       {selectedFile && <TrainingButtons selectedFile={selectedFile} />}
     </div>
   );

@@ -92,7 +92,7 @@ class AppwriteService {
     //         });
     // }
 
-    public async getDocuments(token: string): Promise<any> {
+    public async getDocuments(token: string, refresh?: boolean): Promise<any> {
         if (!await this.verifyToken(token)) {
             throw new Error('JWT token missing or ivalid.');
         }
@@ -100,7 +100,7 @@ class AppwriteService {
         const userId = this.getUserId(token);
         const documents = this.cache.get(userId) as any | undefined;
 
-        if (documents) {
+        if (!refresh && documents) {
             return documents;
         }
 

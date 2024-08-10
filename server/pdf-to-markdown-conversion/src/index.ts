@@ -1,19 +1,22 @@
-import 'dotenv/config';
-import jwt from 'jsonwebtoken';
-
+import cors from 'cors';
 import express from 'express';
-import multer from 'multer';
 import fs from 'fs';
+import jwt from 'jsonwebtoken';
+import multer from 'multer';
 import path from 'path';
+import 'dotenv/config';
 
-import { extractPdfToHtml } from './Converter/PdfToHtml';
 import MarkdownExtractor from './Converter/MarkdownExtractor';
+import { extractPdfToHtml } from './Converter/PdfToHtml';
 import { improveTextWithAI } from './utils/AiOptimizers';
 import AppwriteService from './utils/ApprwriteConnector'
 
 const app = express();
 const upload = multer({ dest: './upload' });
-const awService = AppwriteService.getInstance();
+const db = AppwriteService.getInstance();
+
+// Enable CORS
+app.use(cors());
 
 // Validate JWT token and extract email address
 app.use((req: any, res, next) => {
@@ -23,8 +26,7 @@ app.use((req: any, res, next) => {
   }
 
   try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET || '') as { email: string };
-    req.email = decodedToken.email;
+    req.userId = db.getUserId(token);
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid token' });
@@ -41,7 +43,7 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
   // Extract the file extension from the request object
   const fileExtension = path.extname(file.originalname);
 
-  const fileId = await awService.createDocument(file.originalname, req.email);
+  const fileId = await db.createDocument(file.originalname, req.userId);
 
   fs.mkdirSync(`./upload/${fileId}`);
 
@@ -55,8 +57,8 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
   return res.status(200).json({ message: 'File uploaded successfully' });
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+app.listen(3001, () => {
+  console.log('Server is running on port 3001');
 });
 
 
