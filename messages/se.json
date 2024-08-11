@@ -1,6 +1,13 @@
 {
   "Index": {
-    "title" : "Welcome to RIUA SWEDISH",
-    "Join Our Waitlist": "Join Our Waitlist Swedishh"
+    "title" : "Välkommen till Rimori",
+    "Welcome": "Välkommen till Rimori",
+    "Join Our Waitlist": "Gå med i vår väntelista",
+    "Rimori will soon be available at your university!": "Rimori kommer snart att finnas tillgängligt på ditt universitet!",
+    "Till then, how about staying updated?" : "Till dess, vad sägs om att hålla dig uppdaterad?",
+    "Sign me up!" : "Skriv upp mig!",
+    "An error occurred Please try again": "Ett fel har inträffat. Vänligen försök igen.",
+    "Failed to add you to the waitlist Please try again" : "Det gick inte att lägga till dig på väntelistan. Vänligen försök igen.",
+    "You have been added to the waitlist!": "Du har lagts till på väntelistan!"
   }
 }

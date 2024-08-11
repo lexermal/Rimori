@@ -63,7 +63,7 @@ const WaitlistPage = () => {
       <Head>
         <title>{t('Join Our Waitlist')}</title>
       </Head>
-      <h1 className="text-4xl font-bold mb-4 text-white">{t('RIAU will soon be available at your university!')}</h1>
+      <h1 className="text-4xl font-bold mb-4 text-white">{t('Rimori will soon be available at your university!')}</h1>
       <p className="text-lg mb-6 text-gray-300 font-semibold">{t('Till then, how about staying updated?')}</p>
 
       <div className="w-full max-w-md p-8">

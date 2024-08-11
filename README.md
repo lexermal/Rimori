@@ -1,4 +1,4 @@
-# RIAU MVP
+# Rimori
 
 ## Todo
 

@@ -16,7 +16,7 @@ export default function HomePage() {
   return (
     <main className="flex flex-col min-h-screen bg-gray-100">
       <Head>
-        <title>RIAU</title>
+        <title>Rimori</title>
       </Head>
 
       <div className="flex-1 flex items-center justify-center p-4">

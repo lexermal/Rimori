@@ -18,7 +18,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <head>
-        <title>RIAU</title>
+        <title>Rimori</title>
         <link rel='icon' href='/favicon.ico' />
       </head>
       <body>
