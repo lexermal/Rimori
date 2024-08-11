@@ -5,6 +5,7 @@ import {
   useRemirror,
 } from '@remirror/react';
 import { AllStyledComponent } from '@remirror/styles/emotion';
+import { useCallback, useState } from 'react';
 import {
   BlockquoteExtension,
   BoldExtension,
@@ -32,7 +33,8 @@ import {
 
 // import 'remirror/styles/all.css';
 
-export function Editor(props: { content: string }) {
+export function Editor(props: { content: string, onContentChange: (content: string) => void }) {
+  const [content, setContent] = useState(props.content);
   const { manager, state, onChange } = useRemirror({
     extensions: () => [
       new BoldExtension({}),
@@ -64,16 +66,45 @@ export function Editor(props: { content: string }) {
     stringHandler: 'markdown',
   });
 
+  // Debounce function
+  function debounce(func: any, wait: number) {
+    let timeout: NodeJS.Timeout;
+    return function (...args: any[]) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(args), wait);
+    };
+  }
+
+  // Example save function
+  function saveContent() {
+    // console.log('Saving content:', content);
+    // Add your save logic here
+    props.onContentChange(content);
+  }
+
+  // Debounced save function
+  const debouncedSave = useCallback(debounce(saveContent, 5000), []);
+
+  const handleChange = (newContent: string) => {
+    setContent(newContent);
+    debouncedSave(newContent);
+  };
+
   return (
     <AllStyledComponent>
       <ThemeProvider className='bg-blue-300'>
         <Remirror
           manager={manager}
           state={state}
-          onChange={onChange}
-          autoRender='end'
-        >
-          <MarkdownToolbar  />
+          onChange={(params) => {
+            onChange(params);
+            const newContent = params.state.doc.toString()
+            if (newContent !== props.content) {
+              handleChange(newContent);
+            }
+          }}
+          autoRender='end'>
+          <MarkdownToolbar />
         </Remirror>
       </ThemeProvider>
     </AllStyledComponent>

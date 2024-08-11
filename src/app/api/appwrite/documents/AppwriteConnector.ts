@@ -71,16 +71,14 @@ class AppwriteService {
     //         });
     // }
 
-    // public async updateDocument(documentId: string, content: string): Promise<any> {
-    //     const data = { status: "completed", content }
-
-    //     return this.databases.updateDocument(this.databaseId, this.collectionId, documentId, data)
-    //         .then(response => response)
-    //         .catch(error => {
-    //             console.error('Error updating document:', error);
-    //             throw error;
-    //         });
-    // }
+    public async updateDocument(token:string,documentId: string, content: string): Promise<any> {
+        return this.databases.updateDocument(this.databaseId, this.collectionId, documentId, { content })
+            .then(response => response)
+            .catch(error => {
+                console.error('Error updating document:', error);
+                throw error;
+            });
+    }
 
     // public async uploadFile(filePath: string, fileName: string): Promise<any> {
     //     const file = InputFile.fromPath(filePath, fileName);

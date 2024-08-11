@@ -39,3 +39,32 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+
+export async function PUT(request: NextRequest) {
+  let token = request.headers.get('Authorization');
+  if (!token) {
+    return NextResponse.json({ error: 'JWT token missing' }, { status: 401 });
+  }
+
+  token = token.replace('Bearer ', '');
+
+  try {
+    const body = await request.json();
+    const { documentId, content } = body;
+
+    console.log("documentId", documentId);
+
+    if (!documentId || !content) {
+      return NextResponse.json({ error: 'Missing documentId or content' }, { status: 400 });
+    }
+
+    const result = await db.updateDocument(token, documentId, content);
+
+    return NextResponse.json({ success: true, data: result }, { status: 201 });
+  } catch (error) {
+    console.error('Failed to update document', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+
+}

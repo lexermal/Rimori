@@ -219,9 +219,6 @@ Background information:
 }
 
 async function getMarkdownContent(jwt: string, id: string) {
-  //fetch to /api/appwrite/document?id=
-  //return the content
-
   return fetch("/api/appwrite/documents?documentId=" + id, {
     headers: {
       'Content-Type': 'application/json',

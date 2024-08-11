@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 import { Input } from '@/components/ai-sidebar/Input';
 
+import { useUser } from '@/context/UserContext';
 import { useRouter } from '@/i18n';
 
 import { Editor } from './components/Editor';
@@ -18,12 +19,26 @@ export default function Page() {
   const [content, setContent] = useState<string>('');
   const router = useRouter();
 
+  const { user } = useUser();
+  // @ts-ignore
+  const jwt = user?.jwt;
+
+  const getDocumentId = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const documentId = urlParams.get('file');
+    return documentId;
+  }
+
   useEffect(() => {
-    getContent().then((value) => {
+    if (!jwt) {
+      return;
+    }
+
+    getContent(jwt, getDocumentId()).then((value) => {
       setWebSiteLoaded(true);
       setContent(value);
     });
-  }, []);
+  }, [jwt]);
 
   if (!webSiteLoaded) {
     return (
@@ -37,7 +52,7 @@ export default function Page() {
     <div>
       <Assistant onToogle={setAssistantIsOpen} />
       <div className='fixed w-28 bottom-1 left-1'>
-        <PomodoroCounter onEnd={() => router.push('/go')} />
+        <PomodoroCounter onEnd={() => router.push('/')} />
       </div>
       <div
         style={{
@@ -46,11 +61,27 @@ export default function Page() {
           height: '680px',
           overflowY: 'auto',
           padding: '5px',
-          boxShadow:"0px 0px 25px 11px rgba(0,0,0,0.27)"
+          boxShadow: "0px 0px 25px 11px rgba(0,0,0,0.27)"
         }}
         className='p-4 max-w-3xl mx-auto rounded-lg overflow-hidden'
       >
-        <Editor content={content} key={content.substring(0, 10)} />
+        <Editor
+          content={content}
+          key={content.substring(0, 10)}
+          onContentChange={(content) => {
+            fetch("/api/appwrite/documents", {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': jwt
+              },
+              body: JSON.stringify({ content, documentId: getDocumentId() })
+            }).then(response => response.json())
+              .then(data => {
+                console.log("Document updated", data);
+              });
+          }}
+        />
       </div>
     </div>
   );
@@ -87,28 +118,33 @@ function Assistant(props: { onToogle: (open: boolean) => void }) {
   );
 }
 
-async function getContent() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const fileName = urlParams.get('file');
-
-  if (!fileName) {
+async function getContent(jwt: string, documentId: string | null) {
+  if (!documentId) {
     console.error('No file parameter in the URL');
     return '';
   }
 
-  if (fileName === 'new') {
-    // now file
+  if (documentId === 'new') {
+    // new file
     return '';
   }
 
-  const response = await fetch(
-    `/api/markdown?filename=${encodeURIComponent(fileName)}`
-  );
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const json = await response.json();
-  return json.data;
+  return getMarkdownContent(jwt, documentId);
 }
+
+
+
+async function getMarkdownContent(jwt: string, id: string) {
+  return fetch("/api/appwrite/documents?documentId=" + id, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': jwt
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log("getMarkdownContent", data);
+      return data.data[0].content;
+    });
+}
+
