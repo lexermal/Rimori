@@ -15,7 +15,6 @@ let kickedOffStory = false;
 export default function Story() {
   const [feedback, setFeedback] = React.useState<StoryFeedback | null>(null);
   const [chapterResult, setChapterResult] = React.useState<StoryFeedback[]>([]);
-  const [context, setContext] = React.useState<string | null>(null);
   const [fileId, setFileId] = React.useState<string | null>(null);
   const router = useRouter();
 
@@ -48,12 +47,11 @@ export default function Story() {
       setFileId(fileId);
       console.log("fileId", fileId);
       getAssistentInstructions(jwt, fileId).then(content => {
-        setContext(content);
 
         if (!kickedOffStory) {
           kickedOffStory = true;
           setMessages([{ id: '1', role: 'system', content: content }]);
-          append({ id: '2', role: 'user', content: 'Generate first chapter.' });
+          append({ id: '2', role: 'user', content: `Generate first chapter. The users name is ${user.name.split(" ")[0]}.` });
         }
       });
     }
@@ -196,7 +194,7 @@ function OtherToolRendering(props: { toolInvocation: ToolInvocation }) {
 
 async function getAssistentInstructions(jwt: string, documentId: string) {
   return `
-Act like a storyteller who creates an entertaining story, based on the background information, for the user "Tim".
+Act like a storyteller who creates an entertaining story, based on the background information.
 
 Your tasks:
 - Generate one chapter at a time. 

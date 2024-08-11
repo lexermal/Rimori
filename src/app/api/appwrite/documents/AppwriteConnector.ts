@@ -71,9 +71,12 @@ class AppwriteService {
     //         });
     // }
 
-    public async updateDocument(token:string,documentId: string, content: string): Promise<any> {
+    public async updateDocument(token: string, documentId: string, content: string): Promise<any> {
         return this.databases.updateDocument(this.databaseId, this.collectionId, documentId, { content })
-            .then(response => response)
+            .then(response => {
+                this.getDocuments(token, true);
+                return response;
+            })
             .catch(error => {
                 console.error('Error updating document:', error);
                 throw error;
@@ -110,7 +113,7 @@ class AppwriteService {
 
         console.log('Retrieving documents for cache', userId);
 
-        this.cache.set(userId, documents, 2 * 60);
+        this.cache.set(userId, documents, 60 * 60 * 1);
 
         return docs;
     }
