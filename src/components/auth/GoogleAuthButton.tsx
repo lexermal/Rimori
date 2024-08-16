@@ -5,7 +5,7 @@ import { account } from '@/app/appwrite';
 const GoogleAuthButton = () => {
   const handleGoogleSignIn = async () => {
     try {
-      const response = await account.createOAuth2Session(OAuthProvider.Google, 'http://localhost:3000');
+      const response = await account.createOAuth2Session(OAuthProvider.Google, 'http://localhost:3000/');
       console.log(response);
     } catch (error) {
       console.error('Sign In failed', error);
