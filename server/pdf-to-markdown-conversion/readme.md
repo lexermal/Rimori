@@ -8,6 +8,14 @@ apt install pdftohtml
 npm run dev
 ```
 
+## Docker setup
+The environment variables need to be set in .env
+
+```bash
+docker build -t rimori-pdf-converter:0.1.0 .
+docker compose up -d
+```
+
 ## Example bash request
 
 ```bash
