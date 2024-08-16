@@ -23,7 +23,7 @@ async function getFileContent(file: string, jwt: string) {
         throw new Error("Document not found");
     }
 
-    console.log("found document", doc);
+    // console.log("found document", doc);
 
     return doc.content;
 }

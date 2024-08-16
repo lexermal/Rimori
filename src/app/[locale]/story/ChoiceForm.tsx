@@ -31,7 +31,7 @@ export default function AnswerComponent(props: Props) {
   if (validate) {
     return <div className="bg-gray-300 mx-auto max-w-3xl rounded-xl p-5">
       <Spinner aria-label="Default status example" size="lg" />
-      <span className="ms-2">Validating the answer...</span>
+      <span className="ms-2">Validating your answer...</span>
     </div>
   }
   return <div className="bg-gray-300 mx-auto max-w-3xl rounded-xl p-5 text-left">
