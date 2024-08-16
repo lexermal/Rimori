@@ -1,14 +1,34 @@
+import { parse } from 'cookie';
+import { type NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
-export default createMiddleware({
-  // A list of all locales that are supported
+const intlMiddleware = createMiddleware({
   locales: ['en', 'se'],
-
-  // Used when no locale matches
-  defaultLocale: 'en'
+  defaultLocale: 'en',
 });
 
+export async function middleware(request: NextRequest) {
+  try {
+    const cookies = parse(request.headers.get('cookie') || '');
+    const jwtUser = cookies.auth_user;
+
+    if (request.nextUrl.pathname === '/auth/login') {
+      if (jwtUser !== undefined) {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      return NextResponse.next();
+    }
+
+    if (jwtUser !== undefined) {
+      return intlMiddleware(request);
+    } else {
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
+  } catch (error) {
+    return NextResponse.redirect(new URL('/auth/login', request.url));
+  }
+}
+
 export const config = {
-  // Match only internationalized pathnames
-  matcher: ['/', '/(se|en)/:path*']
+  matcher: ['/', '/(de|en)/:path*', '/auth/login'],
 };

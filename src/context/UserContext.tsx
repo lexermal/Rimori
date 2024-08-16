@@ -40,9 +40,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           router.push(`/${locale}/waitlist?email=${encodeURIComponent(userData.email)}`);
         } else {
           const encryptedUserData = (await account.createJWT()).jwt;
-          // @ts-ignore
-          userData.jwt = encryptedUserData;
-          setUser(userData);
+          const tokenUser = { ...userData, jwt: encryptedUserData };
+          setUser(tokenUser);
+          document.cookie = cookie.serialize('auth_user', '1', {
+            httpOnly: false,
+            secure: true,
+            maxAge: 60 * 60 * 24 * 7, // Cookie expires in 1 week, but check to adapt to appwrite session
+            path: '/',
+          });
         }
       } catch (error) {
         console.error('Failed to fetch user data', error);
@@ -57,6 +62,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await account.deleteSession('current');
       setUser(null);
 
+      document.cookie = cookie.serialize('auth_user', '', {
+        httpOnly: false,
+        secure: true,
+        expires: new Date(0),
+        path: '/',
+      });
+
+      // Also remove 'user_session' cookie if needed
       document.cookie = cookie.serialize('user_session', '', {
         httpOnly: false,
         secure: true,
