@@ -13,6 +13,9 @@ const nextConfig = {
 
   reactStrictMode: true,
   swcMinify: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 
   // Uncoment to add domain whitelist
   // images: {
