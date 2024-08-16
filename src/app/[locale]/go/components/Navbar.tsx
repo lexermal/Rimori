@@ -10,9 +10,9 @@ export function CustomNavbar() {
     <Navbar rounded className='fixed w-full top-0'>
       <Navbar.Brand href={'/' + locale}>
         <div
-          className='mr-3 h-20 w-40 overflow-hidden fixed ml-1 mt-1'
+          className='mr-3 h-16 w-40 overflow-hidden fixed ml-3'
           style={{
-            backgroundImage: 'url("/logo.png")',
+            backgroundImage: 'url("/logo.svg")',
             backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundColor: 'white',
