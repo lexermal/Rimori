@@ -54,7 +54,7 @@ export function FileUpload(props: Props) {
     <div className='bg-blue-300 w-2/5 mt-7 mx-auto p-6 rounded-xl mb-10 cursor-pointer border-dashed border-4 border-spacing-8 border-purple-900 '
       {...(getRootProps() as DropzoneRootProps)}>
       <input {...(getInputProps() as InputHTMLAttributes<HTMLInputElement>)} />
-      <p className='text-center'>{isUploading ? "Please wait..." : "Upload documents here."}</p>
+      <p className='text-center'>{isUploading ? "Please wait..." : "Upload your documents here."}</p>
     </div>
   );
 }

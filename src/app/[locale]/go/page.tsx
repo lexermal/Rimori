@@ -32,7 +32,7 @@ const Page: React.FC = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log('Data:', data);
-        setDocuments(data.data);
+        setDocuments(data.data || []);
         setLoading(false);
       });
   }
@@ -46,7 +46,7 @@ const Page: React.FC = () => {
   }, [jwt]);
 
   return (
-    <div className='pb-40'>
+    <div className='pb-16'>
       {loading && (
         <div className='text-center'>
           <Spinner className='h-24 w-24 mt-64' />
@@ -54,7 +54,7 @@ const Page: React.FC = () => {
       )}
       <div className='w-2/4 mx-auto pt-28'>
         <h2 className='text-center mb-5'>
-          {Object.keys(documents).length === 0 ? '' : 'Study documents'}
+          Study documents
         </h2>
         {Object.keys(documents).length > 0 && (
           <DocumentSelection
@@ -63,11 +63,6 @@ const Page: React.FC = () => {
             onNewDocument={() => router.push('/study-session?file=new')}
           />
         )}
-        {/* <p className='mt-2 text-gray-400 font-bold'>
-          {Object.keys(documents).length === 0
-            ? ''
-            : 'Select one document to start training!'}
-        </p> */}
       </div>
       {!loading && (
         <FileUpload
