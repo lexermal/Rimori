@@ -6,8 +6,6 @@
 * Stories improvements
   * Make it audible (STT, TTS)
   * Add animations
-  * Add navbar
-  * Make username(Tim) configurable
 
 ## Possible future features
 
