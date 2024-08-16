@@ -58,7 +58,7 @@ spec:
               {{- end }}
           {{- end }}
     {{- end }}
-{{- end }
+{{- end }}
 ---
 {{- if .Values.uploaderIngress.enabled -}}
 {{- $fullName := include "rimori-chart.fullname" . -}}
@@ -111,11 +111,11 @@ spec:
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: uploader-ingress
+                name: {{ $fullName }}
                 port:
                   number: 3001
               {{- else }}
-              serviceName: "uploader-ingress"
+              serviceName: {{ $fullName }}
               servicePort: 3001
               {{- end }}
           {{- end }}
