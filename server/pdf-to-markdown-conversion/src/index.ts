@@ -1,7 +1,6 @@
 import cors from 'cors';
 import express from 'express';
 import fs from 'fs';
-import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import path from 'path';
 import 'dotenv/config';
@@ -18,8 +17,13 @@ const db = AppwriteService.getInstance();
 // Enable CORS
 app.use(cors());
 
+// Health check endpoint
+app.get('/health', (req: any, res: any) => {
+  res.status(200).json({ message: 'Server is running' });
+});
+
 // Validate JWT token and extract email address
-app.use((req: any, res, next) => {
+app.use((req: any, res: any, next: any) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -108,6 +112,5 @@ function uploadMarkdownDocument(fileId: string, markdown: string) {
   console.log('Markdown document uploaded successfully. ID:', fileId);
 
   // Clean up the folder
-  // fs.rmdirSync(`./upload/${fileId}`, { recursive: true });
-
+  fs.rmdirSync(`./upload/${fileId}`, { recursive: true });
 }
