@@ -60,17 +60,17 @@ spec:
           image: "{{ .Values.uploaderImage.repository }}:{{ .Values.uploaderImage.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.uploaderImage.pullPolicy }}
           ports:
-            - name: http
+            - name: http-upload
               containerPort: 3001
               protocol: TCP
           livenessProbe:
               httpGet:
                 path: /health
-                port: http
+                port: http-upload
           readinessProbe:
               httpGet:
                 path: /health
-                port: http
+                port: http-upload
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.volumeMounts }}

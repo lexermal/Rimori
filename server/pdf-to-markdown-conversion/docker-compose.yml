@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: rimori-pdf-converter:0.1.0
+    image: registry.weixler.me/rimori-pdf-converter:0.1.0
     ports:
       - "3001:3001"
     environment:
@@ -14,3 +14,4 @@ services:
       - APPWRITE_DOCUMENT_BUCKET_ID=${APPWRITE_DOCUMENT_BUCKET_ID}
       - JWT_SECRET=${JWT_SECRET}
       - ASSET_PATH=${ASSET_PATH}
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN}

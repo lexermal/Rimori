@@ -11,8 +11,20 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+  selector:
+    {{- include "rimori-chart.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uploader-service
+  labels:
+    {{- include "rimori-chart.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
     - port: 3001
-      targetPort: http
+      targetPort: http-upload
       protocol: TCP
       name: http-uploader
   selector:

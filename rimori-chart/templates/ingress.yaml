@@ -111,11 +111,11 @@ spec:
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ $fullName }}
+                name: uploader-service
                 port:
                   number: 3001
               {{- else }}
-              serviceName: {{ $fullName }}
+              serviceName: uploader-service
               servicePort: 3001
               {{- end }}
           {{- end }}

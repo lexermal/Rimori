@@ -15,7 +15,7 @@ const upload = multer({ dest: './upload' });
 const db = AppwriteService.getInstance();
 
 // Enable CORS
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_DOMAIN }));
 
 // Health check endpoint
 app.get('/health', (req: any, res: any) => {
