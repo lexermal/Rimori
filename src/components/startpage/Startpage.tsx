@@ -52,7 +52,7 @@ const StartPage = (props: { uploadBackend: string }) => {
           <Spinner className='h-24 w-24 mt-64' />
         </div>
       )}
-      <div className='w-2/4 mx-auto pt-28'>
+      <div className='w-2/4 mx-auto'>
         {!loading && <h2 className='text-center mb-5'>
           Study documents
         </h2>}
