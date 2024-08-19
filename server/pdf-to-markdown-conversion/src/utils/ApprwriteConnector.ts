@@ -64,8 +64,8 @@ class AppwriteService {
     public async verifyToken(token: string): Promise<boolean> {
         try {
             const client = new Client()
-                .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT || 'https://cloud.appwrite.io/v1')
-                .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || 'project_id_is_missing')
+                .setEndpoint(process.env.APPWRITE_API_ENDPOINT || 'https://cloud.appwrite.io/v1')
+                .setProject(process.env.APPWRITE_PROJECT_ID || 'project_id_is_missing')
                 .setJWT(token);
 
             const databases = new Databases(client);

@@ -4,7 +4,7 @@ import cookie from 'cookie';
 import { useRouter } from 'next/navigation';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
-import { account } from '@/app/appwrite';
+import { AppwriteSingleton } from '@/app/appwrite';
 
 interface UserContextType {
   user: Models.User<Models.Preferences> | null;
@@ -12,10 +12,19 @@ interface UserContextType {
   logout: () => Promise<void>;
 }
 
+interface Props {
+  children: ReactNode,
+  allowedDomains: string[],
+  apiEndpoint: string,
+  projectId: string
+}
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const UserProvider: React.FC<Props> = ({ children, allowedDomains, apiEndpoint, projectId }) => {
   const [user, setUser] = useState<Models.User<Models.Preferences> | null>(null);
+  AppwriteSingleton.init(apiEndpoint, projectId);
+  const account = AppwriteSingleton.getAccount();
   const router = useRouter();
 
   const getLocaleFromCookie = (): string => {
@@ -27,7 +36,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   useEffect(() => {
-    const allowedDomains = process.env.NEXT_PUBLIC_ALLOWED_DOMAINS?.split(',') || [];
     const locale = getLocaleFromCookie();
 
     const fetchUser = async () => {

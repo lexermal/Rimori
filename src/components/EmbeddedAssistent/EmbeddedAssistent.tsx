@@ -11,6 +11,7 @@ import CustomMessages, { MessagesProps } from './CustomMessages';
 import { VoiceId } from './Voice/TTS';
 
 const EmbeddedAssistent = (props: {
+  ttsAPIkey: string;
   id: string;
   instructions: string;
   firstMessage?: string;
@@ -49,6 +50,7 @@ const EmbeddedAssistent = (props: {
           />
         )}
         Messages={renderMessageReceiver(
+          props.ttsAPIkey,
           voiceEnabled,
           props.customMessageComponent,
           props.firstMessage && props.firstMessage,
@@ -103,6 +105,7 @@ function RenderSpeaker(props: {
 }
 
 function renderMessageReceiver(
+  ttsAPIkey:string,
   enableVoice: boolean,
   CustomMessageComponent: React.ComponentType<MessagesProps> | undefined,
   initialMessage?: string,
@@ -121,6 +124,7 @@ function renderMessageReceiver(
       enableVoice={enableVoice}
       initialMessage={initialMessage}
       voiceId={voiceId}
+      ttsAPIKey={ttsAPIkey}
     />
   );
 }

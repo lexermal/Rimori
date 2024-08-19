@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 
 import { useUser } from '@/context/UserContext';
 import { useRouter } from '@/i18n';
+import DocumentSelection from '@/components/startpage/DocumentSelection';
+import { FileUpload } from '@/components/startpage/FileUpload';
 
-import DocumentSelection from './components/DocumentSelection';
-import { FileUpload } from './components/FileUpload';
 
 export interface MarkdownDocument {
   id: string;
@@ -16,7 +16,7 @@ export interface MarkdownDocument {
   topics?: string[];
 }
 
-const Page: React.FC = () => {
+const StartPage = (props: { uploadBackend: string }) => {
   const [documents, setDocuments] = useState<MarkdownDocument[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,9 +53,9 @@ const Page: React.FC = () => {
         </div>
       )}
       <div className='w-2/4 mx-auto pt-28'>
-        <h2 className='text-center mb-5'>
+        {!loading && <h2 className='text-center mb-5'>
           Study documents
-        </h2>
+        </h2>}
         {Object.keys(documents).length > 0 && (
           <DocumentSelection
             onSelected={(id) => setSelectedFile(id)}
@@ -66,6 +66,7 @@ const Page: React.FC = () => {
       </div>
       {!loading && (
         <FileUpload
+          backendEndoint={props.uploadBackend}
           jwt={jwt}
           onFileUpload={() => true}
           onFilesUploaded={() => {
@@ -83,10 +84,10 @@ function TrainingButtons({ selectedFile }: any) {
   const router = useRouter();
 
   const buttons = [
-    {
-      text: 'Study Session',
-      onClick: () => router.push(`/study-session?file=${selectedFile}`),
-    },
+    // {
+    //   text: 'Study Session',
+    //   onClick: () => router.push(`/study-session?file=${selectedFile}`),
+    // },
     {
       text: 'Opposition',
       onClick: () => router.push(`/discussion?file=${selectedFile}`),
@@ -112,4 +113,4 @@ function TrainingButtons({ selectedFile }: any) {
   );
 }
 
-export default Page;
+export default StartPage;

@@ -1,7 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 
-import { CustomNavbar } from '@/app/[locale]/go/components/Navbar';
+import { CustomNavbar } from '@/components/startpage/Navbar';
 
 export default async function LocaleLayout({
   children,

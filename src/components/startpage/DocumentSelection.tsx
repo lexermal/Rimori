@@ -1,6 +1,6 @@
+import { MarkdownDocument } from '@/components/startpage/Startpage';
 import { useEffect, useState } from 'react';
 
-import { MarkdownDocument } from '@/app/[locale]/go/page';
 
 interface Props {
   items: MarkdownDocument[];

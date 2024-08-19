@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { unstable_noStore as noStore } from 'next/cache';
 
 export async function POST(request: NextRequest) {
+  noStore();
+
   const data = await request.formData()
   const file: File | null = data.get('file') as unknown as File
 

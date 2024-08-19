@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { Client, Databases, ID, Query, Storage } from 'node-appwrite';
 import NodeCache from 'node-cache';
+import { unstable_noStore as noStore } from 'next/cache';
 
+noStore();
 
 class AppwriteService {
     private static instance: AppwriteService;
@@ -11,13 +13,14 @@ class AppwriteService {
     private databaseId = process.env.APPWRITE_DATABASE_ID || 'database_id_is_missing';
     private collectionId = process.env.APPWRITE_DOCUMENT_COLLECTION_ID || 'document_collection_id_is_missing';
     private documentBucketId = process.env.APPWRITE_DOCUMENT_BUCKET_ID || 'document_bucket_id_is_missing';
+    private waitlistCollectionId = process.env.APPWRITE_WAITLIST_COLLECTION_ID || 'waitlist_collection_id_is_missing';
     private cache = new NodeCache();
 
     private constructor() {
         this.client = new Client();
         this.client
-            .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT || 'https://cloud.appwrite.io/v1')
-            .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || 'project_id_is_missing')
+            .setEndpoint(process.env.APPWRITE_API_ENDPOINT || 'https://cloud.appwrite.io/v1')
+            .setProject(process.env.APPWRITE_PROJECT_ID || 'project_id_is_missing')
             .setKey(process.env.APPWRITE_SECRET_KEY || 'secret_key_is_missing');
 
         this.databases = new Databases(this.client);
@@ -34,8 +37,8 @@ class AppwriteService {
     public async verifyToken(token: string): Promise<boolean> {
         try {
             const client = new Client()
-                .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_API_ENDPOINT || 'https://cloud.appwrite.io/v1')
-                .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || 'project_id_is_missing')
+                .setEndpoint(process.env.APPWRITE_API_ENDPOINT || 'https://cloud.appwrite.io/v1')
+                .setProject(process.env.APPWRITE_PROJECT_ID || 'project_id_is_missing')
                 .setJWT(token);
 
             const databases = new Databases(client);
@@ -70,6 +73,15 @@ class AppwriteService {
     //             throw error;
     //         });
     // }
+
+    public async addToWaitlist(email: string): Promise<any> {
+        return await this.databases.createDocument(
+            this.databaseId,
+            this.waitlistCollectionId,
+            'unique()', // Unique document ID
+            { email, createdAt: new Date().toISOString() }
+        );
+    }
 
     public async updateDocument(token: string, documentId: string, content: string): Promise<any> {
         return this.databases.updateDocument(this.databaseId, this.collectionId, documentId, { content })
@@ -111,7 +123,7 @@ class AppwriteService {
             [Query.equal('userId', userId)]
         );
 
-        console.log('Retrieving documents for cache', userId);
+        console.log('Retrieving documents from cache', userId);
 
         this.cache.set(userId, documents, 60 * 60 * 1);
 

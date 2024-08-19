@@ -1,5 +1,13 @@
 # Rimori
 
+## Docker setup
+The environment variables need to be set in .env
+
+```bash
+docker build -t registry.weixler.me/rimori:0.1.0 .
+docker compose up -d
+```
+
 ## Todo
 
 * Audio recording works well at beginning but is cut off when I say a second sentence after a pause.

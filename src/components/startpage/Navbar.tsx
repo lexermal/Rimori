@@ -49,16 +49,16 @@ export function CustomNavbar() {
         {/* <Navbar.Link href="#" active>
           Home
         </Navbar.Link> */}
-        <Navbar.Link href={'/' + locale + '/go'}> Study</Navbar.Link>
+        {/* <Navbar.Link href={'/' + locale + '/go'}> Study</Navbar.Link> */}
         {/* <Navbar.Link
           target='_blank'
           href='http://www.educationplanner.org/students/self-assessments/learning-styles'
         >
           Study Type
         </Navbar.Link> */}
-        <Navbar.Link disabled href='#'>
+        {/* <Navbar.Link disabled href='#'>
           Plan your study
-        </Navbar.Link>
+        </Navbar.Link> */}
         {/* <Navbar.Link href="#">Pricing</Navbar.Link> */}
         {/* <Navbar.Link href="#">Contact</Navbar.Link> */}
       </Navbar.Collapse>

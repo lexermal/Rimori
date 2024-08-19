@@ -5,6 +5,7 @@ interface Props {
   onFileUpload: (fileNames: string[]) => void;
   onFilesUploaded: (fileNames: string[]) => void;
   jwt: string
+  backendEndoint: string
 }
 export function FileUpload(props: Props) {
   const [isUploading, setIsUploading] = useState(false);
@@ -32,7 +33,7 @@ export function FileUpload(props: Props) {
 
       setIsUploading(true);
 
-      fetch(process.env.NEXT_PUBLIC_UPLOAD_BACKEND!, {
+      fetch(props.backendEndoint, {
         method: 'POST',
         body: formData,
         headers: { Authorization: `Bearer ${props.jwt}` },

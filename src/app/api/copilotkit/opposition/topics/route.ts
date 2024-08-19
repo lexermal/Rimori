@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
 };
 
 async function getFileContent(file: string, jwt: string) {
-    console.log("mocked file reading. Needs to be implemented properly!");
     const db = AppwriteService.getInstance();
     const docus = await db.getDocuments(jwt);
     // console.log("found documents", docus);

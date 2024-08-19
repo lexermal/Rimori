@@ -16,6 +16,7 @@ export interface MessagesProps {
   enableVoice?: boolean;
   initialMessage?: string;
   voiceId?: VoiceId;
+  ttsAPIKey?: string;
 }
 
 export default function CustomMessages({
@@ -28,6 +29,7 @@ export default function CustomMessages({
   spinner,
   enableVoice,
   voiceId,
+  ttsAPIKey
 }: MessagesProps) {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const [tts, setTTS] = React.useState<TTS | null>(null);
@@ -71,7 +73,7 @@ export default function CustomMessages({
       assistentMessages[assistentMessages.length - 1]?.content;
 
     if (inProgress && !tts) {
-      TTS.createAsync(voiceId!).then((tts) => {
+      TTS.createAsync(voiceId!,ttsAPIKey).then((tts) => {
         console.log('TTS created');
         setTTS(tts);
       });

@@ -1,28 +1,18 @@
-'use client'
-import { CopilotKit } from '@copilotkit/react-core';
-import { ReactNode } from 'react';
+import { AppwriteSingleton } from "@/app/appwrite";
+import RootLayout from "@/app/RootLayout";
+import { unstable_noStore as noStore } from 'next/cache';
 
-import '@copilotkit/react-ui/styles.css';
-import '@/styles/globals.css';
-import '@/styles/colors.css';
+// AppwriteSingleton.init(process.env.APPWRITE_API_ENDPOINT || "", process.env.APPWRITE_PROJECT_ID || "");
+console.log("called AppwriteSingleton.init");
 
-import { GlobalProvider } from '@/context/GlobalContext';
-import { UserProvider } from '@/context/UserContext';
+export default function layout({ children }: { children: React.ReactNode }) {
+  noStore();
 
-type Props = {
-  children: ReactNode;
-};
-
-export default function RootLayout({ children }: Props) {
-  return (
-    <html>
-      <body>
-        <GlobalProvider>
-          <UserProvider>
-            <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
-          </UserProvider>
-        </GlobalProvider>
-      </body>
-    </html>
-  );
+  return <RootLayout
+    allowedDomains={process.env.ALLOWED_DOMAINS?.split(",") || []}
+    apiEndpoint={process.env.APPWRITE_API_ENDPOINT || ""}
+    projectId={process.env.APPWRITE_PROJECT_ID || ""}
+  >
+    {children}
+  </RootLayout>
 }

@@ -1,11 +1,15 @@
 import { OAuthProvider } from 'appwrite';
 
-import { account } from '@/app/appwrite';
+import { AppwriteSingleton } from '@/app/appwrite';
 
-const GoogleAuthButton = () => {
+const GoogleAuthButton = (props: { frontendUrl: string, apiEndpoint: string, projectId: string }) => {
+  AppwriteSingleton.init(props.apiEndpoint, props.projectId);
+  const account = AppwriteSingleton.getAccount();
+
   const handleGoogleSignIn = async () => {
     try {
-      const response = await account.createOAuth2Session(OAuthProvider.Google, 'http://localhost:3000/auth/callback');
+      // console.log('Domain:', props.frontendUrl);
+      const response = await account.createOAuth2Session(OAuthProvider.Google, props.frontendUrl + '/auth/callback');
       console.log(response);
     } catch (error) {
       console.error('Sign In failed', error);
