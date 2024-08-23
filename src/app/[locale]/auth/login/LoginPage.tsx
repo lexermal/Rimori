@@ -4,18 +4,20 @@ import Head from 'next/head';
 import Image from 'next/image';
 import * as React from 'react';
 
-import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
+import { useUser } from '@/hooks/useUser';
+import AuthForm from '@/components/auth/AuthForm';
+import { useTranslations } from 'next-intl';
+import { redirect } from 'next/navigation';
 
-import { useUser } from '@/context/UserContext';
-
-interface Props {
-  frontendUrl: string;
-  apiEndpoint: string;
-  projectId: string;
-}
-
-export default function LoginPage(props: Props) {
+export default function LoginPage() {
   const { user, logout } = useUser();
+  const t = useTranslations('Index');
+
+  React.useEffect(() => {
+    if (user) {
+      redirect('/');
+    }
+  }, [user]);
 
   return (
     <main className="flex flex-col min-h-screen bg-gray-100">
@@ -33,7 +35,7 @@ export default function LoginPage(props: Props) {
         >
           <div className="relative bg-white bg-opacity-30 rounded-lg p-6 flex flex-col items-start min-h-[50vh] min-w-[100%]">
             <p className="text-3xl font-bold text-white mt-4 max-w-[325px]">
-              Unlock your AI learning journey today and propel your academic success to new heights!
+              {t('Unlock your AI learning journey today and propel your academic success to new heights!')}
             </p>
             <Image
               src="/login-sphere.png"
@@ -55,28 +57,28 @@ export default function LoginPage(props: Props) {
         <div className="flex-1 flex items-center justify-center p-4 bg-white relative">
           <Image
             src="/logo.svg"
-            alt="Sphere Graphic"
+            alt="Logo"
             width={80}
             height={80}
             className="absolute top-6 left-6"
           />
 
           <div className="text-center max-w-xs w-full">
-            <h2 className="text-2xl font-semibold mb-4">Login</h2>
-            <p className="text-gray-700 mb-4">
-              {user ? `Welcome back ${user.name}` : "Please log in or sign up to continue."}
-            </p>
             {user ? (
-              <div className="flex justify-center items-center space-x-4">
-                <button
-                  onClick={logout}
-                  className="btn btn-danger px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300"
-                >
-                  Logout
-                </button>
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">Welcome Back!</h2>
+                <p className="text-gray-700 mb-4">
+                  You have logged in successfully!
+                </p>
               </div>
             ) : (
-              <GoogleAuthButton apiEndpoint={props.apiEndpoint} frontendUrl={props.frontendUrl} projectId={props.projectId} />
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">Login</h2>
+                <p className="text-gray-700 mb-4">
+                  {t("Please log in or sign up to continue")}
+                </p>
+                <AuthForm />
+              </div>
             )}
           </div>
         </div>

@@ -1,34 +1,18 @@
-import { parse } from 'cookie';
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
+import { updateSession } from '@/utils/supabase/middleware';
 
-const intlMiddleware = createMiddleware({
+const i18nMiddleware = createMiddleware({
   locales: ['en', 'se'],
   defaultLocale: 'en',
 });
 
 export async function middleware(request: NextRequest) {
-  try {
-    const cookies = parse(request.headers.get('cookie') || '');
-    const jwtUser = cookies.auth_user;
+  const response = i18nMiddleware(request);
 
-    if (request.nextUrl.pathname === '/auth/login') {
-      if (jwtUser !== undefined) {
-        return NextResponse.redirect(new URL('/', request.url));
-      }
-      return NextResponse.next();
-    }
-
-    if (jwtUser !== undefined) {
-      return intlMiddleware(request);
-    } else {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
-    }
-  } catch (error) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
-  }
+  return await updateSession(request, response);
 }
 
 export const config = {
-  matcher: ['/', '/(de|en)/:path*', '/auth/login'],
+  matcher: ['/', '/(se|en)/:path*', '/auth/login'],
 };

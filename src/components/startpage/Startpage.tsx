@@ -3,10 +3,10 @@
 import { Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 
-import { useUser } from '@/context/UserContext';
 import { useRouter } from '@/i18n';
 import DocumentSelection from '@/components/startpage/DocumentSelection';
 import { FileUpload } from '@/components/startpage/FileUpload';
+import { useUser } from '@/hooks/useUser';
 
 
 export interface MarkdownDocument {

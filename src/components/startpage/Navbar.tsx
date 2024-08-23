@@ -1,67 +1,58 @@
 'use client';
 
-import { Navbar } from 'flowbite-react';
+import { usePathname } from '@/i18n';
+import { Navbar, Button } from 'flowbite-react';
 import { useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/hooks/useUser';
 
 export function CustomNavbar() {
   const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useUser();
+
+  if (pathname.startsWith(`/${locale}/auth`)) {
+    return null;
+  }
+
+  const handleLogout = () => {
+    logout();
+    router.replace(`/${locale}/auth/login`);
+  };
 
   return (
-    <Navbar rounded className='fixed w-full top-0'>
-      <Navbar.Brand href={'/' + locale}>
+    <Navbar rounded className="fixed w-full top-0 bg-white shadow-md">
+      <Navbar.Brand href={`/${locale}`}>
         <div
-          className='mr-3 h-16 w-40 overflow-hidden fixed ml-3'
+          className="mr-3 h-16 w-40 overflow-hidden"
           style={{
             backgroundImage: 'url("/logo.svg")',
             backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundColor: 'white',
             backgroundRepeat: 'no-repeat',
-            top: '0',
-            left: '0',
           }}
-        >
-          {/* <img src="/logo.svg" className="mr-3 h-40" alt="Flowbite React Logo" /> */}
-        </div>
-        {/* <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span> */}
+        />
       </Navbar.Brand>
-      <div className='flex md:order-2 mb-16'>
-        {/* <Dropdown
-          arrowIcon={false}
-          inline
-          label={
-            <Avatar alt="User settings" img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" rounded />
-          }
-        >
-          <Dropdown.Header>
-            <span className="block text-sm">Alexander Weixler</span>
-            <span className="block truncate text-sm font-medium">alexander@riau.ai</span>
-          </Dropdown.Header>
-          {/* <Dropdown.Item>Dashboard</Dropdown.Item> */}
-        {/* <Dropdown.Item>Settings</Dropdown.Item> */}
-        {/* <Dropdown.Item>Earnings</Dropdown.Item> */}
-        {/* <Dropdown.Divider />
-          <Dropdown.Item>Sign out</Dropdown.Item>
-        </Dropdown> */}
+
+      <div className="flex md:order-2 items-center">
+
+        {user && (
+          <Button color="light" onClick={handleLogout} className="btn-sm mr-3">
+            Logout
+          </Button>
+        )}
         <Navbar.Toggle />
       </div>
+
       <Navbar.Collapse>
-        {/* <Navbar.Link href="#" active>
+        <Navbar.Link href={`/${locale}`} active={pathname === `/${locale}`}>
           Home
-        </Navbar.Link> */}
-        {/* <Navbar.Link href={'/' + locale + '/go'}> Study</Navbar.Link> */}
-        {/* <Navbar.Link
-          target='_blank'
-          href='http://www.educationplanner.org/students/self-assessments/learning-styles'
-        >
-          Study Type
-        </Navbar.Link> */}
-        {/* <Navbar.Link disabled href='#'>
-          Plan your study
-        </Navbar.Link> */}
-        {/* <Navbar.Link href="#">Pricing</Navbar.Link> */}
-        {/* <Navbar.Link href="#">Contact</Navbar.Link> */}
+        </Navbar.Link>
+
+        {/* Add more Navbar links here if needed */}
       </Navbar.Collapse>
-    </Navbar >
+    </Navbar>
   );
 }
