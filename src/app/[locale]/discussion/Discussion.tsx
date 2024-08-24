@@ -250,7 +250,7 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
                     title={persona.discussionTitle}
                     onClose={() => setShowDiscussion(0)}
                   >
-                    <div
+                    {/* <div
                       className='mr-3 h-16 w-40 overflow-hidden fixed ml-3'
                       style={{
                         backgroundImage: 'url("/logo.svg")',
@@ -261,7 +261,7 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
                         top: '0',
                         left: '0',
                       }}
-                    ></div>
+                    ></div> */}
                     {topics.kid.length === 0 ? (
                       <p className='text-center pt-48 pb-48 font-bold'>
                         <Spinner size="xl" className='mb-4' />
