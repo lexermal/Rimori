@@ -8,7 +8,6 @@ const AuthForm = () => {
     <div className="flex justify-center">
       <SupabaseAuth
         supabaseClient={supabaseClient}
-        redirectTo="http://localhost:3000/en/"
         appearance={{
           extend: false,
           // needed instead of theme because auth ui broken on ssr
