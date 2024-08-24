@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 
 const AuthForm = () => {
@@ -8,6 +8,7 @@ const AuthForm = () => {
     <div className="flex justify-center">
       <SupabaseAuth
         supabaseClient={supabaseClient}
+        redirectTo="http://localhost:3000/en/"
         appearance={{
           extend: false,
           // needed instead of theme because auth ui broken on ssr

@@ -41,6 +41,7 @@
     "canvas": "^2.11.2",
     "clsx": "^2.0.0",
     "cookie": "^0.6.0",
+    "cookies-next": "^4.2.1",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.7.5",
     "hark": "^1.2.3",

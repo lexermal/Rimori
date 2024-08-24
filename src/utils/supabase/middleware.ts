@@ -25,6 +25,22 @@ export async function updateSession(
     }
   );
 
+  // const { searchParams, origin } = new URL(request.url);
+  // const code = searchParams.get('code');
+  // const next = searchParams.get('next') ?? '/';
+
+
+  // if (code) {
+
+  //   const { error, data: { session } } = await supabase.auth.exchangeCodeForSession(code);
+
+  //   if (!error) {
+  //     console.log('setting session')
+  //     await supabase.auth.setSession(session!)
+  //     // return NextResponse.redirect(new URL('/', request.url));
+  //   }
+  // }
+
   const { data: { user } } = await supabase.auth.getUser();
 
   const locale = request.cookies.get('NEXT_LOCALE')?.value || 'en';

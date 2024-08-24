@@ -20,6 +20,10 @@ export const MyUserContextProvider = (props: Props) => {
   const user = useSupaUser();
   const accessToken = session?.access_token ?? null;
 
+  useEffect(() => {
+    console.log(session)
+  }, [session])
+
   const logout = async () => {
     try {
       await supabase.auth.signOut();
