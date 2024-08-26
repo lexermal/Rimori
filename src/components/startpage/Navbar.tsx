@@ -8,10 +8,13 @@ import { useUser } from '@/hooks/useUser';
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/server';
+import { NEXT_PUBLIC_SUPABASE_URL } from '@/utils/constants';
 
 export function CustomNavbar() {
   const locale = useLocale();
   const pathname = usePathname();
+
+  console.log(NEXT_PUBLIC_SUPABASE_URL);
 
   if (pathname.startsWith(`/${locale}/auth`)) {
     return null;
