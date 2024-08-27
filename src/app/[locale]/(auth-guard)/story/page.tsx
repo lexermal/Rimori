@@ -5,8 +5,8 @@ import { Message, useChat } from 'ai/react';
 import React, { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-import AnswerComponent from '@/app/[locale]/story/ChoiceForm';
-import Feedback, { StoryFeedback } from '@/app/[locale]/story/Feedback';
+import AnswerComponent from '@/app/[locale]/(auth-guard)/story/ChoiceForm';
+import Feedback, { StoryFeedback } from '@/app/[locale]/(auth-guard)/story/Feedback';
 import { useUser } from '@/context/UserContext';
 import { useRouter } from '@/i18n';
 

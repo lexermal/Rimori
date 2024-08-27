@@ -7,9 +7,9 @@ import { useEffect, useState } from 'react';
 
 import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 
-import Card from '../../../components/discussion/Card';
-import DiscussionPopup from '../../../components/discussion/DiscussionPopup';
-import EmbeddedAssistent from '../../../components/EmbeddedAssistent/EmbeddedAssistent';
+import Card from '../../../../components/discussion/Card';
+import DiscussionPopup from '../../../../components/discussion/DiscussionPopup';
+import EmbeddedAssistent from '../../../../components/EmbeddedAssistent/EmbeddedAssistent';
 import { useUser } from '@/context/UserContext';
 
 interface Exam {

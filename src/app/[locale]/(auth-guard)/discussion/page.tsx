@@ -1,4 +1,4 @@
-import Discussion from "@/app/[locale]/discussion/Discussion";
+import Discussion from "@/app/[locale]/(auth-guard)/discussion/Discussion";
 
 import { unstable_noStore as noStore } from 'next/cache';
 

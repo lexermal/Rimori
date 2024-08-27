@@ -4,35 +4,22 @@ import { usePathname } from '@/i18n';
 import { Navbar, Button } from 'flowbite-react';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/hooks/useUser';
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/server';
-import { NEXT_PUBLIC_SUPABASE_URL } from '@/utils/constants';
 
 export function CustomNavbar() {
   const locale = useLocale();
   const pathname = usePathname();
-
-  console.log(NEXT_PUBLIC_SUPABASE_URL);
-
-  if (pathname.startsWith(`/${locale}/auth`)) {
-    return null;
-  }
-
   const router = useRouter();
-  const { logout } = useUser();
   const [user, setUser] = useState<User | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
-    const supabase = createClient();
-
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser();
 
-      if (error) {
-        console.error("Error fetching user:", error);
-      } else {
+      if (!error) {
         setUser(data.user);
       }
     };
@@ -41,9 +28,11 @@ export function CustomNavbar() {
   }, []);
 
 
-  const handleLogout = () => {
-    logout();
-    router.replace(`/${locale}/auth/login`);
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      router.replace(`/${locale}/auth/login`);
+    }
   };
 
   return (
