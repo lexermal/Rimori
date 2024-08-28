@@ -6,10 +6,6 @@ export async function GET(request: NextRequest) {
 
   const db = new SupabaseService(token);
 
-  if (!await db.verifyToken()) {
-    return NextResponse.json({ error: 'JWT token missing or invalid' }, { status: 401 });
-  }
-
   try {
     const url = new URL(request.url);
     const documentId = new URLSearchParams(url.search).get('documentId');
@@ -17,7 +13,9 @@ export async function GET(request: NextRequest) {
     if (!documentId) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
-    const { document } = await db.getDocument(documentId);
+    const document = await db.getDocument(documentId);
+
+    console.log('Retrieved document', document);
 
     return NextResponse.json({ success: true, data: document }, { status: 201 });
   } catch (error) {

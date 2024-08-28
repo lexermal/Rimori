@@ -7,8 +7,8 @@ import ReactMarkdown from 'react-markdown';
 
 import AnswerComponent from '@/app/[locale]/(auth-guard)/story/ChoiceForm';
 import Feedback, { StoryFeedback } from '@/app/[locale]/(auth-guard)/story/Feedback';
-import { useUser } from '@/context/UserContext';
 import { useRouter } from '@/i18n';
+import { createClient } from '@/utils/supabase/server';
 
 let kickedOffStory = false;
 
@@ -17,10 +17,6 @@ export default function Story() {
   const [chapterResult, setChapterResult] = React.useState<StoryFeedback[]>([]);
   const [fileId, setFileId] = React.useState<string | null>(null);
   const router = useRouter();
-
-  const { user } = useUser();
-  // @ts-ignore
-  const jwt = user?.jwt;
 
   const { messages, addToolResult, append, isLoading, setMessages } = useChat({
     maxToolRoundtrips: 5,
@@ -38,7 +34,8 @@ export default function Story() {
   console.log("messages", messages);
 
   useEffect(() => {
-    if (jwt) {
+    const supabase = createClient();
+    supabase.auth.getSession().then(session => {
       const fileId = new URLSearchParams(window.location.search).get("file");
       if (!fileId) {
         router.push('/');
@@ -46,16 +43,16 @@ export default function Story() {
       }
       setFileId(fileId);
       console.log("fileId", fileId);
-      getAssistentInstructions(jwt, fileId).then(content => {
-
+      getAssistentInstructions(session.data.session!.access_token, fileId).then(data => {
         if (!kickedOffStory) {
           kickedOffStory = true;
-          setMessages([{ id: '1', role: 'system', content: content }]);
-          append({ id: '2', role: 'user', content: `Generate first chapter. The users name is ${user.name.split(" ")[0]}.` });
+          setMessages([{ id: '1', role: 'system', content: data }]);
+          append({ id: '2', role: 'user', content: `Generate first chapter. The users name is Alex.` });
         }
       });
     }
-  }, [jwt]);
+    );
+  }, []);
 
 
   const agentMessages = messages?.filter((m: Message) => !["system", "user"].includes(m.role));
@@ -99,7 +96,6 @@ export default function Story() {
 
           // render confirmation tool (client-side tool with user interaction)
           return <RenderToolInovation
-            jwt={jwt}
             fileId={fileId || ""}
             key={toolCallId}
             messages={messages}
@@ -115,7 +111,7 @@ export default function Story() {
   )
 }
 
-function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?: string }, messages: Message[], onSubmit: (result: StoryFeedback) => void, chapterResult: StoryFeedback[], fileId: string, jwt: string }) {
+function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?: string }, messages: Message[], onSubmit: (result: StoryFeedback) => void, chapterResult: StoryFeedback[], fileId: string }) {
   console.log("toolInvocation", props.toolInvocation);
   const { toolCallId, toolName, args, result } = props.toolInvocation;
 
@@ -128,7 +124,6 @@ function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?
     return (
       <div key={toolCallId} className='mt-5'>
         <AnswerComponent
-          jwt={props.jwt}
           fileId={props.fileId}
           messages={props.messages}
           question={args.question as string}
@@ -226,7 +221,7 @@ async function getMarkdownContent(jwt: string, id: string) {
     .then(response => response.json())
     .then(data => {
       console.log("getMarkdownContent", data);
-      return data.data[0].content;
+      return data.content;
     });
 }
 

@@ -1,8 +1,7 @@
+import SupabaseService from '@/utils/supabase/server/Connector';
 import { openai } from '@ai-sdk/openai';
 import { convertToCoreMessages, generateText } from 'ai';
 import { NextResponse } from 'next/server';
-
-import AppwriteService from '@/utils/supabase/AppwriteConnector';
 
 export const maxDuration = 30;
 
@@ -74,10 +73,8 @@ The studycase is as follows:
 }
 
 async function getMarkdownContent(jwt: string, fileId: string) {
-  const db = AppwriteService.getInstance();
-  const documents = (await db.getDocuments(jwt)).documents;
-  console.log("documents", documents);
-  const document = documents.find((doc: any) => doc.$id === fileId);
+  const db = new SupabaseService(jwt);
+  const document = await db.getDocument(fileId);
   if (!document) {
     throw new Error('Document not found');
   }
