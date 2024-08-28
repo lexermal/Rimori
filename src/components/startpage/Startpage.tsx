@@ -52,7 +52,7 @@ const StartPage = () => {
   }
 
   return (
-    <div className='pb-16'>
+    <div className='pb-16 pt-6'>
       <div className='w-2/4 mx-auto'>
         <h2 className='text-center mb-5'>
           Study documents
@@ -95,16 +95,18 @@ function TrainingButtons({ selectedFile }: any) {
   ];
 
   return (
-    <div className='fixed bottom-0 right-0 left-0 h-36 bg-gray-500 p-3 flex justify-center items-center space-x-10'>
-      {buttons.map((button, index) => (
-        <button
-          key={index}
-          className='bg-blue-500 hover:bg-blue-700 text-white font-bold text-xl py-8 px-12 rounded-lg border-2 border-white'
-          onClick={button.onClick}
-        >
-          {button.text}
-        </button>
-      ))}
+    <div className='pb-16'>
+      <div className='fixed bottom-0 right-0 left-0 h-36 bg-gray-500 p-3 flex justify-center items-center space-x-10'>
+        {buttons.map((button, index) => (
+          <button
+            key={index}
+            className='bg-blue-500 hover:bg-blue-700 text-white font-bold text-xl py-8 px-12 rounded-lg border-2 border-white'
+            onClick={button.onClick}
+          >
+            {button.text}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
