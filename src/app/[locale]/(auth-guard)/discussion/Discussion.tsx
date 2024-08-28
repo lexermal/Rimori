@@ -10,7 +10,7 @@ import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 import Card from '../../../../components/discussion/Card';
 import DiscussionPopup from '../../../../components/discussion/DiscussionPopup';
 import EmbeddedAssistent from '../../../../components/EmbeddedAssistent/EmbeddedAssistent';
-import { useUser } from '@/context/UserContext';
+import { createClient } from '@/utils/supabase/server';
 
 interface Exam {
   examNr: number;
@@ -31,13 +31,7 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
     visionary: [] as Instructions[],
   });
 
-  const { user } = useUser();
-  // @ts-ignore
-  const jwt = user?.jwt;
-
   useEffect(() => {
-    if (!jwt) return;
-
     const filename =
       new URLSearchParams(window.location.search).get('file') || '';
     setFile(filename);
@@ -46,40 +40,36 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
       return;
     }
     currentlyFetchingTopics = true;
-    fetch(`/api/copilotkit/opposition/topics?file=${filename}&topic=ai`, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setTopics(data);
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-      .finally(() => {
-        currentlyFetchingTopics = false;
-      });
-  }, [jwt]);
 
-  useEffect(() => {
-    setExams([
-      // {
-      //   examNr: 1,
-      //   passed: true,
-      //   reason: 'I understood the explanation',
-      //   improvementHints: 'none',
-      // },
-      // {
-      //   examNr: 2,
-      //   passed: false,
-      //   reason: 'I did not understand the explanation',
-      //   improvementHints: 'none',
-      // },
-    ]);
+    const supabase = createClient();
+    supabase.auth.getSession().then((session) => {
+      fetch(`/api/copilotkit/opposition/topics?file=${filename}`, {
+        headers: { Authorization: `Bearer ${session.data.session?.access_token}` },
+      })
+        .then(async (res) => setTopics(await res.json()))
+        .catch((err) => console.error(err))
+        .finally(() => {
+          currentlyFetchingTopics = false;
+        });
+    });
   }, []);
+
+  // useEffect(() => {
+  //   setExams([
+  //     // {
+  //     //   examNr: 1,
+  //     //   passed: true,
+  //     //   reason: 'I understood the explanation',
+  //     //   improvementHints: 'none',
+  //     // },
+  //     // {
+  //     //   examNr: 2,
+  //     //   passed: false,
+  //     //   reason: 'I did not understand the explanation',
+  //     //   improvementHints: 'none',
+  //     // },
+  //   ]);
+  // }, []);
 
   const actions = [
     {
