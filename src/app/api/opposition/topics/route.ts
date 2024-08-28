@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
     const db = new SupabaseService(req.headers.get("authorization"));
     const doc = await db.getDocument(query.file as string);
 
-    console.log("found document", doc);
     if (!doc) {
         throw new Error("Document not found");
     }
@@ -65,8 +64,6 @@ async function getData(fileContent: string) {
         model: "gpt-4-1106-preview",
         response_format: { type: "json_object" }
     });
-
-console.log("completion", completion);
 
     return JSON.parse(completion.choices[0].message.content!
         .replaceAll("opposition_starting_text", "firstMessage")

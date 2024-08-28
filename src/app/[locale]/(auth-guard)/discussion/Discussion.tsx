@@ -43,7 +43,7 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
 
     const supabase = createClient();
     supabase.auth.getSession().then((session) => {
-      fetch(`/api/copilotkit/opposition/topics?file=${filename}`, {
+      fetch(`/api/opposition/topics?file=${filename}`, {
         headers: { Authorization: `Bearer ${session.data.session?.access_token}` },
       })
         .then(async (res) => setTopics(await res.json()))
@@ -53,23 +53,6 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
         });
     });
   }, []);
-
-  // useEffect(() => {
-  //   setExams([
-  //     // {
-  //     //   examNr: 1,
-  //     //   passed: true,
-  //     //   reason: 'I understood the explanation',
-  //     //   improvementHints: 'none',
-  //     // },
-  //     // {
-  //     //   examNr: 2,
-  //     //   passed: false,
-  //     //   reason: 'I did not understand the explanation',
-  //     //   improvementHints: 'none',
-  //     // },
-  //   ]);
-  // }, []);
 
   const actions = [
     {
