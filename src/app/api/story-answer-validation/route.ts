@@ -2,7 +2,7 @@ import { openai } from '@ai-sdk/openai';
 import { convertToCoreMessages, generateText } from 'ai';
 import { NextResponse } from 'next/server';
 
-import AppwriteService from '@/app/api/appwrite/documents/AppwriteConnector';
+import AppwriteService from '@/utils/supabase/AppwriteConnector';
 
 export const maxDuration = 30;
 
@@ -54,7 +54,7 @@ The studycase is as follows:
 \`\`\`
     `};
 
-    console.log("instructions", instructions);
+  console.log("instructions", instructions);
 
 
   const userMessage = messages.filter((m: any) => m.role === 'user').slice(-1);

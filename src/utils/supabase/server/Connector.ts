@@ -2,7 +2,7 @@ import NodeCache from 'node-cache';
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SUPABASE_URL } from '@/utils/constants';
 
-class AppwriteService {
+class SupabaseService {
     private cache = new NodeCache();
     private client: SupabaseClient;
 
@@ -47,4 +47,4 @@ class AppwriteService {
     }
 }
 
-export default AppwriteService;
+export default SupabaseService;

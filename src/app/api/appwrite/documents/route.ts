@@ -1,11 +1,10 @@
+import SupabaseService from '@/utils/supabase/server/Connector';
 import { NextRequest, NextResponse } from 'next/server';
-
-import SupaBaseService from '@/app/api/appwrite/documents/AppwriteConnector';
 
 export async function GET(request: NextRequest) {
   const token = request.headers.get('Authorization');
 
-  const db = new SupaBaseService(token);
+  const db = new SupabaseService(token);
 
   if (!await db.verifyToken()) {
     return NextResponse.json({ error: 'JWT token missing or invalid' }, { status: 401 });

@@ -1,36 +1,25 @@
+import SupabaseService from "@/utils/supabase/server/Connector";
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from 'openai';
 import { parse } from 'url';
 
-import AppwriteService from "@/app/api/appwrite/documents/AppwriteConnector";
-
 export async function GET(req: NextRequest) {
     const { query } = parse(req.url, true);
-    const { file, topic } = query;
-    //jwt from header
-    const jwt = req.headers.get("authorization")?.replace("Bearer ", "");
 
-    return NextResponse.json(await getData(file!.toString(), topic!.toString(), jwt!));
-};
+    const db = new SupabaseService(req.headers.get("authorization"));
+    const doc = await db.getDocument(query.file as string);
 
-async function getFileContent(file: string, jwt: string) {
-    const db = AppwriteService.getInstance();
-    const docus = await db.getDocuments(jwt);
-    // console.log("found documents", docus);
-    const doc = docus.documents.find((doc: any) => doc.$id === file);
+    console.log("found document", doc);
     if (!doc) {
         throw new Error("Document not found");
     }
 
-    // console.log("found document", doc);
+    return NextResponse.json(getData(doc.content));
+};
 
-    return doc.content;
-}
-
-async function getData(file: string, topic: string, jwt: string) {
+async function getData(fileContent: string) {
     const openai = new OpenAI();
 
-    let fileContent = await getFileContent(file, jwt);
     //replace all markdown images
     fileContent = fileContent.replaceAll(/!\[.*\]\(.*\)/g, "");
     //replace all html images
