@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
+import { createClient } from '@/utils/supabase/server';
 
 enum Status {
   Idle,
@@ -32,18 +33,17 @@ const WaitlistPage = () => {
     setMessage('');
 
     try {
-      const response = await fetch('/api/appwrite/waitlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
+      const supabase = createClient();
 
-      if (response.ok) {
+      const { error } = await supabase.from('waitlist').insert({ email })
+
+      if (!error) {
         setStatus(Status.Success);
         setMessage(t('You have been added to the waitlist!'));
         setEmail('');
       } else {
         setStatus(Status.Error);
+        console.error('Failed to add to waitlist:', error);
         setMessage(t('Failed to add you to the waitlist. Please try again.'));
       }
     } catch (error) {

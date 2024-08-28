@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from '@/i18n';
 import DocumentSelection from '@/components/startpage/DocumentSelection';
 import { FileUpload } from '@/components/startpage/FileUpload';
-import { useUser } from '@/hooks/useUser';
+import { createClient } from '@/utils/supabase/server';
 
 
 export interface MarkdownDocument {
@@ -16,47 +16,48 @@ export interface MarkdownDocument {
   topics?: string[];
 }
 
-const StartPage = (props: { uploadBackend: string }) => {
-  const [documents, setDocuments] = useState<MarkdownDocument[]>([]);
-  const [loading, setLoading] = useState(true);
+export interface DocumentStatus {
+  id: string;
+  name: string;
+  status: string;
+}
 
+const StartPage = () => {
+  const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<string>('');
+  const [documents, setDocuments] = useState<DocumentStatus[]>([]);
 
   const router = useRouter();
-  const { user } = useUser();
-  // @ts-ignore
-  const jwt = user?.jwt;
+  const supabase = createClient();
 
-  const fetchDocuments = async (refreshIndex?: boolean) => {
-    fetch('/api/appwrite/documents?onlyTitle=true' + (refreshIndex ? "&refresh=true" : ""), { headers: { Authorization: `Bearer ${jwt}` } })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Data:', data);
-        setDocuments(data.data || []);
-        setLoading(false);
-      });
+  const fetchDocuments = async () => {
+    const { data, error } = await supabase.from('documents').select('id,name,status')
+
+    if (error) console.error('Failed to retrieve documents:', error);
+
+    setDocuments(data || []);
+    setLoading(false);
   }
 
   useEffect(() => {
-    if (!jwt) {
-      return;
-    }
-
     fetchDocuments();
-  }, [jwt]);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className='text-center'>
+        <Spinner className='h-24 w-24 mt-64' />
+      </div>
+    );
+  }
 
   return (
     <div className='pb-16'>
-      {loading && (
-        <div className='text-center'>
-          <Spinner className='h-24 w-24 mt-64' />
-        </div>
-      )}
       <div className='w-2/4 mx-auto'>
-        {!loading && <h2 className='text-center mb-5'>
+        <h2 className='text-center mb-5'>
           Study documents
-        </h2>}
-        {Object.keys(documents).length > 0 && (
+        </h2>
+        {documents.length > 0 && (
           <DocumentSelection
             onSelected={(id) => setSelectedFile(id)}
             items={documents}
@@ -64,23 +65,18 @@ const StartPage = (props: { uploadBackend: string }) => {
           />
         )}
       </div>
-      {!loading && (
-        <FileUpload
-          backendEndoint={props.uploadBackend}
-          jwt={jwt}
-          onFileUpload={() => true}
-          onFilesUploaded={() => {
-            fetchDocuments(true);
-          }}
-        />
-      )}
+      <FileUpload
+        onFileUpload={() => true}
+        onFilesUploaded={() => {
+          fetchDocuments();
+        }}
+      />
       {selectedFile && <TrainingButtons selectedFile={selectedFile} />}
     </div>
   );
 };
 
 function TrainingButtons({ selectedFile }: any) {
-  // router for pushing to the next page
   const router = useRouter();
 
   const buttons = [

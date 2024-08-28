@@ -1,14 +1,18 @@
+"use client";
+
+import { UPLOAD_BACKEND } from '@/utils/constants';
+import { createClient } from '@/utils/supabase/server';
 import { InputHTMLAttributes, useEffect, useState } from 'react';
 import { DropzoneRootProps, useDropzone } from 'react-dropzone';
 
 interface Props {
   onFileUpload: (fileNames: string[]) => void;
   onFilesUploaded: (fileNames: string[]) => void;
-  jwt: string
-  backendEndoint: string
 }
+
 export function FileUpload(props: Props) {
   const [isUploading, setIsUploading] = useState(false);
+  const [jwt, setJWT] = useState<string>('');
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     multiple: true,
     onDragEnter: () => console.log('onDragEnter'),
@@ -18,37 +22,43 @@ export function FileUpload(props: Props) {
       'application/pdf': [],
     },
   });
-  console.log('acceptedFiles:', acceptedFiles);
-
-  //useeffect that uploads the file to /api/upload
 
   useEffect(() => {
-    if (acceptedFiles.length > 0) {
-      props.onFileUpload(acceptedFiles.map((file) => file.name));
-
-      const formData = new FormData();
-      acceptedFiles.forEach((file) => {
-        formData.append('file', file);
-      });
-
-      setIsUploading(true);
-
-      fetch(props.backendEndoint, {
-        method: 'POST',
-        body: formData,
-        headers: { Authorization: `Bearer ${props.jwt}` },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          props.onFilesUploaded(data.allFiles);
-          console.log('Success:', data);
-          setIsUploading(false);
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-          setIsUploading(false);
-        });
+    const supabase = createClient();
+    supabase.auth.getSession().then((session) => {
+      setJWT(session.data.session!.access_token);
     }
+    );
+  }, []);
+
+  useEffect(() => {
+    if (acceptedFiles.length === 0) {
+      return;
+    }
+
+    props.onFileUpload(acceptedFiles.map((file) => file.name));
+
+    const formData = new FormData();
+    acceptedFiles.forEach((file) => {
+      formData.append('file', file);
+    });
+
+    setIsUploading(true);
+
+    fetch(UPLOAD_BACKEND, {
+      method: 'POST',
+      body: formData,
+      headers: { Authorization: `Bearer ${jwt}` },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        props.onFilesUploaded(data.allFiles);
+        console.log('Success:', data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      })
+      .then(() => setIsUploading(false));
   }, [acceptedFiles]);
 
   return (
