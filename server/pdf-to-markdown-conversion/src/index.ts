@@ -8,7 +8,7 @@ import 'dotenv/config';
 import MarkdownExtractor from './Converter/MarkdownExtractor';
 import { extractPdfToHtml } from './Converter/PdfToHtml';
 import { improveTextWithAI } from './utils/AiOptimizers';
-import SupabaseService from './utils/ApprwriteConnector';
+import SupabaseService from './utils/Connector';
 import { ASSET_PATH, FRONTEND_DOMAIN } from './utils/constants';
 import jwt from 'jsonwebtoken';
 import { createLogger } from './utils/logger';
