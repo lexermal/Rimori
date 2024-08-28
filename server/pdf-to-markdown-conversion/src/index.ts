@@ -8,109 +8,103 @@ import 'dotenv/config';
 import MarkdownExtractor from './Converter/MarkdownExtractor';
 import { extractPdfToHtml } from './Converter/PdfToHtml';
 import { improveTextWithAI } from './utils/AiOptimizers';
-import AppwriteService from './utils/ApprwriteConnector'
+import SupabaseService from './utils/ApprwriteConnector';
+import { ASSET_PATH, FRONTEND_DOMAIN } from './utils/constants';
+import jwt from 'jsonwebtoken';
+import { createLogger } from './utils/logger';
 
 const app = express();
 const upload = multer({ dest: './upload' });
-const db = AppwriteService.getInstance();
+const logger = createLogger("index.ts");
 
 // Enable CORS
-app.use(cors({ origin: process.env.FRONTEND_DOMAIN }));
+app.use(cors({ origin: FRONTEND_DOMAIN }));
 
 // Health check endpoint
 app.get('/health', (req: any, res: any) => {
   res.status(200).json({ message: 'Server is running' });
 });
 
-// Validate JWT token and extract email address
+// Validate JWT token
 app.use((req: any, res: any, next: any) => {
+  logger.info('Validating JWT token...');
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  try {
-    req.userId = db.getUserId(token);
-    next();
-  } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
+  req.token = token;
+  next();
 });
 
 app.post('/upload', upload.single('file'), async (req: any, res) => {
-  // Handle the uploaded file here
   const file = req.file;
   if (!file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
+  const db = new SupabaseService(req.token);
+
   // Extract the file extension from the request object
   const fileExtension = path.extname(file.originalname);
 
-  const fileId = await db.createDocument(file.originalname, req.userId);
+  const fileId = await db.createDocument(file.originalname.replace(fileExtension, ''));
+  logger.debug('File ID:', fileId);
 
   fs.mkdirSync(`./upload/${fileId}`);
 
   // Move the uploaded file into the created folder with the new name
-  const filePath = `./upload/${fileId}/${fileId}${fileExtension}`;
-  fs.renameSync(file.path, filePath);
+  fs.renameSync(file.path, `./upload/${fileId}/${fileId}${fileExtension}`);
 
-  const markdown = await convertPdfToMarkdown(fileId);
-  uploadMarkdownDocument(fileId, markdown);
+  await uploadMarkdownDocument(req.token, fileId, await convertPdfToMarkdown(fileId));
 
   return res.status(200).json({ message: 'File uploaded successfully' });
 });
 
 app.listen(3001, () => {
-  console.log('Server is running on port 3001');
+  logger.info('Server is running on port 3001');
 });
 
-
 async function convertPdfToMarkdown(fileId: string) {
-  console.log('Converting PDF to Markdown...');
+  logger.info('Converting PDF to Markdown...');
 
   const xml = await extractPdfToHtml(fileId);
 
-  const assetPath = process.env.ASSET_PATH || ".";
+  const pages = await new MarkdownExtractor().getMarkdown(xml, ASSET_PATH);
 
-  const markdownPages = await new MarkdownExtractor().getMarkdown(xml, assetPath);
+  const markdown = await improveTextWithAI(pages);
 
-  const improvedMarkdown = await Promise.all(markdownPages.map(async (page, index) => {
-    console.log('Improving page ' + index + ' with AI');
-    return await improveTextWithAI(page);
-  }));
+  logger.info('PDF converted to Markdown successfully. ID: ', fileId);
 
-  const finishedMarkdown = improvedMarkdown.join('\n\n');
-
-  //  write the markdown to a file
-  const markdownFilePath = `./upload/${fileId}/output.md`;
-  // console.log('Markdown file path:', markdownFilePath);
-  fs.writeFileSync(markdownFilePath, finishedMarkdown);
-
-  console.log('PDF converted to Markdown successfully. ID: ', fileId);
-
-  return finishedMarkdown;
+  return markdown;
 }
 
 
-function uploadMarkdownDocument(fileId: string, markdown: string) {
-  const awService = AppwriteService.getInstance();
+async function uploadMarkdownDocument(token: string, id: string, markdown: string) {
+  const client = new SupabaseService(token)
+  const { sub } = jwt.decode(token) as { sub: string };
 
-  // Get all .png files in the folder and upload them to the Appwrite storage
-  const files = fs.readdirSync(`./upload/${fileId}`).filter((file) => file.endsWith('.png'));
-  files.forEach(async (file) => {
-    console.log('Uploading image:', file);
-    const id = await awService.uploadFile(`./upload/${fileId}/${file}`, file);
-    // console.log('Image uploaded with ID:', id);
+  // Get all image files in the folder and upload them to the Supabase storage
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.svg', '.webp', '.ico'];
+
+  const assets = fs.readdirSync(`./upload/${id}`).filter(file => {
+    const fileExtension = path.extname(file).toLowerCase();
+    return imageExtensions.includes(fileExtension);
   });
 
+  await Promise.all(assets.map(async (file) => {
+    logger.debug('Uploading image:', file);
+    await client.uploadAsset(`./upload/${id}/${file}`, sub + "/" + file);
+  }));
+
   //upload the original pdf file
-  awService.uploadFile(`./upload/${fileId}/${fileId}.pdf`, fileId + "_original.pdf");
+  logger.info('Uploading original PDF file');
+  await client.uploadDocument(`./upload/${id}/${id}.pdf`, sub + "_" + id + "_original.pdf");
 
-  awService.updateDocument(fileId, markdown);
+  await client.completeDocument(id, markdown);
 
-  console.log('Markdown document uploaded successfully. ID:', fileId);
+  logger.info('Markdown document uploaded successfully. ID:', id);
 
   // Clean up the folder
-  fs.rmdirSync(`./upload/${fileId}`, { recursive: true });
+  fs.rm(`./upload/${id}`, { recursive: true }, (err) => err && logger.error(err));
 }

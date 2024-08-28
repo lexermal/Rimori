@@ -4,9 +4,11 @@ export const createLogger = (fileId: string) => {
   const logger = winston.createLogger({
     format: winston.format.combine(
       winston.format.timestamp(),
-      winston.format.colorize(),
-      winston.format.printf(({ level, message, timestamp }) => {
-        return `[${timestamp}] [${fileId}] [${level.toUpperCase()}]: ${message}`;
+      winston.format.splat(),
+      winston.format.printf(({ level, message, timestamp, ...meta }) => {
+        const additionalParams = Object.values(meta).join('');
+        const logEntry = `[${timestamp}] [${fileId}] [${level}]: ${message} ${additionalParams}`;
+        return winston.format.colorize().colorize(level, logEntry);
       })
     ),
     transports: [

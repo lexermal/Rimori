@@ -1,43 +1,31 @@
 import OpenAI from "openai";
+import { OPENAI_API_KEY } from "./constants";
+import { createLogger } from "./logger";
 
-export async function improveTextWithAI(unpretty_markdown_text: string) {
+const logger = createLogger("AiOptimizers.ts");
+
+async function improvePage(unpretty_markdown_text: string) {
   const systemPrompt = "Format and send the text entered by the user in an easy-to-read Markdown format. Make use of headings and lists. Do not change the content.";
 
-  const openai = new OpenAI();
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-  const gptResponse = await openai.chat.completions.create({
+  return await openai.chat.completions.create({
     model: 'gpt-4o',
+    temperature: 0.7,
     messages: [{ "role": "system", "content": systemPrompt },
     { "role": "user", "content": unpretty_markdown_text }],
-    temperature: 0.7
-  });
-
-  return gptResponse.choices[0].message.content;
+  })
+    .then((response) => response.choices[0].message.content)
+    .catch((error) => {
+      logger.error('Error:', error);
+      return unpretty_markdown_text;
+    });
 }
 
-// export async function imageContentLookup(base64: string) {
+export async function improveTextWithAI(pages: string[]) {
+  return await Promise.all(pages.map(async (page, index) => {
+    logger.info('Improving page ' + (index + 1) + ' with AI');
 
-//   const openai = new OpenAI();
-
-//   const response = await openai.chat.completions.create({
-//     model: "gpt-4-turbo",
-//     messages: [
-//       {
-//         role: "user",
-//         content: [
-//           { type: "text", text: "What is this picture about and then give the text written on it." },
-//           {
-//             type: "image_url",
-//             image_url: {
-//               "url": "data:image/jpeg;base64," + base64
-//             },
-//           },
-//         ],
-//       },
-//     ],
-//   });
-//   console.log(response.choices[0]);
-// }
-
-
-
+    return await improvePage(page);
+  })).then((result) => result.join('\n\n'));
+}
