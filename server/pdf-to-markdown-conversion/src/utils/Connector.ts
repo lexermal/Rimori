@@ -39,6 +39,16 @@ class SupabaseService {
         }
     }
 
+    public async deleteDocument(id: string): Promise<void> {
+        const { error } = await this.client.from('documents').delete().eq('id', id);
+
+        if (error) {
+            logger.error('Failed to delete document:', error);
+            throw new Error('Failed to delete document');
+        }
+        logger.info('Document deleted successfully', id);
+    }
+
     public async uploadAsset(filePath: string, fileName: string): Promise<any> {
         const fileBuffer = fs.readFileSync(filePath);
 

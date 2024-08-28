@@ -56,7 +56,18 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
   // Move the uploaded file into the created folder with the new name
   fs.renameSync(file.path, `./upload/${fileId}/${fileId}${fileExtension}`);
 
-  await uploadMarkdownDocument(req.token, fileId, await convertPdfToMarkdown(fileId));
+  try {
+    const markdown = await convertPdfToMarkdown(fileId);
+    await uploadMarkdownDocument(req.token, fileId, markdown);
+
+    fs.rm(`./upload/${fileId}`, { recursive: true }, (err) => err && logger.error(err));
+  } catch (error: any) {
+    logger.error('Failed to convert PDF to Markdown:', error);
+    await db.deleteDocument(fileId);
+    fs.rm(`./upload/${fileId}`, { recursive: true }, (err) => err && logger.error(err));
+
+    return res.status(400).json({ error: error.message });
+  }
 
   return res.status(200).json({ message: 'File uploaded successfully' });
 });
@@ -71,6 +82,17 @@ async function convertPdfToMarkdown(fileId: string) {
   const xml = await extractPdfToHtml(fileId);
 
   const pages = await new MarkdownExtractor().getMarkdown(xml, ASSET_PATH);
+
+  const totalPercentageOfLines = pages.map((page) => rationOfImages(page))
+    .filter((percentage) => percentage !== null)
+    .reduce((acc, curr) => (acc + curr) / 2);
+
+  logger.debug('Total percentage of images:', totalPercentageOfLines);
+
+  if (totalPercentageOfLines > 80) {
+    logger.error('The document contains more than 80% images.');
+    throw new Error("The document mainly contains images and only little text. Rimori will be able to read such files soon.");
+  }
 
   const markdown = await improveTextWithAI(pages);
 
@@ -104,7 +126,23 @@ async function uploadMarkdownDocument(token: string, id: string, markdown: strin
   await client.completeDocument(id, markdown);
 
   logger.info('Markdown document uploaded successfully. ID:', id);
+}
 
-  // Clean up the folder
-  fs.rm(`./upload/${id}`, { recursive: true }, (err) => err && logger.error(err));
+function rationOfImages(markdown: string): number | null {
+  // Regular expression to match Markdown image syntax
+  const imageRegex = /!\[.*?\]\(.*?\)/;
+
+  // Split the document into lines
+  const lines = markdown.split('\n').filter(line => line.trim() !== '');
+
+  const totalLines = lines.length;
+
+  if (totalLines === 0) {
+    return null;
+  }
+
+  // Count the number of lines that are images
+  const imageLinesCount = lines.filter(line => imageRegex.test(line.trim())).length;
+
+  return (imageLinesCount / totalLines) * 100;
 }
