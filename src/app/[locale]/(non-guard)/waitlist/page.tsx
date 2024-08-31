@@ -3,7 +3,7 @@
 import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { createClient } from '@/utils/supabase/server';
 
 enum Status {
@@ -16,47 +16,60 @@ enum Status {
 const WaitlistPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const emailParam = searchParams.get('email');
+  const emailParam = searchParams.get('email') ?? '';
 
-  const [email, setEmail] = useState(emailParam || '');
-  const [status, setStatus] = useState<Status>(Status.Idle);
-  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState(emailParam);
+  const [statusMessage, setStatusMessage] = useState({
+    status: Status.Idle,
+    message: '',
+  });
+
   const t = useTranslations('Index');
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
 
   const handleClick = async () => {
     if (!email) {
-      setMessage(t('Please enter a valid email address.'));
+      setStatusMessage({
+        status: Status.Error,
+        message: t('Please enter a valid email address'),
+      });
       return;
     }
 
-    setStatus(Status.Loading);
-    setMessage('');
+    setStatusMessage({
+      status: Status.Loading,
+      message: '',
+    });
 
     try {
       const supabase = createClient();
-
-      const { error } = await supabase.from('waitlist').insert({ email })
+      const { error } = await supabase.from('waitlist').insert({ email });
 
       if (!error) {
-        setStatus(Status.Success);
-        setMessage(t('You have been added to the waitlist!'));
+        setStatusMessage({
+          status: Status.Success,
+          message: t('You have been added to the waitlist!'),
+        });
         setEmail('');
       } else {
-        setStatus(Status.Error);
-        console.error('Failed to add to waitlist:', error);
-        setMessage(t('Failed to add you to the waitlist. Please try again.'));
+        let errorMessage = t('Failed to add you to the waitlist Please try again');
+        if (error.code === '23505') {
+          errorMessage = t('You have already been registered to the waitlist We will contact you when Rimori is available for you');
+        }
+        setStatusMessage({
+          status: Status.Error,
+          message: errorMessage,
+        });
       }
     } catch (error) {
-      setStatus(Status.Error);
-      setMessage(t('An error occurred. Please try again.'));
+      setStatusMessage({
+        status: Status.Error,
+        message: t('An error occurred Please try again later'),
+      });
     }
   };
-
-  useEffect(() => {
-    if (emailParam) {
-      setEmail(emailParam);
-    }
-  }, [emailParam]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#406d46] to-[#5e6b20] p-4">
@@ -74,14 +87,14 @@ const WaitlistPage = () => {
               type="email"
               placeholder="john.doe@university.edu"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleInputChange}
               className="border border-gray-300 p-2 w-full rounded-lg"
               required
             />
           </div>
         )}
-        {status === Status.Error && <p className="text-red-500 text-sm mb-4">{message}</p>}
-        {status === Status.Success && <p className="text-green-500 text-sm mb-4">{message}</p>}
+        {statusMessage.status === Status.Error && <p className="text-red-500 text-sm mb-4">{statusMessage.message}</p>}
+        {statusMessage.status === Status.Success && <p className="text-green-500 text-sm mb-4">{statusMessage.message}</p>}
 
         <div className="flex justify-center align-middle space-x-4 mt-6">
           <button
@@ -93,9 +106,9 @@ const WaitlistPage = () => {
           <button
             type="button"
             className="bg-gray-400 text-white p-2 rounded-lg hover:bg-gray-100 transition duration-300"
-            onClick={() => router.push('/learn-more')}
+            onClick={() => router.replace('/')}
           >
-            Learn More
+            {t('Go to homepage')}
           </button>
         </div>
       </div>
