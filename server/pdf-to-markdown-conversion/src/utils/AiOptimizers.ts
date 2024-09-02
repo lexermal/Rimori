@@ -1,11 +1,15 @@
 import OpenAI from "openai";
-import { OPENAI_API_KEY } from "./constants";
+import { OPENAI_API_KEY, SKIP_AI_ENHANCING } from "./constants";
 import { createLogger } from "./logger";
 
 const logger = createLogger("AiOptimizers.ts");
 
 async function improvePage(unpretty_markdown_text: string) {
   const systemPrompt = "Format and send the text entered by the user in an easy-to-read Markdown format. Make use of headings and lists. Do not change the content.";
+
+  if (SKIP_AI_ENHANCING) {
+    return unpretty_markdown_text;
+  }
 
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
