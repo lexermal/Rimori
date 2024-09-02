@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 
 import { Input } from '@/components/ai-sidebar/Input';
 
-import { useUser } from '@/context/UserContext';
 import { useRouter } from '@/i18n';
 
 import { Editor } from './components/Editor';
@@ -19,9 +18,7 @@ export default function Page() {
   const [content, setContent] = useState<string>('');
   const router = useRouter();
 
-  const { user } = useUser();
-  // @ts-ignore
-  const jwt = user?.jwt;
+  const jwt ="ddd";
 
   const getDocumentId = () => {
     const urlParams = new URLSearchParams(window.location.search);
