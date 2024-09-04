@@ -41,7 +41,7 @@ class SupabaseService {
             throw new Error('Failed to retrieve documents');
         }
 
-        console.log('Retrieved document from database', data[0]);
+        // console.log('Retrieved document from database', data[0]);
 
         const foundDocument = data[0];
 
