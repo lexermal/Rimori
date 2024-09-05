@@ -11,7 +11,7 @@ const nextConfig = {
     esmExternals: 'loose',
   },
 
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
   typescript: {
     ignoreBuildErrors: true,

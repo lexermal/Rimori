@@ -94,7 +94,7 @@ function TrainingButtons({ selectedFile }: any) {
     },
     {
       text: 'Speaking exam',
-      onClick: () => router.push(`/exam-session/speaking-exam?file=${selectedFile}`),
+      onClick: () => router.push(`/exam-session?file=${selectedFile}`),
     },
   ];
 
