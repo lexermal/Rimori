@@ -6,12 +6,14 @@ import path from 'path';
 import 'dotenv/config';
 
 import MarkdownExtractor from './Converter/MarkdownExtractor';
-import { extractPdfToHtml } from './Converter/PdfToHtml';
-import { improveTextWithAI } from './utils/AiOptimizers';
+import { extractPdfToXml } from './Converter/PdfToHtml';
 import SupabaseService from './utils/Connector';
 import { ASSET_PATH, FRONTEND_DOMAIN } from './utils/constants';
 import jwt from 'jsonwebtoken';
 import { createLogger } from './utils/logger';
+import { getMarkdownSections, Section } from './utils/HeadingSplitter';
+import { getVectors } from './Converter/Embeddings';
+import { improveTextWithAI } from './Converter/AiOptimizers';
 
 const app = express();
 const upload = multer({ dest: './upload' });
@@ -58,7 +60,18 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
 
   try {
     const markdown = await convertPdfToMarkdown(fileId);
-    await uploadMarkdownDocument(req.token, fileId, markdown);
+    const sections = await splitMarkdownIntoSections(markdown);
+    const markdown2 = sections.map(section => section.markdown).join("\n\n");
+
+    //write markdown to file in upload/markdown folder
+    fs.writeFileSync(`./upload/markdown/${fileId}.md`, markdown2);
+
+    await uploadMarkdownDocument(req.token, fileId, markdown2);
+    const sections2 = await getMarkdownSections(markdown2);
+
+    sections2.forEach(async ({ heading, markdown, level }) => {
+      db.createDocumentSection(fileId, heading, level, markdown, await getVectors(markdown));
+    });
 
     fs.rm(`./upload/${fileId}`, { recursive: true }, (err) => err && logger.error(err));
   } catch (error: any) {
@@ -79,11 +92,14 @@ app.listen(3001, () => {
 async function convertPdfToMarkdown(fileId: string) {
   logger.info('Converting PDF to Markdown...');
 
-  const xml = await extractPdfToHtml(fileId);
+  const xml = await extractPdfToXml(fileId);
 
   const pages = await new MarkdownExtractor().getMarkdown(xml, ASSET_PATH);
 
-  const totalPercentageOfLines = pages.map((page) => rationOfImages(page))
+  // console.log("pages: ", pages);
+  // throw new Error("Test error");
+
+  const totalPercentageOfLines = pages.map((page) => getImageRatio(page))
     .filter((percentage) => percentage !== null)
     .reduce((acc, curr) => (acc + curr) / 2);
 
@@ -93,12 +109,36 @@ async function convertPdfToMarkdown(fileId: string) {
     logger.error('The document contains more than 80% images.');
     throw new Error("The document mainly contains images and only little text. Rimori will be able to read such files soon.");
   }
+  fs.writeFileSync(`./upload/markdown/${fileId}_withoutAI.md`, pages.join('\n\n'));
 
-  const markdown = await improveTextWithAI(pages);
+  // throw new Error("Test error");
+  // const markdown = await improveTextWithAI(pages);
+
 
   logger.info('PDF converted to Markdown successfully. ID: ', fileId);
 
-  return markdown;
+  return pages.join('\n\n');
+}
+
+async function splitMarkdownIntoSections(markdown: string): Promise<Section[]> {
+  // console.log("markdown: ", markdown);
+  const sections2 = await getMarkdownSections(markdown);
+  // console.log("sections2: ", sections2);
+  const newHeadings = sections2.map(section => "#".repeat(section.level) + " " + section.heading);
+
+  console.log("newHeadings: ", newHeadings.join("\n"));
+
+
+  //map through sections and improve each section with AI
+  const improvedSections = await Promise.all(sections2.map(async (section) => {
+    // console.log("ORIGINAL SECTION------------------------------: ", section.markdown);
+    section.markdown = await improveTextWithAI(section.markdown);
+    // console.log("IMPROVED SECTION------------------------------: ", section.markdown);
+    // throw new Error("Test error");
+    return section;
+  }));
+
+  return improvedSections;
 }
 
 
@@ -128,7 +168,7 @@ async function uploadMarkdownDocument(token: string, id: string, markdown: strin
   logger.info('Markdown document uploaded successfully. ID:', id);
 }
 
-function rationOfImages(markdown: string): number | null {
+function getImageRatio(markdown: string): number | null {
   // Regular expression to match Markdown image syntax
   const imageRegex = /!\[.*?\]\(.*?\)/;
 

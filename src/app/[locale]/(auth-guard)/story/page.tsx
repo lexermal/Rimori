@@ -9,6 +9,7 @@ import AnswerComponent from '@/app/[locale]/(auth-guard)/story/ChoiceForm';
 import Feedback, { StoryFeedback } from '@/app/[locale]/(auth-guard)/story/Feedback';
 import { useRouter } from '@/i18n';
 import { createClient } from '@/utils/supabase/server';
+import SupabaseService from '@/utils/supabase/server/Connector';
 
 let kickedOffStory = false;
 
@@ -77,11 +78,17 @@ export default function Story() {
 
   if (!visibleMessages) return null;
 
-  return visibleMessages.map((m, index) =>
-    <>
+
+  return visibleMessages.map((m, index) => {
+    let content = m.content.split("functions.askForChapterDecision")[0];
+    const contentSplit = content.split("#");
+
+    content = contentSplit.length > 1 ? "# " + contentSplit[1] : "";
+
+    return <>
       <div key={m.id} className='mx-auto max-w-4xl mb-2 text-justify'>
         <ReactMarkdown>
-          {m.content.split("functions.askForChapterDecision")[0]}
+          {content}
         </ReactMarkdown>
         {m.toolInvocations?.map((invocation: ToolInvocation) => {
           const toolCallId = invocation.toolCallId;
@@ -91,7 +98,7 @@ export default function Story() {
             return <Feedback key={toolCallId} feedback={feedback} onContinue={() => {
               addResult("The answer was: " + feedback.chosenOption);
               setFeedback(null);
-            }} />
+            }} />;
           }
 
           // render confirmation tool (client-side tool with user interaction)
@@ -107,7 +114,8 @@ export default function Story() {
             }} />;
         })}
       </div>
-    </>
+    </>;
+  }
   )
 }
 
@@ -189,7 +197,8 @@ function OtherToolRendering(props: { toolInvocation: ToolInvocation }) {
 
 async function getAssistentInstructions(jwt: string, documentId: string) {
   return `
-Act like a storyteller who creates an entertaining story, based on the background information.
+Act like a usecase developer who creates an intersting usecase, based on the background information.
+The usecase consists of 5 chapters that build on each other. 
 
 Your tasks:
 - Generate one chapter at a time. 
@@ -201,8 +210,14 @@ Your tasks:
 - The title of the chapter is a heading.
 - After the story finished call the function "storyEnded" to end the story.
 
-You are not allowed to use key terms mentioned in the background information.
-You are not allowed to say things like "Let's ask the user how the story should continue."
+You are prohibited to use key terms mentioned in the background information.
+
+Your answer should be in the form of a chapter:
+# Chapter 1
+Once upon a time...
+
+The chapter should end with "How should the story continue?".
+
 
 Background information: 
 \`\`\`markdown
@@ -212,16 +227,9 @@ Background information:
 }
 
 async function getMarkdownContent(jwt: string, id: string) {
-  return fetch("/api/appwrite/documents?documentId=" + id, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': jwt
-    }
-  })
-    .then(response => response.json())
-    .then(data => {
-      console.log("getMarkdownContent", data);
-      return data.content;
-    });
+  const db = new SupabaseService(jwt);
+  const document = await db.getDocument(id);
+
+  return document.content;
 }
 

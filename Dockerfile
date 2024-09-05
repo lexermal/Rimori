@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM node:22 AS builder
+FROM node:22.6.0 AS builder
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -23,7 +23,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Create the final image
-FROM node:22
+FROM node:22.6.0
 
 # Install system dependencies for runtime
 RUN apt-get update && apt-get install -y \
