@@ -83,6 +83,19 @@ class SupabaseService {
         }
     }
 
+    public async createDocumentSection(documentId: string, heading: string, headingLevel: number, content: string, vector: number[]): Promise<string> {
+        const { error, data } = await this.client
+            .from('document_section')
+            .insert({ document_id: documentId, heading, heading_level: headingLevel, content, embedding: vector })
+            .select();
+
+        if (error) {
+            console.error('Failed to create document section:', error.message);
+            throw new Error('Failed to create document section');
+        }
+
+        return (data![0] as any).id;
+    }
 }
 
 export default SupabaseService;
