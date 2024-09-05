@@ -36,37 +36,35 @@ export function CustomNavbar() {
   };
 
   return (
-    <div className='mb-24'>
-      <Navbar rounded className="fixed w-full top-0 bg-white shadow-md">
-        <Navbar.Brand href={`/${locale}`}>
-          <div
-            className="mr-3 h-16 w-40 overflow-hidden"
-            style={{
-              backgroundImage: 'url("/logo.svg")',
-              backgroundSize: 'contain',
-              backgroundPosition: 'center',
-              backgroundColor: 'white',
-              backgroundRepeat: 'no-repeat',
-            }}
-          />
-        </Navbar.Brand>
+    <Navbar rounded className="w-full top-0 bg-white shadow-md">
+      <Navbar.Brand href={`/${locale}`}>
+        <div
+          className="mr-3 h-16 w-40 overflow-hidden"
+          style={{
+            backgroundImage: 'url("/logo.svg")',
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundColor: 'white',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+      </Navbar.Brand>
 
-        <div className="flex md:order-2 items-center">
-          {user && (
-            <Button color="light" onClick={handleLogout} className="btn-sm mr-3">
-              Logout
-            </Button>
-          )}
-          <Navbar.Toggle />
-        </div>
+      <div className="flex md:order-2 items-center">
+        {user && (
+          <Button color="light" onClick={handleLogout} className="btn-sm mr-3">
+            Logout
+          </Button>
+        )}
+        <Navbar.Toggle />
+      </div>
 
-        <Navbar.Collapse>
-          <Navbar.Link href={`/${locale}`} active={pathname === `/${locale}`}>
-            Home
-          </Navbar.Link>
-          {/* Add more Navbar links here if needed */}
-        </Navbar.Collapse>
-      </Navbar>
-    </div>
+      <Navbar.Collapse>
+        <Navbar.Link href={`/${locale}`} active={pathname === `/${locale}`}>
+          Home
+        </Navbar.Link>
+        {/* Add more Navbar links here if needed */}
+      </Navbar.Collapse>
+    </Navbar>
   );
 }
