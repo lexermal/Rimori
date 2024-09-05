@@ -23,7 +23,7 @@ export async function getMarkdownSections(markdown: string): Promise<Section[]> 
 
         if (isRealHeading(heading)) {
             const section: Section = {
-                heading,
+                heading: cleanHeading(heading),
                 level,
                 markdown: sectionMarkdown,
                 documentPosition: sections.length + 1,
@@ -46,4 +46,17 @@ function getNextHeadingIndex(markdown: string, currentIndex: number): number {
 
 function isRealHeading(str: string): boolean {
     return str.match(/[a-z0-9]/i) !== null;
+}
+
+function cleanHeading(heading: string): string {
+    // remove * from heading
+    heading = heading.replace(/\*/g, "");
+
+    // check if heading is a markdown link and extract the link text
+    const linkMatch = heading.match(/\[(.*)\]/);
+    if (linkMatch) {
+        heading = linkMatch[1];
+    }
+
+    return heading;
 }
