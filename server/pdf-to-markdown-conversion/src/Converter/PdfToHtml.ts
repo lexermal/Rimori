@@ -6,7 +6,7 @@ import { createLogger } from '../utils/logger';
 const execAsync = promisify(exec);
 const logger = createLogger("PdfToHtml.ts");
 
-export async function extractPdfToHtml(fileId: string): Promise<string> {
+export async function extractPdfToXml(fileId: string): Promise<string> {
   try {
     const { stdout, stderr, } = await execAsync(`pdftohtml -hidden -c -xml -nodrm ${fileId}.pdf`, { cwd: "./upload/" + fileId });
     logger.info('Command output:', stdout);

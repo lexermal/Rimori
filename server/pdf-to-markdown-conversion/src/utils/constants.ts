@@ -12,6 +12,5 @@ export const NEXT_PUBLIC_SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_AN
 export const ASSET_PATH = process.env.ASSET_PATH as string;
 export const FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN as string;
 export const OPENAI_API_KEY = process.env.OPENAI_API_KEY as string;
-export const SKIP_AI_ENHANCING = process.env.SKIP_AI_ENHANCING === 'true';
 
 
