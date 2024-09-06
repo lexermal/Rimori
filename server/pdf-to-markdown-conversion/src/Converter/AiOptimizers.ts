@@ -10,6 +10,8 @@ export async function improveTextWithAI(unpretty_markdown_text: string): Promise
   Make use of lists and text formatting. 
   Do not change the content. Don't change the headings.
   Replace ordered and unordered list symbols with Markdown lists.
+  If you make something a heading, you are only allowed to use h3 and h4 headings.
+  If a heading was h2 or h1 you leave the heading type as it is.
   `;
 
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
