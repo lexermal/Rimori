@@ -50,13 +50,10 @@ class MarkdownExtractor {
   private extractTextData(textElement: any, biggestFontSize: number): string {
     // Extract text data from the text element and convert it to markdown
 
-    // logger.info('Text element:', textElement);
-
     const headingAttribute = parseInt(textElement.$.height);
     const heading = headingAttribute ? this.fontSizeToMarkdownHeading(biggestFontSize, headingAttribute) : "";
 
     if (textElement.b) {
-      // console.log('Text element with bold:', textElement);
       const text = textElement.b[0].toString().trim();
 
       if (text.length === 0) {
@@ -64,7 +61,6 @@ class MarkdownExtractor {
       }
 
       if (textElement.$.href) {
-        // console.log('Text element with bold and link:', textElement);
         return `${heading}[**${text}**](${textElement.$.href})`;
       }
 
@@ -72,7 +68,6 @@ class MarkdownExtractor {
     }
 
     if (textElement.i) {
-      // console.log('Text element with italic:', textElement);
       const text = textElement.i[0].toString().trim();
 
       if (text.length === 0) {
@@ -84,7 +79,6 @@ class MarkdownExtractor {
       }
 
       if (textElement.i[0].b) {
-        // console.log('Text element with italic and bold:', textElement.i[0].b);
         const text = textElement.i[0].b[0].toString().trim();
         return `${heading}***${text}***`;
       }
@@ -93,8 +87,6 @@ class MarkdownExtractor {
     }
 
     if (textElement.a) {
-      // console.log('Text element with link:', textElement.a);
-
       const linkElement = textElement.a[0];
 
       if (linkElement.b) {
@@ -119,7 +111,6 @@ class MarkdownExtractor {
     }
 
     if (textElement._) {
-      // console.log('Text element:', textElement);
       return heading + textElement._.toString().trim();
     }
 
@@ -131,7 +122,6 @@ class MarkdownExtractor {
   }
 
   private extractImageData(imageElement: any, uploadFolder: string): string {
-    // logger.info('Image element:', imageElement);
     // Extract image data from the image element and convert it to markdown
     return `![Image](${uploadFolder}/${imageElement.$.src})`;
   }

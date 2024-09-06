@@ -65,9 +65,10 @@ export default function Story() {
 
   useEffect(() => {
     if (messages.length > 2 && !lastAgentMessage.toolInvocations && !isLoading) {
-      const triggerFunction = chapterResult.length < 5 ? "askForChapterDecision" : "storyEnded";
-      console.log("trigger " + triggerFunction);
-      append({ id: '3', role: 'user', content: 'You forgot to trigger the function "' + triggerFunction + '".' });
+      if (chapterResult.length < 5) {
+        console.log("trigger askForChapterDecision");
+        append({ id: '3', role: 'user', content: 'You forgot to trigger the function "askForChapterDecision".' });
+      }
     }
   }, [isLoading]);
 
@@ -113,6 +114,9 @@ export default function Story() {
               setFeedback(f);
             }} />;
         })}
+        {
+          chapterResult.length > 4 && <StoryEndRendering chapterResult={chapterResult} />
+        }
       </div>
     </>;
   }
@@ -144,8 +148,6 @@ function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?
           }} />
       </div>
     );
-  } else if (toolName === 'storyEnded') {
-    return <StoryEndRendering chapterResult={props.chapterResult} />;
   }
 
   // other tools
@@ -202,18 +204,18 @@ The usecase consists of 5 chapters that build on each other.
 
 Your tasks:
 - Generate one chapter at a time. 
-- The user will answer how the story should continue and whether the answer is correct.
-- For correct answers you continue with the next chapter. For wrong answers the story ends.
-- After the 5th chapter the story ends.
-- The chapter should have max 200 words
-- After each chapter trigger the function "askForChapterDecision" to ask the user how the story should continue.
+- The user will answer how the usecase should continue and whether the answer is correct.
+- For correct answers you continue with the next chapter. For wrong answers the usecase ends.
+- After the 5th chapter the usecase ends.
+- The chapter should have max 300 words
+- After each chapter trigger the function "askForChapterDecision" to ask the user how the usecase should continue.
 - The title of the chapter is a heading.
-- After the story finished call the function "storyEnded" to end the story.
+- After the usecase finished call the function "storyEnded" to end the usecase.
 
 You are prohibited to use key terms mentioned in the background information.
 
 Your answer should be in the form of a chapter:
-# Chapter 1
+# "Chapter 1: <Title>" or "The end" 
 Once upon a time...
 
 The chapter should end with "How should the story continue?".
@@ -223,6 +225,8 @@ Background information:
 \`\`\`markdown
 `+ await getMarkdownContent(jwt, documentId) + `
 \`\`\`
+
+Remember the usecase should have max 300 words.
 `;
 }
 

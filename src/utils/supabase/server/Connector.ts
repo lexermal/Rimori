@@ -2,6 +2,8 @@ import NodeCache from 'node-cache';
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SUPABASE_URL } from '@/utils/constants';
 import jwt from 'jsonwebtoken';
+import { embedMany } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
 class SupabaseService {
     private cache = new NodeCache();
@@ -16,7 +18,10 @@ class SupabaseService {
             throw new Error('Failed to decode token');
         }
 
-        this.client = createClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, { accessToken: async () => token });
+        this.client = createClient(
+            NEXT_PUBLIC_SUPABASE_URL,
+            NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            { accessToken: async () => token });
     }
 
     public async verifyToken(): Promise<boolean> {
@@ -48,6 +53,46 @@ class SupabaseService {
         this.cache.set(id, foundDocument, 60 * 60 * 1);
 
         return foundDocument;
+    }
+
+    public async getSemanticDocumentSections(fileid: string, text: string): Promise<string> {
+        //split with tentense end
+        const embeddings = await this.getEmbedding(text.split(/(?<=[.?!])\s+/));
+        // console.log('Embeddings:', embeddings);
+
+        const context = await Promise.all(embeddings.map(async (embedding: any, index: number) => {
+            const { error, data } = await this.client.rpc(
+                "match_document_sections", {
+                embedding,
+                search_document: fileid,
+                match_threshold: 0.78,
+                match_count: 5,
+                min_content_length: 50,
+            });
+
+            if (error) {
+                console.error('Failed to retrieve document sections:', error);
+                throw new Error('Failed to retrieve document sections');
+            }
+            console.log('Retrieved document sections for embedding ' + index, data);
+
+            return data;
+        }));
+
+        const sections = context.map((c: any) => c.map((s: any) => s.content)).flat()
+
+        console.log('Retrieved document sections', sections);
+        return sections.join("\n\n");
+    }
+
+    private async getEmbedding(sentences: string[]) {
+        console.log('Generating embeddings for sentences:', sentences);
+        const { embeddings } = await embedMany({
+            model: openai.embedding('text-embedding-ada-002'),
+            values: sentences
+        });
+
+        return embeddings;
     }
 }
 

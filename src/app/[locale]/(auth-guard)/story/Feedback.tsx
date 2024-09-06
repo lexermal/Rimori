@@ -14,7 +14,8 @@ export interface StoryFeedback {
 
 export default function Feedback(props: { feedback: StoryFeedback, onContinue: () => void }) {
   console.log("feedback", props.feedback);
-  const { coherence, deepUnderstanding, generalFeedback, suggestions, understanding, vocabulary } = props.feedback;
+  const { generalFeedback, suggestions } = props.feedback;
+  let { coherence, deepUnderstanding, understanding, vocabulary } = props.feedback;
   const router = useRouter();
 
   let grade = props.feedback.grade;
@@ -23,6 +24,11 @@ export default function Feedback(props: { feedback: StoryFeedback, onContinue: (
   if (["A", "B", "C"].indexOf(grade) === -1) {
     grade = "F";
     isAnswerCorrect = false;
+
+    coherence = 0;
+    deepUnderstanding = 0;
+    understanding = 0;
+    vocabulary = 0;
   }
 
   //todo: remove this
