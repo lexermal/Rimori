@@ -69,8 +69,8 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
     await uploadMarkdownDocument(req.token, fileId, markdown2);
     const sections2 = await getMarkdownSections(markdown2);
 
-    sections2.forEach(async ({ heading, markdown, level }) => {
-      db.createDocumentSection(fileId, heading, level, markdown, await getVectors(markdown));
+    sections2.forEach(async ({ heading, markdown, level }, index) => {
+      db.createDocumentSection(fileId, heading, level, markdown, await getVectors(markdown), index);
     });
 
     fs.rm(`./upload/${fileId}`, { recursive: true }, (err) => err && logger.error(err));

@@ -83,10 +83,10 @@ class SupabaseService {
         }
     }
 
-    public async createDocumentSection(documentId: string, heading: string, headingLevel: number, content: string, vector: number[]): Promise<string> {
+    public async createDocumentSection(documentId: string, heading: string, headingLevel: number, content: string, vector: number[], content_index: number): Promise<string> {
         const { error, data } = await this.client
             .from('document_section')
-            .insert({ document_id: documentId, heading, heading_level: headingLevel, content, embedding: vector })
+            .insert({ document_id: documentId, heading, heading_level: headingLevel, content, embedding: vector, content_index })
             .select();
 
         if (error) {
