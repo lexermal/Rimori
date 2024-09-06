@@ -95,7 +95,7 @@ function RenderSpeaker(props: {
       xmlns='http://www.w3.org/2000/svg'
       viewBox='0 0 640 512'
       style={{ fill: props.voiceEnabled ? 'rgb(56 116 181)' : 'black' }}
-      className={'h-7 mr-2 cursor-pointer '}
+      className='h-7 mr-2 cursor-pointer'
       onClick={props.toggleVoice}
     >
       {/* <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
@@ -105,7 +105,7 @@ function RenderSpeaker(props: {
 }
 
 function renderMessageReceiver(
-  ttsAPIkey:string,
+  ttsAPIkey: string,
   enableVoice: boolean,
   CustomMessageComponent: React.ComponentType<MessagesProps> | undefined,
   initialMessage?: string,

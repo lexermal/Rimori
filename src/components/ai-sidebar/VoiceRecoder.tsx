@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 
 interface Props {
   onVoiceRecorded?: (message: string) => void;
+  isDisabled?: boolean;
 }
 
 let mediaRecorder: MediaRecorder;
@@ -127,6 +128,7 @@ function VoiceRecorder(props: Props) {
     <div>
       <button
         onClick={isRecording ? stopRecordingSession : startRecordingSession}
+        disabled={props.isDisabled}
       >
         <svg
           xmlns='http://www.w3.org/2000/svg'

@@ -92,6 +92,10 @@ function TrainingButtons({ selectedFile }: any) {
       text: 'Story',
       onClick: () => router.push(`/story?file=${selectedFile}`),
     },
+    {
+      text: 'Speaking exam',
+      onClick: () => router.push(`/exam-session?file=${selectedFile}`),
+    },
   ];
 
   return (
