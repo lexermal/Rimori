@@ -31,9 +31,12 @@ export default function Feedback(props: { feedback: StoryFeedback, onContinue: (
     vocabulary = 0;
   }
 
-  //todo: remove this
-  // grade = "A";
-  // isAnswerCorrect = true;
+  //for testing set the grade to A
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("test") === "pass") {
+    grade = "A";
+    isAnswerCorrect = true;
+  }
 
   return (
     <div className={'p-5 mt-3 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-md text-left ' + (isAnswerCorrect ? 'border-3 border-green-500' : 'border border-red-500')}>
