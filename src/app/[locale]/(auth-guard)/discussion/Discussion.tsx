@@ -198,7 +198,7 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
 
   return (
     <CopilotKit url='/api/copilotkit/opposition' headers={{ file }}>
-      <div>
+      <div className='mt-8'>
         <h1 className='text-center mb-3'>Time to shine</h1>
         <p className='text-center mb-4'>
           <b>Here are 3 opponents. Your mission is to beat them!</b>
@@ -282,12 +282,12 @@ function getPersonas(
 
   return [
     {
-      name: 'Leo (10)',
-      discussionTitle: 'Leo (10)',
+      name: 'Leo',
+      discussionTitle: 'Leo',
       voiceId: VoiceId.KID,
       image: '/images/opponents/kid-1.webp',
       description:
-        'He loves to tease people by asking tons of questions. Can you explain your topic in a way that he forgets his mission?',
+        'He loves to tease people by asking tons of questions. Can you explain the topic in a way that he forgets his mission?',
       firstMessage: kid.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should explain you a topic in easy terms.
@@ -311,17 +311,17 @@ function getPersonas(
     `,
     },
     {
-      name: 'Clarence (fixed mindset)',
-      discussionTitle: 'Clarence (fixed mindset)',
+      name: 'Clarence',
+      discussionTitle: 'Clarence',
       voiceId: VoiceId.OLD_MAN,
       image: '/images/opponents/mindset-1.webp',
       description:
-        "He has a fixed opinion, but it's outdated. Can you convince him to check if his opinion is still valid?",
+        "He has a fixed opinion and believes he knows everything. Can you convince him that his oppinion is outdated?",
       firstMessage: oldy.firstMessage,
       instructions: `
     Context: You have a conversation with the user who should convince you to change your oppinion about a topic.
-    Your Persona: Act as a old guy with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it. You love to roast the user.
-    Your Oppinion: "${oldy.topic}". 
+    Your Persona: Act as a old guy called Calarence with a fixed mindset and a strong oppinion about a topic by providing strong argumentations for it. You love to roast the user.
+    Your Oppinion: "${oldy.topic}".
     Goal: 
     - After 10 messages call the action "oppinionChanged" and tell the user if you changed your oppinion.
     - If the user explained something right about the topic challenge him with your arguments to explain more about the topic.
@@ -338,8 +338,8 @@ function getPersonas(
     `,
     },
     {
-      name: 'Elena (visionary)',
-      discussionTitle: 'Elena (visionary)',
+      name: 'Elena',
+      discussionTitle: 'Elena',
       voiceId: VoiceId.VISIONARY,
       image: '/images/opponents/inventor-1.webp',
       description:
@@ -360,7 +360,7 @@ function getPersonas(
     - You are now allowed to fall out of the role of a 35 year old woman who is a inspireing visionary.
     - Don't help the user to explain the topic. Tell them they should have done their homework before coming here. 
     - Your answers are not allowed to be longer then 80 words.
-    - You are now allowed to ask more then two questions per response.
+    - You are not allowed to ask more then two questions per response.
     `,
     },
   ];
