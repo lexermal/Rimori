@@ -68,10 +68,22 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
 
     await uploadMarkdownDocument(req.token, fileId, markdown2);
     const sections2 = await getMarkdownSections(markdown2);
+    let headingID = "";
 
-    sections2.forEach(async ({ heading, markdown, level }, index) => {
-      db.createDocumentSection(fileId, heading, level, markdown, await getVectors(markdown), index);
-    });
+    console.log("Creating heading section relationships")
+    for (let index = 0; index < sections2.length; index++) {
+      const { heading, markdown, level } = sections2[index];
+      const sectionId = await db.createDocumentSection(fileId, heading, level, markdown, await getVectors(markdown), index);
+
+      //if first characters are markdown h1 or h2,then get the section id and store it in headingID
+      if (markdown.startsWith("# ") || markdown.startsWith("## ")) {
+        headingID = sectionId;
+      }
+      await db.createSectionRelation(headingID, sectionId);
+    }
+
+    await db.setRealHeadings(fileId);
+    console.log("Heading section relationships created")
 
     fs.rm(`./upload/${fileId}`, { recursive: true }, (err) => err && logger.error(err));
   } catch (error: any) {
@@ -124,9 +136,9 @@ async function splitMarkdownIntoSections(markdown: string): Promise<Section[]> {
   // console.log("markdown: ", markdown);
   const sections2 = await getMarkdownSections(markdown);
   // console.log("sections2: ", sections2);
-  const newHeadings = sections2.map(section => "#".repeat(section.level) + " " + section.heading);
+  // const newHeadings = sections2.map(section => "#".repeat(section.level) + " " + section.heading);
 
-  console.log("newHeadings: ", newHeadings.join("\n"));
+  // console.log("newHeadings: ", newHeadings.join("\n"));
 
 
   //map through sections and improve each section with AI

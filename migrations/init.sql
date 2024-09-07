@@ -35,3 +35,21 @@ begin
   limit match_count;
 end;
 $$;
+
+--- Create function to update isRealHeading field
+CREATE OR REPLACE FUNCTION update_is_real_heading(p_document_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE document_section
+  SET "isRealHeading" = TRUE
+  WHERE id IN (
+    SELECT hr.id
+    FROM section_relation sr
+    INNER JOIN document_section ds ON sr.section_id = ds.id
+    INNER JOIN document_section hr ON sr.heading_id = hr.id
+    WHERE hr.document_id = p_document_id
+    GROUP BY sr.heading_id, hr.heading, hr.content_index, hr.id
+    HAVING SUM(LENGTH(ds.content)) > 600
+  );
+END;
+$$ LANGUAGE plpgsql;

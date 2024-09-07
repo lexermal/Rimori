@@ -96,6 +96,31 @@ class SupabaseService {
 
         return (data![0] as any).id;
     }
+
+    public async createSectionRelation(headingId: string, sectionId: string): Promise<string> {
+        const { error, data } = await this.client
+            .from('section_relation')
+            .insert({ heading_id: headingId, section_id: sectionId })
+            .select();
+
+        if (error) {
+            console.error('Failed to create section relation:', error.message);
+            throw new Error('Failed to create section relation');
+        }
+
+        return (data![0] as any).id;
+    }
+
+    public async setRealHeadings(documentId: string): Promise<void> {
+        const { error } = await this.client
+            .rpc('update_is_real_heading', { p_document_id: documentId })
+
+        if (error) {
+            console.error('Error executing updating real headings column:', error)
+        }
+    }
+
+
 }
 
 export default SupabaseService;
