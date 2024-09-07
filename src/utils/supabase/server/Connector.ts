@@ -48,7 +48,7 @@ class SupabaseService {
                 throw new Error('Failed to retrieve document');
             }
 
-            console.log('Retrieved document from database', data);
+            // console.log('Retrieved document from database', data);
             const content = data.map((d: any) => d.content).join("\n\n");
             this.cache.set(id, content, 60 * 60 * 1);
 

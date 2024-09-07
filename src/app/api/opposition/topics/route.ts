@@ -1,6 +1,8 @@
+import { NEXT_PUBLIC_ANTHROPIC_API_KEY } from "@/utils/constants";
 import SupabaseService from "@/utils/supabase/server/Connector";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { generateText, convertToCoreMessages } from "ai";
 import { NextRequest, NextResponse } from "next/server";
-import { OpenAI } from 'openai';
 import { parse } from 'url';
 
 export async function GET(req: NextRequest) {
@@ -17,17 +19,14 @@ export async function GET(req: NextRequest) {
 };
 
 async function getData(fileContent: string) {
-    const openai = new OpenAI();
-
     //replace all markdown images
     fileContent = fileContent.replaceAll(/!\[.*\]\(.*\)/g, "");
     //replace all html images
     fileContent = fileContent.replaceAll(/<img.*>/g, "");
 
-    const completion = await openai.chat.completions.create({
-        messages: [
-            {
-                "role": "system", "content": `Your goal is to prepare guiding questions for an opposition between a student an AI.
+    const messages = [
+        {
+            "role": "system", "content": `Your goal is to prepare guiding questions for an opposition between a student an AI.
             The AI takes in 2 different personas and the student has to beat them:
             - Kid: called Leo, 10 years old, loves to tease people by asking tons of questions. The student should explain a concept in an way that the kid forgets to tease the student.
             - Oldy: called Clarance, 70 years old, has a fixed mindset and believes that he knows everything. The student should explain a topic in a way that the oldy is convinced that he is wrong.
@@ -55,17 +54,20 @@ async function getData(fileContent: string) {
     For every persona, you should provide 1 question.
     
     The instructions should be clear and concise. `
-            },
-            {
-                "role": "user", "content": `Here is a summary to curate from:
+        },
+        {
+            "role": "user", "content": `Here is a summary to curate from:
             ${fileContent}`
-            },
-        ],
-        model: "gpt-4-1106-preview",
-        response_format: { type: "json_object" }
+        },
+    ] as { role: "system" | "user", content: string }[];
+
+    const anthropic = createAnthropic({ apiKey: NEXT_PUBLIC_ANTHROPIC_API_KEY });
+    const result = await generateText({
+        model: anthropic("claude-3-5-sonnet-20240620"),
+        messages: convertToCoreMessages(messages),
     });
 
-    return JSON.parse(completion.choices[0].message.content!
+    return JSON.parse(result.text
         .replaceAll("opposition_starting_text", "firstMessage")
         .replaceAll("opposition_win_instructions", "topic"));
 }
