@@ -1,5 +1,5 @@
 import hark from 'hark';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useImperativeHandle, forwardRef } from 'react';
 
 interface Props {
   onVoiceRecorded?: (message: string) => void;
@@ -10,7 +10,7 @@ let mediaRecorder: MediaRecorder;
 let audioChunks: { data: Blob; timespamp: number }[] = [];
 let speechEventHandler: hark.Harker;
 
-function VoiceRecorder(props: Props) {
+const VoiceRecorder = forwardRef((props: Props, ref) => {
   const [isRecording, setIsRecording] = useState(false);
   const voiceStartTimestampRef = useRef(0);
 
@@ -30,7 +30,7 @@ function VoiceRecorder(props: Props) {
     console.log('Audio chunks amount: ', audioChunks.length);
 
     if (startChunkIndex > 2) {
-      // init chunks are needed as it seams to be the file header
+      // init chunks are needed as it seems to be the file header
       // without the audio data won't be playable
       const initChunks = audioChunks.slice(0, 2);
       const laterChunks = audioChunks.slice(startChunkIndex - 4);
@@ -77,8 +77,8 @@ function VoiceRecorder(props: Props) {
     const speechEvents = hark(stream, { interval: 150 });
 
     speechEventHandler = speechEvents;
-    //TODO: improve recording by also allowing continuous chitchatting with assistent without stoping hark
-    //The lines in this function are disabled for demo and allow a push to talk recording with automatic stopping, also a convinient feature
+    //TODO: improve recording by also allowing continuous chitchatting with assistant without stopping hark
+    //The lines in this function are disabled for demo and allow a push-to-talk recording with automatic stopping, also a convenient feature
 
     // speechEvents.on('speaking', () => {
     console.log('Speaking...');
@@ -121,8 +121,13 @@ function VoiceRecorder(props: Props) {
     mediaRecorder.ondataavailable = null;
 
     setIsRecording(false);
-    audioChunks = [];
+    // audioChunks = []; //bug and interfering with recording functionaloty on exam session. to be checked if neededs
   };
+
+  useImperativeHandle(ref, () => ({
+    startRecording: startRecordingSession,
+    stopRecording: stopRecordingSession,
+  }));
 
   return (
     <div>
@@ -142,7 +147,7 @@ function VoiceRecorder(props: Props) {
       </button>
     </div>
   );
-}
+});
 
 export default VoiceRecorder;
 

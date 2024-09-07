@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import { OpenAI } from "openai";
 import VoiceRecorder from "@/components/ai-sidebar/VoiceRecoder";
@@ -35,6 +35,18 @@ const ExamSimulator = () => {
   const [isStudent1Thinking, setIsStudent1Thinking] = useState(false);
   const [isStudent2Thinking, setIsStudent2Thinking] = useState(false);
   const [loading, setLoading] = useState(true); // Added loading state
+
+  const voiceRecorderRef = useRef<{ startRecording: () => void; stopRecording: () => void, getTranscript: () => Promise<string> } | null>(null);
+
+  const handleStartRecording = () => {
+    if (voiceRecorderRef.current) {
+      voiceRecorderRef.current.startRecording();
+    }
+  };
+
+  const handleStopRecording = () => {
+    voiceRecorderRef.current?.stopRecording();
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,7 +92,7 @@ const ExamSimulator = () => {
   const handleTimerComplete = () => {
     switch (currentRole) {
       case Role.Student:
-        // stopRecording(); //improve this, the recording must stop after timer is
+        handleStopRecording();  // Stop the recording
         break;
       case Role.Student1:
         setIsStudent1Thinking(false);
@@ -96,6 +108,7 @@ const ExamSimulator = () => {
     }
     return { shouldRepeat: false };
   };
+
 
   const handleStudentSubmit = async (transcript: string) => {
     const updatedRounds = [...rounds];
@@ -169,6 +182,12 @@ const ExamSimulator = () => {
     setIsTimerPlaying(true);
     setTimerKey((prevKey) => prevKey + 1);
   };
+
+  useEffect(() => {
+    if (currentRole === Role.Student) {
+      handleStartRecording();
+    }
+  }, [currentRole]);
 
   const handleNextTopic = () => {
     if (currentRound < rounds.length - 1) {
@@ -267,7 +286,7 @@ const ExamSimulator = () => {
                     {currentRole === Role.Student && (
                       <div className="flex flex-row">
                         <div className="mr-2">
-                          <VoiceRecorder isDisabled={!isInputEnabled || !isTimerPlaying} onVoiceRecorded={(transcript: string) => handleStudentSubmit(transcript)} />
+                          <VoiceRecorder isDisabled={!isInputEnabled || !isTimerPlaying} onVoiceRecorded={(transcript: string) => handleStudentSubmit(transcript)} ref={voiceRecorderRef} />
                         </div>
                         <div className="font-semibold">Recording will start when you press the button</div>
                       </div>
