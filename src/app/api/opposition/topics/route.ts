@@ -7,13 +7,13 @@ export async function GET(req: NextRequest) {
     const { query } = parse(req.url, true);
 
     const db = new SupabaseService(req.headers.get("authorization"));
-    const doc = await db.getDocument(query.file as string);
+    const doc = await db.getDocumentContent(query.file as string);
 
     if (!doc) {
         throw new Error("Document not found");
     }
 
-    return NextResponse.json(await getData(doc.content));
+    return NextResponse.json(await getData(doc));
 };
 
 async function getData(fileContent: string) {

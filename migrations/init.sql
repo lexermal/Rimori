@@ -1,4 +1,5 @@
-DROP FUNCTION match_document_sections(vector,double precision,integer,integer);
+
+
 -- Create embedding similarity search functions
 create or replace function "public"."match_document_sections"(embedding vector(1536), search_document uuid, match_threshold float, match_count int, min_content_length int)
 returns table (id uuid, document_id uuid, heading text, heading_level smallint, content text, similarity float)
@@ -74,5 +75,34 @@ BEGIN
   WHERE
     ds."isRealHeading" = TRUE
   ORDER BY d.id, ds.content_index;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--- Create function to get section details by heading
+CREATE
+OR REPLACE FUNCTION public.get_section_details_by_heading (p_heading_id UUID) RETURNS TABLE (
+  heading_id UUID,
+  section_id UUID,
+  document_id UUID,
+  heading TEXT,
+  CONTENT TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        sr.heading_id,
+        sr.section_id,
+        ds.document_id,
+        ds.heading,
+        ds.content
+    FROM
+        public.section_relation sr
+    INNER JOIN 
+        public.document_section ds ON sr.section_id = ds.id
+    WHERE 
+        sr.heading_id = p_heading_id
+    ORDER BY 
+        ds.content_index;
 END;
 $$ LANGUAGE plpgsql;

@@ -7,14 +7,14 @@ export async function GET(req: NextRequest) {
   const { query } = parse(req.url, true);
 
   const db = new SupabaseService(req.headers.get("authorization"));
-  const doc = await db.getDocument(query.file as string);
+  const doc = await db.getDocumentContent(query.file as string);
 
   if (!doc) {
     return NextResponse.json({ error: "Document not found" }, { status: 404 });
   }
 
   try {
-    const topics = await generateExamTopics(doc.content);
+    const topics = await generateExamTopics(doc);
     return NextResponse.json(topics);
   } catch (error) {
     console.error("Error generating exam topics:", error);

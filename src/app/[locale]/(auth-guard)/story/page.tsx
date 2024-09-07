@@ -232,7 +232,7 @@ Remember the usecase should have max 300 words.
 
 async function getMarkdownContent(jwt: string, id: string) {
   const db = new SupabaseService(jwt);
-  const document = await db.getDocument(id);
+  const document = await db.getDocumentContent(id);
 
   return document.content;
 }

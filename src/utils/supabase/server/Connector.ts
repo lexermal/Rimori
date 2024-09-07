@@ -31,12 +31,28 @@ class SupabaseService {
         })
     }
 
-    public async getDocument(id: string): Promise<any> {
+    public async getDocumentContent(id: string): Promise<string> {
         const document = this.cache.get(id) as any | undefined;
 
         if (document) {
             console.log('Retrieving document from cache', this.userID);
             return document;
+        }
+
+        if (id.includes("_")) {
+            const [fileid, sectionId] = id.split("_");
+            const { data, error } = await this.client.rpc("get_section_details_by_heading", { p_heading_id: sectionId });
+
+            if (error || !data) {
+                console.error('Failed to retrieve document:', error);
+                throw new Error('Failed to retrieve document');
+            }
+
+            console.log('Retrieved document from database', data);
+            const content = data.map((d: any) => d.content).join("\n\n");
+            this.cache.set(id, content, 60 * 60 * 1);
+
+            return content;
         }
 
         const { data, error } = await this.client.from('documents').select().eq('id', id);
@@ -48,7 +64,7 @@ class SupabaseService {
 
         // console.log('Retrieved document from database', data[0]);
 
-        const foundDocument = data[0];
+        const foundDocument = data[0].content;
 
         this.cache.set(id, foundDocument, 60 * 60 * 1);
 

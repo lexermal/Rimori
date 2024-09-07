@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     if (!documentId) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
-    const document = await db.getDocument(documentId);
+    const document = await db.getDocumentContent(documentId);
 
     console.log('Retrieved document', document);
 
