@@ -53,3 +53,26 @@ BEGIN
   );
 END;
 $$ LANGUAGE plpgsql;
+
+--- Create function to get real headings
+CREATE OR REPLACE FUNCTION get_real_headings()
+RETURNS TABLE (
+  document_id uuid,
+  document_name TEXT,
+  section_id uuid,
+  section_heading TEXT,
+  heading_level SMALLINT,
+  content_index BIGINT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    d.id, d.name, ds.id as "section_id", ds.heading as "section_heading", ds.heading_level, ds.content_index
+  FROM
+    public.documents d
+  INNER JOIN public.document_section ds ON d.id = ds.document_id
+  WHERE
+    ds."isRealHeading" = TRUE
+  ORDER BY d.id, ds.content_index;
+END;
+$$ LANGUAGE plpgsql;

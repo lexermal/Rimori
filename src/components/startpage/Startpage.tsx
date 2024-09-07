@@ -17,9 +17,12 @@ export interface MarkdownDocument {
 }
 
 export interface DocumentStatus {
-  id: string;
-  name: string;
-  status: string;
+  document_id: string;
+  document_name: string;
+  section_id: string;
+  section_heading: string;
+  heading_level: number;
+  content_index: number;
 }
 
 const StartPage = () => {
@@ -31,9 +34,11 @@ const StartPage = () => {
   const supabase = createClient();
 
   const fetchDocuments = async () => {
-    const { data, error } = await supabase.from('documents').select('id,name,status')
+    const { data, error } = await supabase.rpc('get_real_headings')
 
     if (error) console.error('Failed to retrieve documents:', error);
+
+    // console.log('data', data);
 
     setDocuments(data || []);
     setLoading(false);
@@ -59,7 +64,15 @@ const StartPage = () => {
         </h2>
         {documents.length > 0 && (
           <DocumentSelection
-            onSelected={(id) => setSelectedFile(id)}
+            onSelected={(id) => {
+              if (!id.includes("_")) {
+                const availableDocuments = documents.filter(d => d.document_id == id && d.section_id != id);
+                const randomdocument = availableDocuments[Math.floor(Math.random() * availableDocuments.length)];
+                id = id + "_" + randomdocument.section_id;
+                console.log("id", id);
+              }
+              setSelectedFile(id);
+            }}
             items={documents}
             onNewDocument={() => router.push('/study-session?file=new')}
           />
@@ -80,31 +93,37 @@ function TrainingButtons({ selectedFile }: any) {
   const router = useRouter();
 
   const buttons = [
-    // {
-    //   text: 'Study Session',
-    //   onClick: () => router.push(`/study-session?file=${selectedFile}`),
-    // },
+    {
+      text: 'Study Session',
+      onClick: () => router.push(`/study-session?file=${selectedFile}`),
+      enabled: false
+    },
     {
       text: 'Opposition',
       onClick: () => router.push(`/discussion?file=${selectedFile}`),
+      enabled: true
     },
     {
       text: 'Story',
       onClick: () => router.push(`/story?file=${selectedFile}`),
+      enabled: true
     },
     {
-      text: 'Speaking exam',
+      text: "Oral exam simulation",
       onClick: () => router.push(`/exam-session?file=${selectedFile}`),
+      enabled: true //Todo remove this line
+      // enable on 20.09.2024 by using date comparison
+      // enabled: new Date() > new Date('2024-09-20'),
     },
   ];
 
   return (
     <div className='pb-16'>
       <div className='fixed bottom-0 right-0 left-0 h-36 bg-gray-500 p-3 flex justify-center items-center space-x-10'>
-        {buttons.map((button, index) => (
+        {buttons.filter((button) => button.enabled).map((button, index) => (
           <button
             key={index}
-            className='bg-blue-500 hover:bg-blue-700 text-white font-bold text-xl py-8 px-12 rounded-lg border-2 border-white'
+            className='bg-blue-500 hover:bg-blue-700 text-white font-bold text-xl h-24 w-48 rounded-lg border-2 border-white'
             onClick={button.onClick}
           >
             {button.text}
