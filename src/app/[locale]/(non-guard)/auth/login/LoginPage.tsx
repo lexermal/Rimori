@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl';
 import { redirect } from 'next/navigation';
 
 export default function LoginPage() {
-  const { user, logout } = useUser();
+  const { user } = useUser();
   const t = useTranslations('Index');
 
   React.useEffect(() => {
@@ -73,10 +73,6 @@ export default function LoginPage() {
               </div>
             ) : (
               <div>
-                <h2 className="text-2xl font-semibold mb-4">Login</h2>
-                <p className="text-gray-700 mb-4">
-                  {t("Please log in or sign up to continue")}
-                </p>
                 <AuthForm />
               </div>
             )}

@@ -13,7 +13,7 @@ export default async function NonGuardLayout({
   return (
     <html lang={locale}>
       <head>
-        <title>Rimori - Non-Auth</title>
+        <title>Rimori</title>
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
