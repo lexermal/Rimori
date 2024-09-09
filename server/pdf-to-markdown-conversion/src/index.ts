@@ -8,7 +8,7 @@ import 'dotenv/config';
 import MarkdownExtractor from './Converter/MarkdownExtractor';
 import { extractPdfToXml } from './Converter/PdfToHtml';
 import SupabaseService from './utils/Connector';
-import { ASSET_PATH, FRONTEND_DOMAIN } from './utils/constants';
+import { FRONTEND_DOMAIN } from './utils/constants';
 import jwt from 'jsonwebtoken';
 import { createLogger } from './utils/logger';
 import { getMarkdownSections, Section } from './utils/HeadingSplitter';
@@ -70,8 +70,9 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
     const sections2 = await getMarkdownSections(markdown2);
     let headingID = "";
 
-    console.log("Creating heading section relationships")
+    // console.log("Creating heading section relationships")
     for (let index = 0; index < sections2.length; index++) {
+      console.log(`Creating heading section relationships for section ${index} of ${sections2.length}`);
       const { heading, markdown, level } = sections2[index];
       const sectionId = await db.createDocumentSection(fileId, heading, level, markdown, await getVectors(markdown), index);
 
@@ -106,10 +107,7 @@ async function convertPdfToMarkdown(fileId: string) {
 
   const xml = await extractPdfToXml(fileId);
 
-  const pages = await new MarkdownExtractor().getMarkdown(xml, ASSET_PATH);
-
-  // console.log("pages: ", pages);
-  // throw new Error("Test error");
+  const pages = await new MarkdownExtractor().getMarkdown(xml, "upload/assets");
 
   const totalPercentageOfLines = pages.map((page) => getImageRatio(page))
     .filter((percentage) => percentage !== null)
@@ -123,30 +121,17 @@ async function convertPdfToMarkdown(fileId: string) {
   }
   fs.writeFileSync(`./upload/markdown/${fileId}_withoutAI.md`, pages.join('\n\n'));
 
-  // throw new Error("Test error");
-  // const markdown = await improveTextWithAI(pages);
-
-
   logger.info('PDF converted to Markdown successfully. ID: ', fileId);
 
   return pages.join('\n\n');
 }
 
 async function splitMarkdownIntoSections(markdown: string): Promise<Section[]> {
-  // console.log("markdown: ", markdown);
   const sections2 = await getMarkdownSections(markdown);
-  // console.log("sections2: ", sections2);
-  // const newHeadings = sections2.map(section => "#".repeat(section.level) + " " + section.heading);
-
-  // console.log("newHeadings: ", newHeadings.join("\n"));
-
 
   //map through sections and improve each section with AI
   const improvedSections = await Promise.all(sections2.map(async (section) => {
-    // console.log("ORIGINAL SECTION------------------------------: ", section.markdown);
     section.markdown = await improveTextWithAI(section.markdown);
-    // console.log("IMPROVED SECTION------------------------------: ", section.markdown);
-    // throw new Error("Test error");
     return section;
   }));
 

@@ -1,30 +1,33 @@
-import OpenAI from "openai";
-import { OPENAI_API_KEY } from "../utils/constants";
 import { createLogger } from "../utils/logger";
+import Anthropic from "@anthropic-ai/sdk";
+import { TextBlock } from "@anthropic-ai/sdk/resources";
+import { ANTHROPIC_API_KEY } from "../utils/constants";
 
 const logger = createLogger("AiOptimizers.ts");
 
 export async function improveTextWithAI(unpretty_markdown_text: string): Promise<string> {
   const systemPrompt = `
-  Format and send the text entered by the user in an easy-to-read Markdown format. 
-  Make use of lists and text formatting. 
-  Do not change the content. Don't change the headings.
-  Replace ordered and unordered list symbols with Markdown lists.
-  If you make something a heading, you are only allowed to use h3 and h4 headings.
-  If a heading was h2 or h1 you leave the heading type as it is.
+**Markdown Formatting Instructions:**
+
+1. Convert user-entered text into Markdown format, ensuring it's easy to read.
+2. Utilize Markdown syntax for lists and apply appropriate text formatting without altering the content.
+3. Maintain existing headings. Do not change their content or level.
+   - For new headings, use only "###" (h3) or "####" (h4) formats.
+   - Keep headings that are already "##" (h2) or "#" (h1) unchanged.
+4. Transform all list symbols into Markdown list formats.
+5. Keep all images unchanged.
   `;
 
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+  const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
 
-  return await openai.chat.completions.create({
-    model: 'gpt-4o',
-    temperature: 0.7,
-    messages: [{ "role": "system", "content": systemPrompt },
-    { "role": "user", "content": unpretty_markdown_text }],
-  })
-    .then((response) => response.choices[0].message.content as string)
-    .catch((error) => {
-      logger.error('Error:', error);
-      return "";
-    });
+  const msg = await anthropic.messages.create({
+    model: "claude-3-5-sonnet-20240620",
+    system: systemPrompt,
+    max_tokens: 1000 + unpretty_markdown_text.split(" ").length * 2,
+    messages: [{ "role": "user", "content": unpretty_markdown_text }]
+  });
+
+  logger.info("Response from AI: ", msg.usage);
+
+  return (msg.content[0] as TextBlock).text;
 }

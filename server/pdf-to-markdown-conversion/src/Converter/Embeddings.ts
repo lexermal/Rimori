@@ -1,9 +1,7 @@
 import OpenAI from "openai";
 import { OPENAI_API_KEY } from "../utils/constants";
 
-
 export async function getVectors(markdown: string): Promise<number[]> {
-    // console.log("Generating embeddings for markdown: ", markdown)
     try {
         const openai = new OpenAI({ apiKey: OPENAI_API_KEY })
 

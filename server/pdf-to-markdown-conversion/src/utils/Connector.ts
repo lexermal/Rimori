@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SUPABASE_URL } from './constants';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from './constants';
 import { createLogger } from './logger';
 
 const logger = createLogger("ApprwriteConnector.ts");
@@ -10,7 +10,7 @@ class SupabaseService {
 
     public constructor(bearerToken: string | null) {
         const token = (bearerToken ?? "").replace('Bearer ', '');
-        this.client = createClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, { accessToken: async () => token });
+        this.client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { accessToken: async () => token });
     }
 
     public async createDocument(fileName: string): Promise<string> {
