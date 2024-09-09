@@ -26,9 +26,9 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
   const [exams, setExams] = useState<Exam[]>([]);
   const [file, setFile] = useState('');
   const [topics, setTopics] = useState({
-    kid: [] as Instructions[],
-    oldy: [] as Instructions[],
-    visionary: [] as Instructions[],
+    kid: {} as Instructions,
+    oldy: {} as Instructions,
+    visionary: {} as Instructions,
   });
 
   useEffect(() => {
@@ -205,7 +205,7 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
         </p>
 
         <div className='flex mx-auto w-3/4'>
-          {getPersonas(topics.kid[0], topics.oldy[0], topics.visionary[0]).map(
+          {getPersonas(topics.kid, topics.oldy, topics.visionary).map(
             (persona, index) => {
               const exam = exams.filter((e) => e.examNr === index + 1);
 
@@ -216,26 +216,12 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
                     src={persona.image}
                     description={persona.description}
                     success={exam[0]?.passed}
-                    onClick={() => setShowDiscussion(index + 1)}
-                  />
+                    onClick={() => setShowDiscussion(index + 1)} />
                   <DiscussionPopup
                     show={showDiscussion === index + 1}
                     title={persona.discussionTitle}
-                    onClose={() => setShowDiscussion(0)}
-                  >
-                    {/* <div
-                      className='mr-3 h-16 w-40 overflow-hidden fixed ml-3'
-                      style={{
-                        backgroundImage: 'url("/logo.svg")',
-                        backgroundSize: 'contain',
-                        backgroundPosition: 'center',
-                        backgroundColor: 'white',
-                        backgroundRepeat: 'no-repeat',
-                        top: '0',
-                        left: '0',
-                      }}
-                    ></div> */}
-                    {topics.kid.length === 0 ? (
+                    onClose={() => setShowDiscussion(0)}>
+                    {Object.keys(topics.kid).length === 0 ? (
                       <p className='text-center pt-48 pb-48 font-bold'>
                         <Spinner size="xl" className='mb-4' />
                         <br />
@@ -250,8 +236,7 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
                         // instructions={''}
                         instructions={persona.instructions}
                         firstMessage={persona.firstMessage}
-                        voiceId={persona.voiceId}
-                      />
+                        voiceId={persona.voiceId} />
                     )}
                   </DiscussionPopup>
                 </div>

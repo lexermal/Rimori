@@ -24,6 +24,11 @@ async function getData(fileContent: string) {
     //replace all html images
     fileContent = fileContent.replaceAll(/<img.*>/g, "");
 
+    const prefilledContent = `{
+        "kid":
+     {
+      "opposition_starting_text": `;
+
     const messages = [
         {
             "role": "system", "content": `Your goal is to prepare guiding questions for an opposition between a student an AI.
@@ -35,13 +40,12 @@ async function getData(fileContent: string) {
      Your sole task is to go through the provided information and create the guiding questions needed for the oppositions a JSON list of strings
      in this format:
      {
-        kid:[
+        "kid":
      {
-      opposition_starting_text: "Beginning of the conversation and the question or statement the kid will ask",
-      opposition_win_instructions: "Instractions on what the student should do to win against the kid",
+      "opposition_starting_text": "Beginning of the conversation and the question or statement the kid will ask",
+      "opposition_win_instructions": "Instractions on what the student should do to win against the kid",
      },
      ...
-    ]
     }
 
     The opposition_starting_text is the sentence opening a conversation and the question or statement the kid will ask. Open the conversation with an introduction about yourself and then everything else. Explain the setting a bit.
@@ -59,6 +63,10 @@ async function getData(fileContent: string) {
             "role": "user", "content": `Here is a summary to curate from:
             ${fileContent}`
         },
+        {
+            role: "assistant",
+            content: prefilledContent
+        }
     ] as { role: "system" | "user", content: string }[];
 
     const anthropic = createAnthropic({ apiKey: NEXT_PUBLIC_ANTHROPIC_API_KEY });
@@ -67,7 +75,9 @@ async function getData(fileContent: string) {
         messages: convertToCoreMessages(messages),
     });
 
-    return JSON.parse(result.text
+    // console.log(prefilledContent + result.text);
+
+    return JSON.parse((prefilledContent + result.text)
         .replaceAll("opposition_starting_text", "firstMessage")
         .replaceAll("opposition_win_instructions", "topic"));
 }
