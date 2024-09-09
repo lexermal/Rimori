@@ -65,7 +65,7 @@ export default function Story() {
 
   useEffect(() => {
     if (messages.length > 2 && !lastAgentMessage.toolInvocations && !isLoading) {
-      if (chapterResult.length < 5) {
+      if (chapterResult.length < 5 && !lastAgentMessage.content.includes("# The End")) {
         console.log("trigger askForChapterDecision");
         append({ id: '3', role: 'user', content: 'You forgot to trigger the function "askForChapterDecision".' });
       }
@@ -84,10 +84,10 @@ export default function Story() {
     let content = m.content.split("functions.askForChapterDecision")[0];
     const contentSplit = content.split("#");
 
-    content = contentSplit.length > 1 ? "# " + contentSplit[1] : "";
+    content = contentSplit.length > 1 ? "#" + contentSplit[1] : "";
 
     return <>
-      <div key={m.id} className='mx-auto max-w-4xl mb-2 text-justify'>
+      <div key={m.id} className='mx-auto max-w-4xl mb-5 text-justify mt-5'>
         <ReactMarkdown>
           {content}
         </ReactMarkdown>
@@ -115,7 +115,7 @@ export default function Story() {
             }} />;
         })}
         {
-          chapterResult.length > 4 && <StoryEndRendering chapterResult={chapterResult} />
+          !isLoading && content.includes("# The End") && <StoryEndRendering chapterResult={chapterResult} />
         }
       </div>
     </>;
@@ -156,10 +156,10 @@ function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?
 
 function StoryEndRendering(props: { chapterResult: StoryFeedback[] }) {
   const router = useRouter();
-  let greeting = "Congratulations! You made it to the end, you are on the right track to A's the exam!";
+  let greeting = "Congratulations! You made it to the end!";
 
-  if (props.chapterResult.length < 4) {
-    greeting = "This is no happy ending! You need to study more!";
+  if (props.chapterResult.length < 5) {
+    greeting = "This is no happy ending...";
   }
 
 
@@ -234,6 +234,6 @@ async function getMarkdownContent(jwt: string, id: string) {
   const db = new SupabaseService(jwt);
   const document = await db.getDocumentContent(id);
 
-  return document.content;
+  return document;
 }
 

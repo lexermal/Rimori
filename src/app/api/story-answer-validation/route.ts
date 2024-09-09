@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
   const jwt = req.headers.get('Authorization')!;
 
-  const response = await getAIResponse(messages, jwt,fileId).catch((e) => {
+  const response = await getAIResponse(messages, jwt, fileId.split("_")[0]).catch((e) => {
     console.error("Failed to get a valid answer from the AI backend, trying again. The error was:", e);
 
     return getAIResponse(messages, jwt, fileId);
@@ -20,14 +20,14 @@ export async function POST(req: Request) {
   return NextResponse.json({ result: response });
 }
 
-async function getMarkdownContent(jwt: string, userResponse: string,fileId: string) {
+async function getMarkdownContent(jwt: string, userResponse: string, fileId: string) {
   const db = new SupabaseService(jwt);
-  const document = await db.getSemanticDocumentSections(fileId,userResponse);
+  const document = await db.getSemanticDocumentSections(fileId, userResponse);
   // console.log("Document content: ", document);
   return document;
 }
 
-async function getAIResponse(messages: any[], jwt: string,fileId: string) {
+async function getAIResponse(messages: any[], jwt: string, fileId: string) {
   const assistentMessages = messages.filter((m: any) => m.role === 'assistant').map((m: any) => m.content).join('\n');
   const userMessage = messages.filter((m: any) => m.role === 'user').slice(-1);
 
@@ -60,7 +60,7 @@ async function getAIResponse(messages: any[], jwt: string,fileId: string) {
 
     The document content the student is supposed to be familiar with is as follows:
 \`\`\`markdown
-`+ await getMarkdownContent(jwt, userMessage[0].content.split("reason:")[1],fileId) + `
+`+ await getMarkdownContent(jwt, userMessage[0].content.split("reason:")[1], fileId) + `
 \`\`\`
 If the document content does not contain anything useful it means the student failed to provide the necessary information.
 
