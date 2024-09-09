@@ -66,7 +66,40 @@ export function FileUpload(props: Props) {
     <div className='bg-blue-300 w-2/5 mt-7 mx-auto p-6 rounded-xl mb-10 cursor-pointer border-dashed border-4 border-spacing-8 border-purple-900 '
       {...(getRootProps() as DropzoneRootProps)}>
       <input {...(getInputProps() as InputHTMLAttributes<HTMLInputElement>)} />
-      <p>{isUploading ? "Please wait..." : <div className='text-center flex flex-row'><FaUpload className='w-14 h-6'  /><span>Upload your documents...</span></div>}</p>
+      <p>{isUploading ? <FileUploadProgress /> : <div className='text-center flex flex-row'><FaUpload className='w-14 h-6' /><span>Upload your documents...</span></div>}</p>
+    </div>
+  );
+}
+
+function FileUploadProgress() {
+  // progressbar that fills up over the next 60 seconds
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const timeStart = Date.now();
+    const timeEnd = timeStart + 4 * 60000;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      let progress = (now - timeStart) / (timeEnd - timeStart);
+
+      if (progress > 0.95) {
+        progress = 0.95;
+      }
+
+      setProgress(progress);
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div>
+      <p className='font-bold'>Processing your document...</p>
+      <div className='relative h-2 bg-gray-300 rounded-lg'>
+      <div className='absolute h-full bg-blue-500 rounded-lg' style={{ width: `${progress * 100}%`}}></div>
+      </div>
+      <p className='text-sm mt-3'>Meanwhile, you can study with other documents.</p>
     </div>
   );
 }
