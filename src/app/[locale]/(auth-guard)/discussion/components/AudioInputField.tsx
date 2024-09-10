@@ -38,7 +38,7 @@ const AudioInputField: React.FC<AudioInputFieldProps> = ({ onSubmit }) => {
                 placeholder='Type a message...'
             />
             <button onClick={() => handleSubmit()} className="cursor-default">
-                <BiSolidRightArrow className='w-10 h-10 cursor-pointer' />
+                <BiSolidRightArrow className='w-9 h-10 cursor-pointer' />
             </button>
         </div>
     );

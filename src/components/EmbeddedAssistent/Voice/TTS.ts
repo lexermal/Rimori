@@ -13,15 +13,13 @@ export default class TTS {
     private player = new ChunkedAudioPlayer();
     private sentencesParts = [] as number[];
     private messageCount = 0;
-    private apiKey;
 
-    private constructor(socket: WebSocket, apiKey: string) {
+    private constructor(socket: WebSocket) {
         this.socket = socket;
-        this.apiKey = apiKey;
     }
 
     // based on https://elevenlabs.io/docs/api-reference/websockets#example-voice-streaming-using-elevenlabs-and-openai
-    static createAsync(voiceId: VoiceId,apiKey:string, model = 'eleven_monolingual_v1'): Promise<TTS> {
+    static createAsync(voiceId: VoiceId, apiKey: string, model = 'eleven_monolingual_v1'): Promise<TTS> {
         return new Promise((resolve, reject) => {
             const wsUrl = `wss://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream-input?model_id=${model}`;
             const socket = new WebSocket(wsUrl);
@@ -38,7 +36,7 @@ export default class TTS {
 
                 socket.send(JSON.stringify(bosMessage));
 
-                const tts = new TTS(socket, apiKey);
+                const tts = new TTS(socket);
                 socket.onmessage = tts.handleMessage.bind(tts);
                 socket.onerror = tts.handleError.bind(tts);
                 socket.onclose = tts.handleClose.bind(tts);
@@ -53,9 +51,7 @@ export default class TTS {
     }
 
     endConversation() {
-        const eosMessage = {
-            "text": ""
-        };
+        const eosMessage = { "text": "" };
 
         this.socket.send(JSON.stringify(eosMessage));
     }

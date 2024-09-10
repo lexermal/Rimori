@@ -18,6 +18,7 @@ const sender = new MessageSender();
 
 function Assistentv2({ oralCommunication, personImageUrl, instructions, firstMessage, voiceId }: Props) {
     sender.setVoiceId(voiceId);
+    oralCommunication = true;
 
     const { messages, addToolResult, append, isLoading, setMessages } = useChat({
         maxToolRoundtrips: 5,
@@ -52,7 +53,7 @@ function Assistentv2({ oralCommunication, personImageUrl, instructions, firstMes
 
     return (
         <div>
-            {oralCommunication && <CircleAudioAvatar imageUrl={personImageUrl} />}
+            {oralCommunication && <CircleAudioAvatar imageUrl={personImageUrl} className='mx-auto' />}
             {!oralCommunication && <div className="w-full">
                 {lastAssistantMessage && <div className="text-sm text-gray-500">
                     {lastAssistantMessage}
