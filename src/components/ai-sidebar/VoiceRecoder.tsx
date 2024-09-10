@@ -1,5 +1,6 @@
 import hark from 'hark';
 import React, { useRef, useState, useImperativeHandle, forwardRef } from 'react';
+import { FaMicrophone } from 'react-icons/fa6';
 
 interface Props {
   onVoiceRecorded?: (message: string) => void;
@@ -132,18 +133,9 @@ const VoiceRecorder = forwardRef((props: Props, ref) => {
   return (
     <div>
       <button
-        onClick={isRecording ? stopRecordingSession : startRecordingSession}
         disabled={props.isDisabled}
-      >
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 384 512'
-          className='h-6 mr-2'
-          style={{ fill: isRecording ? 'red' : 'black' }}
-        >
-          {/* <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--> */}
-          <path d='M192 0C139 0 96 43 96 96V256c0 53 43 96 96 96s96-43 96-96V96c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 89.1 66.2 162.7 152 174.4V464H120c-13.3 0-24 10.7-24 24s10.7 24 24 24h72 72c13.3 0 24-10.7 24-24s-10.7-24-24-24H216V430.4c85.8-11.7 152-85.3 152-174.4V216c0-13.3-10.7-24-24-24s-24 10.7-24 24v40c0 70.7-57.3 128-128 128s-128-57.3-128-128V216z' />
-        </svg>
+        onClick={isRecording ? stopRecordingSession : startRecordingSession}>
+          <FaMicrophone className={"h-7 w-7 mr-2 " + (isRecording ? "text-red-600" : "")} />
       </button>
     </div>
   );

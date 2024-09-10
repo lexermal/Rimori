@@ -11,6 +11,7 @@ import Card from '../../../../components/discussion/Card';
 import DiscussionPopup from '../../../../components/discussion/DiscussionPopup';
 import EmbeddedAssistent from '../../../../components/EmbeddedAssistent/EmbeddedAssistent';
 import { createClient } from '@/utils/supabase/server';
+import Assistentv2 from './components/Assistentv2';
 
 interface Exam {
   examNr: number;
@@ -22,7 +23,7 @@ interface Exam {
 let currentlyFetchingTopics = false;
 
 export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
-  const [showDiscussion, setShowDiscussion] = useState(0);
+  const [showDiscussion, setShowDiscussion] = useState(1);
   const [exams, setExams] = useState<Exam[]>([]);
   const [file, setFile] = useState('');
   const [topics, setTopics] = useState({
@@ -221,22 +222,37 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
                     show={showDiscussion === index + 1}
                     title={persona.discussionTitle}
                     onClose={() => setShowDiscussion(0)}>
-                    {Object.keys(topics.kid).length === 0 ? (
+                    {
+                    false&&
+                    Object.keys(topics.kid).length === 0 ? (
                       <p className='text-center pt-48 pb-48 font-bold'>
                         <Spinner size="xl" className='mb-4' />
                         <br />
                         Your opponent is getting ready.
                       </p>
                     ) : (
-                      <EmbeddedAssistent
-                        ttsAPIkey={props.ttsAPIkey}
-                        id='discussion_assistant'
-                        actions={actions}
+                      // <EmbeddedAssistent
+                      //   ttsAPIkey={props.ttsAPIkey}
+                      //   id='discussion_assistant'
+                      //   actions={actions}
+                      //   //temporarely disabled
+                      //   // instructions={''}
+                      //   instructions={persona.instructions}
+                      //   firstMessage={persona.firstMessage}
+                      //   voiceId={persona.voiceId} />
+                      <Assistentv2 
+                        oralCommunication={false}
+                        personImageUrl={persona.image}
+                          // ttsAPIkey={props.ttsAPIkey}
+                        // id='discussion_assistant'
+                        // actions={actions}
                         //temporarely disabled
-                        // instructions={''}
-                        instructions={persona.instructions}
-                        firstMessage={persona.firstMessage}
-                        voiceId={persona.voiceId} />
+                        instructions={'no instructions from my side'}
+                        // instructions={persona.instructions}
+                        firstMessage={"hi test"}
+                        // firstMessage={persona.firstMessage}
+                        voiceId={persona.voiceId} 
+                      />
                     )}
                   </DiscussionPopup>
                 </div>
