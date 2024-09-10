@@ -46,6 +46,7 @@ class MessageSender {
         if (!inProgress) {
             this.sendMessage(message, true);
             this.prefLastAssistentMessage = '';
+            this.updateCount = 0;
             this.tts?.endConversation();
             // console.log('TTS ended');
             this.tts = null;

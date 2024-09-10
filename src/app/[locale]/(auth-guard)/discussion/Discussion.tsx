@@ -22,8 +22,8 @@ interface Exam {
 
 let currentlyFetchingTopics = false;
 
-export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
-  const [showDiscussion, setShowDiscussion] = useState(1);
+export default function Discussion(): JSX.Element {
+  const [showDiscussion, setShowDiscussion] = useState(2);
   const [exams, setExams] = useState<Exam[]>([]);
   const [file, setFile] = useState('');
   const [topics, setTopics] = useState({
@@ -55,147 +55,147 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
     });
   }, []);
 
-  const actions = [
-    {
-      name: 'explanationUnderstood',
-      description: 'Evaluate the explanation of a topic in easy terms.',
-      parameters: [
-        {
-          name: 'explanationUnderstood',
-          type: 'boolean',
-          description: 'if the explanation was understood',
-        },
-        {
-          name: 'explanation',
-          type: 'string',
-          description: 'the explanation why it was understood or not',
-        },
-        {
-          name: 'improvementHints',
-          type: 'string',
-          description: 'hints for improvement',
-        },
-      ],
-      handler: async (params: any) => {
-        console.log('params of explanationUnderstood Result: ', params);
+  // const actions = [
+  //   {
+  //     name: 'explanationUnderstood',
+  //     description: 'Evaluate the explanation of a topic in easy terms.',
+  //     parameters: [
+  //       {
+  //         name: 'explanationUnderstood',
+  //         type: 'boolean',
+  //         description: 'if the explanation was understood',
+  //       },
+  //       {
+  //         name: 'explanation',
+  //         type: 'string',
+  //         description: 'the explanation why it was understood or not',
+  //       },
+  //       {
+  //         name: 'improvementHints',
+  //         type: 'string',
+  //         description: 'hints for improvement',
+  //       },
+  //     ],
+  //     handler: async (params: any) => {
+  //       console.log('params of explanationUnderstood Result: ', params);
 
-        //temporary disabled failing for demo purposes
-        if (params.explanationUnderstood) {
-          const newExam = {
-            examNr: 1,
-            passed: true,
-            reason: params.explanation,
-            improvementHints: params.improvementHints,
-          };
-          setExams([...exams, newExam]);
-        }
-        // const newExam = {
-        //   examNr: 1,
-        //   passed: params.explanationUnderstood,
-        //   reason: params.explanation,
-        //   improvementHints: params.improvementHints,
-        // };
-        // setExams([...exams, newExam]);
-        setTimeout(() => {
-          setShowDiscussion(0);
-        }, 20000);
-      },
-    },
-    {
-      name: 'oppinionChanged',
-      description: 'Evaluate if the user managed to change your oppinion.',
-      parameters: [
-        {
-          name: 'studentKnowsTopic',
-          type: 'boolean',
-          description:
-            'if the student knows the topic in depth and explained it right',
-        },
-        {
-          name: 'explanation',
-          type: 'string',
-          description: 'the explanation why the oppinion was changed or not',
-        },
-        {
-          name: 'improvementHints',
-          type: 'string',
-          description: 'hints for improvement',
-        },
-      ],
-      handler: async (params: any) => {
-        console.log('params of oppinionChanged Result: ', params);
+  //       //temporary disabled failing for demo purposes
+  //       if (params.explanationUnderstood) {
+  //         const newExam = {
+  //           examNr: 1,
+  //           passed: true,
+  //           reason: params.explanation,
+  //           improvementHints: params.improvementHints,
+  //         };
+  //         setExams([...exams, newExam]);
+  //       }
+  //       // const newExam = {
+  //       //   examNr: 1,
+  //       //   passed: params.explanationUnderstood,
+  //       //   reason: params.explanation,
+  //       //   improvementHints: params.improvementHints,
+  //       // };
+  //       // setExams([...exams, newExam]);
+  //       setTimeout(() => {
+  //         setShowDiscussion(0);
+  //       }, 20000);
+  //     },
+  //   },
+  //   {
+  //     name: 'oppinionChanged',
+  //     description: 'Evaluate if the user managed to change your oppinion.',
+  //     parameters: [
+  //       {
+  //         name: 'studentKnowsTopic',
+  //         type: 'boolean',
+  //         description:
+  //           'if the student knows the topic in depth and explained it right',
+  //       },
+  //       {
+  //         name: 'explanation',
+  //         type: 'string',
+  //         description: 'the explanation why the oppinion was changed or not',
+  //       },
+  //       {
+  //         name: 'improvementHints',
+  //         type: 'string',
+  //         description: 'hints for improvement',
+  //       },
+  //     ],
+  //     handler: async (params: any) => {
+  //       console.log('params of oppinionChanged Result: ', params);
 
-        //temporary disabled failing for demo purposes
-        if (params.studentKnowsTopic) {
-          const newExam = {
-            examNr: 2,
-            passed: true,
-            reason: params.explanation,
-            improvementHints: params.improvementHints,
-          };
-          setExams([...exams, newExam]);
-        }
-        // const newExam = {
-        //   examNr: 2,
-        //   passed: params.studentKnowsTopic,
-        //   reason: params.explanation,
-        //   improvementHints: params.improvementHints,
-        // };
-        // setExams([...exams, newExam]);
-        setTimeout(() => {
-          setShowDiscussion(0);
-        }, 20000);
-      },
-    },
-    {
-      name: 'conceptApplied',
-      description:
-        'Evaluate if the user managed to apply the concept in the given setting.',
-      parameters: [
-        {
-          name: 'studentKnowsTopic',
-          type: 'boolean',
-          description:
-            'if the student knows the topic in depth and explained it right',
-        },
-        {
-          name: 'explanation',
-          type: 'string',
-          description:
-            'the explanation how well or not he applied the concept in the setting',
-        },
-        {
-          name: 'improvementHints',
-          type: 'string',
-          description: 'hints for improvement',
-        },
-      ],
-      handler: async (params: any) => {
-        console.log('params of oppinionChanged Result: ', params);
+  //       //temporary disabled failing for demo purposes
+  //       if (params.studentKnowsTopic) {
+  //         const newExam = {
+  //           examNr: 2,
+  //           passed: true,
+  //           reason: params.explanation,
+  //           improvementHints: params.improvementHints,
+  //         };
+  //         setExams([...exams, newExam]);
+  //       }
+  //       // const newExam = {
+  //       //   examNr: 2,
+  //       //   passed: params.studentKnowsTopic,
+  //       //   reason: params.explanation,
+  //       //   improvementHints: params.improvementHints,
+  //       // };
+  //       // setExams([...exams, newExam]);
+  //       setTimeout(() => {
+  //         setShowDiscussion(0);
+  //       }, 20000);
+  //     },
+  //   },
+  //   {
+  //     name: 'conceptApplied',
+  //     description:
+  //       'Evaluate if the user managed to apply the concept in the given setting.',
+  //     parameters: [
+  //       {
+  //         name: 'studentKnowsTopic',
+  //         type: 'boolean',
+  //         description:
+  //           'if the student knows the topic in depth and explained it right',
+  //       },
+  //       {
+  //         name: 'explanation',
+  //         type: 'string',
+  //         description:
+  //           'the explanation how well or not he applied the concept in the setting',
+  //       },
+  //       {
+  //         name: 'improvementHints',
+  //         type: 'string',
+  //         description: 'hints for improvement',
+  //       },
+  //     ],
+  //     handler: async (params: any) => {
+  //       console.log('params of oppinionChanged Result: ', params);
 
-        //temporary disabled failing for demo purposes
-        if (params.studentKnowsTopic) {
-          const newExam = {
-            examNr: 3,
-            passed: true,
-            reason: params.explanation,
-            improvementHints: params.improvementHints,
-          };
-          setExams([...exams, newExam]);
-        }
-        // const newExam = {
-        //   examNr: 2,
-        //   passed: params.studentKnowsTopic,
-        //   reason: params.explanation,
-        //   improvementHints: params.improvementHints,
-        // };
-        // setExams([...exams, newExam]);
-        setTimeout(() => {
-          setShowDiscussion(0);
-        }, 20000);
-      },
-    },
-  ] as unknown as FrontendAction[];
+  //       //temporary disabled failing for demo purposes
+  //       // if (params.studentKnowsTopic) {
+  //       //   const newExam = {
+  //       //     examNr: 3,
+  //       //     passed: true,
+  //       //     reason: params.explanation,
+  //       //     improvementHints: params.improvementHints,
+  //       //   };
+  //       //   setExams([...exams, newExam]);
+  //       // }
+  //       const newExam = {
+  //         examNr: 2,
+  //         passed: params.studentKnowsTopic,
+  //         reason: params.explanation,
+  //         improvementHints: params.improvementHints,
+  //       };
+  //       setExams([...exams, newExam]);
+  //       setTimeout(() => {
+  //         setShowDiscussion(0);
+  //       }, 20000);
+  //     },
+  //   },
+  // ] as unknown as FrontendAction[];
 
   return (
     <CopilotKit url='/api/copilotkit/opposition' headers={{ file }}>
@@ -223,37 +223,63 @@ export default function Discussion(props: { ttsAPIkey: string }): JSX.Element {
                     title={persona.discussionTitle}
                     onClose={() => setShowDiscussion(0)}>
                     {
-                    false&&
-                    Object.keys(topics.kid).length === 0 ? (
-                      <p className='text-center pt-48 pb-48 font-bold'>
-                        <Spinner size="xl" className='mb-4' />
-                        <br />
-                        Your opponent is getting ready.
-                      </p>
-                    ) : (
-                      // <EmbeddedAssistent
-                      //   ttsAPIkey={props.ttsAPIkey}
-                      //   id='discussion_assistant'
-                      //   actions={actions}
-                      //   //temporarely disabled
-                      //   // instructions={''}
-                      //   instructions={persona.instructions}
-                      //   firstMessage={persona.firstMessage}
-                      //   voiceId={persona.voiceId} />
-                      <Assistentv2 
-                        oralCommunication={false}
-                        personImageUrl={persona.image}
+                      Object.keys(topics.kid).length === 0 ? (
+                        <p className='text-center pt-48 pb-48 font-bold'>
+                          <Spinner size="xl" className='mb-4' />
+                          <br />
+                          Your opponent is getting ready.
+                        </p>
+                      ) : (
+                        // <EmbeddedAssistent
+                        //   ttsAPIkey={props.ttsAPIkey}
+                        //   id='discussion_assistant'
+                        //   actions={actions}
+                        //   //temporarely disabled
+                        //   // instructions={''}
+                        //   instructions={persona.instructions}
+                        //   firstMessage={persona.firstMessage}
+                        //   voiceId={persona.voiceId} />
+                        <Assistentv2
+                          personImageUrl={persona.image}
                           // ttsAPIkey={props.ttsAPIkey}
-                        // id='discussion_assistant'
-                        // actions={actions}
-                        //temporarely disabled
-                        instructions={'no instructions from my side'}
-                        // instructions={persona.instructions}
-                        firstMessage={"hi test"}
-                        // firstMessage={persona.firstMessage}
-                        voiceId={persona.voiceId} 
-                      />
-                    )}
+                          // id='discussion_assistant'
+                          // actions={actions}
+                          //temporarely disabled
+                          // instructions={'no instructions from my side'}
+                          instructions={persona.instructions}
+                          // firstMessage={"hi test"}
+                          firstMessage={persona.firstMessage}
+                          voiceId={persona.voiceId}
+                          onComplete={(params) => {
+                            console.log('result of discussion', params);
+                            let newExam: Exam;
+
+                            if (params.explanationUnderstood) {
+                              newExam = {
+                                examNr: 1,
+                                passed: params.explanationUnderstood === "TRUE",
+                                reason: params.explanation,
+                                improvementHints: params.improvementHints,
+                              };
+                            } else if (params.studentKnowsTopic) {
+                              newExam = {
+                                examNr: 2,
+                                passed: params.studentKnowsTopic === "TRUE",
+                                reason: params.explanation,
+                                improvementHints: params.improvementHints,
+                              };
+                            } else {
+                              newExam = {
+                                examNr: 3,
+                                passed: params.studentAppliesConcept === "TRUE",
+                                reason: params.explanation,
+                                improvementHints: params.improvementHints,
+                              };
+                            }
+                            setExams([...exams, newExam]);
+                          }}
+                        />
+                      )}
                   </DiscussionPopup>
                 </div>
               );

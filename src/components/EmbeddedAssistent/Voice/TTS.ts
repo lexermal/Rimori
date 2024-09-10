@@ -57,7 +57,7 @@ export default class TTS {
     }
 
     sendMessage(text: string) {
-        console.log('Sending message ' + this.messageCount + ":" + text);
+        // console.log('Sending message ' + this.messageCount + ":" + text);
 
         const textMessage = {
             "text": text,
@@ -68,7 +68,7 @@ export default class TTS {
 
         // If textMessage contains a sentence ending like . or ! or ?, write the current index to sentencesParts
         if (textMessage.text.match(/[.!?]/)) {
-            console.log("Sentence ending found")
+            // console.log("Sentence ending found")
             this.sentencesParts.push(this.messageCount);
         }
         this.messageCount++;
@@ -90,7 +90,7 @@ export default class TTS {
         if (response.audio) {
             const audioChunk = response.audio as string;
             this.chunks.push(audioChunk);
-            console.log("Received audio chunk");
+            // console.log("Received audio chunk");
 
             // const audioBuffer = this.base64ToArrayBuffer(audioChunk);
             // const audioContext = new AudioContext();
@@ -119,9 +119,9 @@ export default class TTS {
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = new Audio(audioUrl);
             audio.playbackRate = 1.05;
-            console.log("Start Playing audio...");
+            // console.log("Start Playing audio...");
             // audio.play();
-            console.log("Audio played");
+            // console.log("Audio played");
             this.player.endConversation();
 
             // Clear the chunks after playing the audio

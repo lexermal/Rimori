@@ -107,15 +107,26 @@ const toolBuilder = new ToolBuilder();
 //     return weatherOptions[Math.floor(Math.random() * weatherOptions.length)];
 //   });
 
-toolBuilder.addUserInteractionTool("askForChapterDecision", "Ask the user how the story should continue. The response is a string with the users choice and correctness of their answer.")
-  .addParameter("question", "string", "Ask with an open ended question how the story should continue")
-  .addParameter("possibility1", "string", "The first possibility how the story could continue")
-  .addParameter("possibility2", "string", "The second possibility how the story could continue")
-  .addParameter("possibility3", "string", "The third possibility how the story could continue")
+toolBuilder.addUserInteractionTool("explanationUnderstood", "Evaluate the explanation of a topic in easy terms.")
+  .addParameter("explanationUnderstood", "boolean", "if the explanation was understood. TRUE or FALSE")
+  .addParameter("explanation", "string", "The explanation why it was understood or not, directed to the user directly")
+  .addParameter("improvementHints", "string", "hints for improvement, directed to the user directly")
   .build();
 
-toolBuilder.addClientTool("storyEnded", "End the story. The user has reached the end of the story.")
+  toolBuilder.addUserInteractionTool("oppinionChanged", "Evaluate if the user managed to change your oppinion.")
+  .addParameter("studentKnowsTopic", "boolean", "if the student knows the topic in depth and explained it right. TRUE or FALSE")
+  .addParameter("explanation", "string", "The explanation why the oppinion was changed or not")
+  .addParameter("improvementHints", "string", "hints for improvement, directed to the user directly")
   .build();
+
+  toolBuilder.addUserInteractionTool("conceptApplied", "Evaluate if the user managed to apply the concept in the given setting.")
+  .addParameter("studentAppliesConcept", "boolean", "if the student managed to apply the concept in the given setting. TRUE or FALSE")
+  .addParameter("explanation", "string", "The explanation how well or not he applied the concept in the setting")
+  .addParameter("improvementHints", "string", "hints for improvement, directed to the user directly")
+  .build();
+
+// toolBuilder.addClientTool("storyEnded", "End the story. The user has reached the end of the story.")
+//   .build();
 
 toolBuilder.getTools();
 

@@ -24,6 +24,10 @@ const CircleAudioAvatar: React.FC<CircleAudioAvatarProps> = ({ imageUrl, classNa
             if (ctx) {
                 const image = new Image();
                 image.src = imageUrl;
+                image.onload = () => {
+                    draw(ctx, canvas, image, 0);
+                }
+
 
                 emitter.on('loudness', (loudness: number) => {
                     // console.log('Loudness:', loudness);
@@ -68,7 +72,7 @@ const CircleAudioAvatar: React.FC<CircleAudioAvatarProps> = ({ imageUrl, classNa
         }
     };
 
-    return <canvas ref={canvasRef} className={className} width={300} height={300} style={{ width: '150px', height: '150px' }} />;
+    return <canvas ref={canvasRef} className={className} width={500} height={500} style={{ width: '350px', height: '350px' }} />;
 };
 
 export default CircleAudioAvatar;
