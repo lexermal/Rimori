@@ -7,12 +7,21 @@ class MessageSender {
     private updateCount = 0;
     private tts: TTS | null = null;
     private prefLastAssistentMessage = '';
+    private voiceEnabled = true;
 
     public setVoiceId(voiceId: VoiceId) {
         this.voiceId = voiceId;
     }
 
+    public setVoiceEnabled(enabled: boolean) {
+        this.voiceEnabled = enabled;
+    }
+
     public async steamFullMessage(message: string) {
+        if (!this.voiceEnabled) {
+            return;
+        }
+
         await this.streamOngoingMessage(true, undefined);
 
         const tokens = message.split(' ');
@@ -25,6 +34,10 @@ class MessageSender {
 
     // This function slowly transmits the message as it is being generated
     public async streamOngoingMessage(inProgress: boolean, message: string | undefined) {
+        if (!this.voiceEnabled) {
+            return;
+        }
+
         if (inProgress && !this.tts) {
             this.tts = await TTS.createAsync(this.voiceId!, NEXT_PUBLIC_ELEVENLABS_API_KEY!);
             // console.log('TTS created');

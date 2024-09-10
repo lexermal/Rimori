@@ -4,6 +4,9 @@ import AudioInputField from './AudioInputField';
 import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 import { useChat } from 'ai/react';
 import MessageSender from './MessageSender';
+import EmitterSingleton from './Emitter';
+
+const emitter = EmitterSingleton;
 
 interface Props {
     instructions: string;
@@ -88,7 +91,11 @@ function Assistentv2({ personImageUrl, instructions, firstMessage, voiceId, onCo
                 </div>}
             <AudioInputField
                 onSubmit={m => append({ id: "4", role: 'user', content: m })}
-                onAudioControl={voice => setOralCommunication(voice)} />
+                onAudioControl={voice => {
+                    setOralCommunication(voice);
+                    sender.setVoiceEnabled(voice);
+                    emitter.emit('enableAudio', voice);
+                }} />
         </div>
     );
 };

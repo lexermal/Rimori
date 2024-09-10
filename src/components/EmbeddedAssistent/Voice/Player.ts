@@ -15,6 +15,7 @@ export default class ChunkedAudioPlayer {
     private emitter = EmitterSingleton;
     private isMonitoring = false;
     private handle = 0;
+    private volume = 1.0;
 
     constructor() {
         this.audioContext = new AudioContext();
@@ -22,6 +23,10 @@ export default class ChunkedAudioPlayer {
         this.analyser.fftSize = 256; // Set the FFT size (smaller values provide faster updates, larger ones give better resolution)
         const bufferLength = this.analyser.frequencyBinCount;
         this.dataArray = new Uint8Array(bufferLength); // Array to hold frequency data
+
+        this.emitter.on('enableAudio', (enable: boolean) => {
+            this.volume = enable ? 1.0 : 0.0;
+        });
     }
 
     async addChunk(chunk: ArrayBufferLike, chunkSplit: number[]): Promise<void> {
@@ -69,11 +74,19 @@ export default class ChunkedAudioPlayer {
             const source = this.audioContext.createBufferSource();
             source.buffer = chunk;
 
-            // Connect the source to the analyser node, then to the destination (speakers)
-            source.connect(this.analyser);
+            // Create a GainNode for volume control
+            const gainNode = this.audioContext.createGain();
+            gainNode.gain.value = this.volume;
+
+            // Connect the source to the GainNode, then to the analyser node, then to the destination (speakers)
+            source.connect(gainNode);
+            gainNode.connect(this.analyser);
             this.analyser.connect(this.audioContext.destination);
 
             source.start(0);
+            this.emitter.on('enableAudio', (enable: boolean) => {
+                gainNode.gain.value = enable ? 1.0 : 0.0;
+            });
 
             source.onended = () => {
                 resolve();
@@ -162,7 +175,4 @@ export default class ChunkedAudioPlayer {
         // Call this method again at regular intervals if you want continuous loudness monitoring
         this.handle = requestAnimationFrame(() => this.monitorLoudness());
     }
-
-
-
 }
