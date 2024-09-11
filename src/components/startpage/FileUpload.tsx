@@ -38,7 +38,7 @@ export function FileUpload(props: Props) {
     setIsUploading(true);
 
     const supabase = createClient();
-    supabase.auth.getSession().then(({data}) => {
+    supabase.auth.getSession().then(({ data }) => {
       fetch(UPLOAD_BACKEND, {
         method: 'POST',
         body: formData,
@@ -61,7 +61,7 @@ export function FileUpload(props: Props) {
     <div className='bg-blue-300 w-2/5 mt-7 mx-auto p-6 rounded-xl mb-10 cursor-pointer border-dashed border-4 border-spacing-8 border-purple-900 '
       {...(getRootProps() as DropzoneRootProps)}>
       <input {...(getInputProps() as InputHTMLAttributes<HTMLInputElement>)} />
-      <p>{isUploading ? <FileUploadProgress /> : <div className='text-center flex flex-row'><FaUpload className='w-14 h-6' /><span>Upload your documents...</span></div>}</p>
+      <div className='small'>{isUploading ? <FileUploadProgress /> : <div className='text-center flex flex-row'><FaUpload className='w-14 h-6' /><span>Upload your documents...</span></div>}</div>
     </div>
   );
 }

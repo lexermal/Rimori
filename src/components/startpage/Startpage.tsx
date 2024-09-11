@@ -7,7 +7,7 @@ import { useRouter } from '@/i18n';
 import DocumentSelection from '@/components/startpage/DocumentSelection';
 import { FileUpload } from '@/components/startpage/FileUpload';
 import { createClient } from '@/utils/supabase/server';
-
+import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
 
 export interface MarkdownDocument {
   id: string;
@@ -95,22 +95,34 @@ function TrainingButtons({ selectedFile }: any) {
   const buttons = [
     {
       text: 'Study Session',
-      onClick: () => router.push(`/study-session?file=${selectedFile}`),
+      onClick: () => {
+        EmitterSingleton.emit('analytics-click-event', { key: 'Study Session' });
+        router.push(`/study-session?file=${selectedFile}`);
+      },
       enabled: false
     },
     {
       text: 'Opposition',
-      onClick: () => router.push(`/discussion?file=${selectedFile}`),
+      onClick: () => {
+        EmitterSingleton.emit('analytics-click-event', { key: 'Opposition' });
+        router.push(`/discussion?file=${selectedFile}`);
+      },
       enabled: true
     },
     {
       text: 'Story',
-      onClick: () => router.push(`/story?file=${selectedFile}`),
+      onClick: () => {
+        EmitterSingleton.emit('analytics-click-event', { key: 'Story' });
+        router.push(`/story?file=${selectedFile}`);
+      },
       enabled: true
     },
     {
-      text: "Oral exam simulation",
-      onClick: () => router.push(`/exam-session?file=${selectedFile}`),
+      text: "Exam simulation",
+      onClick: () => {
+        EmitterSingleton.emit('analytics-click-event', { key: 'Exam simulation' });
+        router.push(`/exam-session?file=${selectedFile}`);
+      },
       enabled: true //Todo remove this line
       // enable on 20.09.2024 by using date comparison
       // enabled: new Date() > new Date('2024-09-20'),
