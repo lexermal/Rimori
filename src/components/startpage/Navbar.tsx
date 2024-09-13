@@ -60,8 +60,11 @@ export function CustomNavbar() {
       </div>
 
       <Navbar.Collapse>
-        <Navbar.Link href={`/${locale}`} active={pathname === `/${locale}`}>
+        {/* <Navbar.Link href={`/${locale}`} active={pathname === `/${locale}`}>
           Home
+        </Navbar.Link> */}
+        <Navbar.Link href={`https://discord.gg/3ReFE7ET`} active={pathname === `/${locale}`}>
+          Support
         </Navbar.Link>
         {/* Add more Navbar links here if needed */}
       </Navbar.Collapse>
