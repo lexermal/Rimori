@@ -1,7 +1,6 @@
 'use client';
 
 import { CopilotKit } from '@copilotkit/react-core';
-import { FrontendAction } from '@copilotkit/react-core/dist/types/frontend-action';
 import { Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 

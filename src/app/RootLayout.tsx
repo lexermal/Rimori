@@ -9,22 +9,24 @@ import '@/styles/colors.css';
 import { GlobalProvider } from '@/context/GlobalContext';
 import SupabaseProvider from '@/providers/SupabaseProvider';
 import UserProvider from '@/providers/UserProvider';
+import { EnvProvider } from '@/providers/EnvProvider';
+import { Env } from './layout';
 
 type Props = {
+  env: Env;
   children: ReactNode;
-  allowedDomains: string[];
-  apiEndpoint: string,
-  projectId: string
 };
 
-export default function RootLayout({ children }: Props) {
+export default function RootLayout({ children, env }: Props) {
   return (
     <html>
       <body>
         <GlobalProvider>
           <SupabaseProvider>
             <UserProvider>
-              <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
+              <EnvProvider env={env}>
+                <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
+              </EnvProvider>
             </UserProvider>
           </SupabaseProvider>
         </GlobalProvider>
