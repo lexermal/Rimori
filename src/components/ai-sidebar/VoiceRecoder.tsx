@@ -91,19 +91,19 @@ const VoiceRecorder = forwardRef((props: Props, ref) => {
     voiceStartTimestampRef.current = Date.now();
     console.log('Voice start timestamp: ', voiceStartTimestampRef);
     // });
-    speechEvents.on('stopped_speaking', () => {
-      console.log('Silence detected...');
-      if (mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
+    // speechEvents.on('stopped_speaking', () => {
+    //   console.log('Silence detected...');
+    //   if (mediaRecorder.state === 'recording') {
+    //     mediaRecorder.stop();
 
-        //temporary stop recording for demo
-        //TODO improve recording
-        setTimeout(() => {
-          stopRecordingSession();
-          console.log('Recording stopped...');
-        }, 500);
-      }
-    });
+    //     //temporary stop recording for demo
+    //     //TODO improve recording
+    //     setTimeout(() => {
+    //       stopRecordingSession();
+    //       console.log('Recording stopped...');
+    //     }, 500);
+    //   }
+    // });
     mediaRecorder.ondataavailable = handleDataAvailable;
     mediaRecorder.onstop = handleStop;
     // mediaRecorder.start();
@@ -135,7 +135,7 @@ const VoiceRecorder = forwardRef((props: Props, ref) => {
       <button
         disabled={props.isDisabled}
         onClick={isRecording ? stopRecordingSession : startRecordingSession}>
-          <FaMicrophone className={"h-7 w-7 mr-2 " + (isRecording ? "text-red-600" : "")} />
+        <FaMicrophone className={"h-7 w-7 mr-2 " + (isRecording ? "text-red-600" : "")} />
       </button>
     </div>
   );

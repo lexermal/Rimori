@@ -12,12 +12,6 @@ const CircleAudioAvatar: React.FC<CircleAudioAvatarProps> = ({ imageUrl, classNa
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        setupImageContext();
-    }, [imageUrl]);
-
-
-    // Function to set up the audio context
-    const setupImageContext = () => {
         const canvas = canvasRef.current;
         if (canvas) {
             const ctx = canvas.getContext('2d');
@@ -26,17 +20,20 @@ const CircleAudioAvatar: React.FC<CircleAudioAvatarProps> = ({ imageUrl, classNa
                 image.src = imageUrl;
                 image.onload = () => {
                     draw(ctx, canvas, image, 0);
-                }
+                };
 
-
-                emitter.on('loudness', (loudness: number) => {
-                    // console.log('Loudness:', loudness);
+                const handleLoudness = (loudness: number) => {
                     draw(ctx, canvas, image, loudness);
-                });
-                draw(ctx, canvas, image, 0);
+                };
+
+                emitter.on('loudness', handleLoudness);
+
+                return () => {
+                    emitter.off('loudness', handleLoudness);
+                };
             }
         }
-    };
+    }, [imageUrl]);
 
     // Function to draw on the canvas
     const draw = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, image: HTMLImageElement, loudness: number) => {

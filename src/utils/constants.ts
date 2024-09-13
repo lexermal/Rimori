@@ -8,7 +8,6 @@ if (!process.env.NEXT_PUBLIC_UPLOAD_BACKEND) throw new Error('Missing env.NEXT_P
 if (!process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY) throw new Error('Missing env.NEXT_PUBLIC_ANTHROPIC_API_KEY')
 if (!process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY) throw new Error('Missing env.NEXT_PUBLIC_ELEVENLABS_API_KEY')
 if (!process.env.NEXT_PUBLIC_MATOMO_URL) throw new Error('Missing env.NEXT_PUBLIC_MATOMO_URL')
-if (!process.env.NEXT_PUBLIC_MATOMO_SCRIPT_URL) throw new Error('Missing env.NEXT_PUBLIC_MATOMO_SCRIPT_URL')
 
 
 export const NEXT_PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
@@ -18,4 +17,3 @@ export const UPLOAD_BACKEND = process.env.NEXT_PUBLIC_UPLOAD_BACKEND as string;
 export const NEXT_PUBLIC_ANTHROPIC_API_KEY = process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY as string;
 export const NEXT_PUBLIC_ELEVENLABS_API_KEY = process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY as string;
 export const NEXT_PUBLIC_MATOMO_URL = process.env.NEXT_PUBLIC_MATOMO_URL as string;
-export const NEXT_PUBLIC_MATOMO_SCRIPT_URL = process.env.NEXT_PUBLIC_MATOMO_SCRIPT_URL as string;

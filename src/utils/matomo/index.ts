@@ -1,4 +1,4 @@
-import { NEXT_PUBLIC_MATOMO_SCRIPT_URL, NEXT_PUBLIC_MATOMO_URL } from '@/utils/constants';
+import { NEXT_PUBLIC_MATOMO_URL } from '@/utils/constants';
 import { createInstance } from '@jonkoops/matomo-tracker-react';
 
 let matomoInstance: any;
@@ -11,7 +11,6 @@ export const getMatomoInstance = (userId?: string) => {
       urlBase: NEXT_PUBLIC_MATOMO_URL,
       siteId: 1,
       userId,
-      srcUrl: NEXT_PUBLIC_MATOMO_SCRIPT_URL,
       disabled: false,
       heartBeat: {
         active: true,
