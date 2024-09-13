@@ -1,0 +1,38 @@
+# helm upgrade -i matomo oci://registry-1.docker.io/bitnamicharts/matomo -f values.yml -n matomo --create-namespace
+
+image:
+  debug: true
+global:
+  storageClass: longhorn
+matomoUsername: "mtadmin"
+# matomoPassword: "MBjccT2Ub2q2Xiq6q2eW"
+matomoWebsiteName: "Rimori Study Platform"
+matomoWebsiteHost: "https://study.rimori.se"
+allowEmptyPassword: false
+hostAliases:
+  - ip: "127.0.0.1"
+    hostnames:
+      - "matomo.rimori.se"
+persistence:
+  storageClass: longhorn
+  accessModes:
+  - ReadWriteMany
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hostname: matomo.rimori.se
+  tls: true
+mariadb:
+  auth:
+    rootPassword: 3e3vQJncxWfh5X0cTXrV
+    password: 3e3vQJncxWfh5X0cTXrV
+  primary:
+    persistence:
+      storageClass: longhorn
+service:
+  type: ClusterIP
+#extraEnvVars:
+#  - name: MATOMO_PROXY_HOST_HEADER
+#    value: HTTP_X_FORWARDED_HOST
+#  - name: MATOMO_PROXY_CLIENT_HEADER
+#    value: HTTP_X_FORWARDED_FOR
