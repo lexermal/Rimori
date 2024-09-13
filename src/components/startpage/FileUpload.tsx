@@ -1,5 +1,6 @@
 "use client";
 
+import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
 import { UPLOAD_BACKEND } from '@/utils/constants';
 import { createClient } from '@/utils/supabase/server';
 import { InputHTMLAttributes, useEffect, useState } from 'react';
@@ -36,20 +37,23 @@ export function FileUpload(props: Props) {
     });
 
     setIsUploading(true);
+    EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-init' });
 
     const supabase = createClient();
     supabase.auth.getSession().then(({ data }) => {
       fetch(UPLOAD_BACKEND, {
         method: 'POST',
         body: formData,
-        headers: { Authorization: `Bearer ${data.session!.access_token}` },
+        headers: { Authorization: `Bearer ${data.session?.access_token}` },
       })
         .then((response) => response.json())
         .then((data) => {
           props.onFilesUploaded(data.allFiles);
           console.log('Success:', data);
+          EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-success' });
         })
         .catch((error) => {
+          EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-error', name: error.message ?? 'No error message provided!' });
           console.error('Error:', error);
         })
         .then(() => setIsUploading(false));

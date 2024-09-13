@@ -96,7 +96,7 @@ function TrainingButtons({ selectedFile }: any) {
     {
       text: 'Study Session',
       onClick: () => {
-        EmitterSingleton.emit('analytics-click-event', { key: 'Study Session' });
+        EmitterSingleton.emit('analytics-event', { name: 'Study Session' });
         router.push(`/study-session?file=${selectedFile}`);
       },
       enabled: false
@@ -104,7 +104,7 @@ function TrainingButtons({ selectedFile }: any) {
     {
       text: 'Opposition',
       onClick: () => {
-        EmitterSingleton.emit('analytics-click-event', { key: 'Opposition' });
+        EmitterSingleton.emit('analytics-event', { name: 'Opposition' });
         router.push(`/discussion?file=${selectedFile}`);
       },
       enabled: true
@@ -112,7 +112,7 @@ function TrainingButtons({ selectedFile }: any) {
     {
       text: 'Story',
       onClick: () => {
-        EmitterSingleton.emit('analytics-click-event', { key: 'Story' });
+        EmitterSingleton.emit('analytics-event', { name: 'Story' });
         router.push(`/story?file=${selectedFile}`);
       },
       enabled: true
@@ -120,7 +120,7 @@ function TrainingButtons({ selectedFile }: any) {
     {
       text: "Exam simulation",
       onClick: () => {
-        EmitterSingleton.emit('analytics-click-event', { key: 'Exam simulation' });
+        EmitterSingleton.emit('analytics-event', { name: 'Exam simulation' });
         router.push(`/exam-session?file=${selectedFile}`);
       },
       enabled: true //Todo remove this line
