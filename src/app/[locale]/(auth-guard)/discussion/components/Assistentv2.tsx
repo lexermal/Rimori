@@ -11,7 +11,6 @@ const emitter = EmitterSingleton;
 interface Props {
     instructions: string;
     firstMessage: string;
-    // actions?: FrontendAction[];
     voiceId: VoiceId;
     personImageUrl: string;
     onComplete: (result: any) => void;
@@ -26,15 +25,6 @@ function Assistentv2({ personImageUrl, instructions, firstMessage, voiceId, onCo
     const { messages, append, isLoading, setMessages } = useChat({
         maxToolRoundtrips: 5,
         api: "/api/opposition",
-
-
-        // run client-side tools that are automatically executed:
-        // async onToolCall({ toolCall }) {
-        //   if (toolCall.toolName === 'storyEnded') {
-        //     setStoryEnded(true);
-        //     return true;
-        //   }
-        // },
     });
 
     const lastAssistantMessage = [...messages].filter((m) => m.role === 'assistant').pop()?.content;
@@ -90,7 +80,7 @@ function Assistentv2({ personImageUrl, instructions, firstMessage, voiceId, onCo
                     </div>}
                 </div>}
             <AudioInputField
-                onSubmit={m => append({ id: "4", role: 'user', content: m })}
+                onSubmit={m => append({ role: 'user', content: m })}
                 onAudioControl={voice => {
                     setOralCommunication(voice);
                     sender.setVoiceEnabled(voice);

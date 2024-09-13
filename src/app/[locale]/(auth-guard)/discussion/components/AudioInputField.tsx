@@ -14,9 +14,8 @@ const AudioInputField: React.FC<AudioInputFieldProps> = ({ onSubmit, onAudioCont
 
     const handleSubmit = (manualText?: string) => {
         const sendableText = manualText || text;
-        console.log({ sendableText })
         if (sendableText.trim()) {
-            onSubmit(text);
+            onSubmit(sendableText);
             setTimeout(() => {
                 setText('');
             }, 100);
