@@ -23,7 +23,7 @@ interface Exam {
 let currentlyFetchingTopics = false;
 
 export default function Discussion(): JSX.Element {
-  const [showDiscussion, setShowDiscussion] = useState(2);
+  const [showDiscussion, setShowDiscussion] = useState(0);
   const [exams, setExams] = useState<Exam[]>([]);
   const [file, setFile] = useState('');
   const [topics, setTopics] = useState({

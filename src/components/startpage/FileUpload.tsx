@@ -1,5 +1,6 @@
 "use client";
 
+import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
 import { UPLOAD_BACKEND } from '@/utils/constants';
 import { createClient } from '@/utils/supabase/server';
 import { InputHTMLAttributes, useEffect, useState } from 'react';
@@ -36,20 +37,23 @@ export function FileUpload(props: Props) {
     });
 
     setIsUploading(true);
+    EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-init' });
 
     const supabase = createClient();
-    supabase.auth.getSession().then(({data}) => {
+    supabase.auth.getSession().then(({ data }) => {
       fetch(UPLOAD_BACKEND, {
         method: 'POST',
         body: formData,
-        headers: { Authorization: `Bearer ${data.session!.access_token}` },
+        headers: { Authorization: `Bearer ${data.session?.access_token}` },
       })
         .then((response) => response.json())
         .then((data) => {
           props.onFilesUploaded(data.allFiles);
           console.log('Success:', data);
+          EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-success' });
         })
         .catch((error) => {
+          EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-error', name: error.message ?? 'No error message provided!' });
           console.error('Error:', error);
         })
         .then(() => setIsUploading(false));
@@ -61,7 +65,7 @@ export function FileUpload(props: Props) {
     <div className='bg-blue-300 w-2/5 mt-7 mx-auto p-6 rounded-xl mb-10 cursor-pointer border-dashed border-4 border-spacing-8 border-purple-900 '
       {...(getRootProps() as DropzoneRootProps)}>
       <input {...(getInputProps() as InputHTMLAttributes<HTMLInputElement>)} />
-      <p>{isUploading ? <FileUploadProgress /> : <div className='text-center flex flex-row'><FaUpload className='w-14 h-6' /><span>Upload your documents...</span></div>}</p>
+      <div className='small'>{isUploading ? <FileUploadProgress /> : <div className='text-center flex flex-row'><FaUpload className='w-14 h-6' /><span>Upload your documents...</span></div>}</div>
     </div>
   );
 }

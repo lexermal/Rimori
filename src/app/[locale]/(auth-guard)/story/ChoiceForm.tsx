@@ -1,3 +1,4 @@
+import EmitterSingleton from "@/app/[locale]/(auth-guard)/discussion/components/Emitter";
 import { createClient } from "@/utils/supabase/server";
 import { Spinner } from "flowbite-react";
 import React from "react";
@@ -13,7 +14,7 @@ interface Props {
 async function fetchDataFromBackend(messages: any[], fileId: string) {
   const supabase = createClient();
   const { data } = await supabase.auth.getSession();
-  
+
   return await fetch('/api/story-answer-validation', {
     method: 'POST',
     body: JSON.stringify({ messages, fileId }),
@@ -64,6 +65,8 @@ export default function AnswerComponent(props: Props) {
 
         const assistentChoiceMessage = { role: "assistant", content: `Question: '${props.question}', answer possibilities: \n- ${props.possibilties.join("\n- ")}` };
         const userMessage = { role: "user", content: `Choice: '${selected}', reason: '${reason}'` };
+
+        EmitterSingleton.emit('analytics-event', { category: 'Story answer', action: 'form-submit', name: JSON.stringify({ assistentChoiceMessage, userMessage }) });
 
         fetchDataFromBackend([...props.messages, assistentChoiceMessage, userMessage], props.fileId).then((data) => {
           console.log("data", data);
