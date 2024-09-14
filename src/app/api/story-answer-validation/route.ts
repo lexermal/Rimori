@@ -1,5 +1,5 @@
 import { env } from '@/utils/constants';
-import SupabaseService from '@/utils/supabase/server/Connector';
+import SupabaseService from '@/app/api/opposition/Connector';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { convertToCoreMessages, generateText } from 'ai';
 import { NextResponse } from 'next/server';

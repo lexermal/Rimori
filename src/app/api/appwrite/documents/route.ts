@@ -1,4 +1,4 @@
-import SupabaseService from '@/utils/supabase/server/Connector';
+import SupabaseService from '@/app/api/opposition/Connector';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {

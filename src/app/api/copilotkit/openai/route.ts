@@ -1,7 +1,5 @@
 import { CopilotBackend, OpenAIAdapter } from "@copilotkit/backend";
 
-export const runtime = "edge";
-
 export async function POST(req: Request): Promise<Response> {
   console.log("POST /api/copilotkit/openai");
   const copilotKit = new CopilotBackend();

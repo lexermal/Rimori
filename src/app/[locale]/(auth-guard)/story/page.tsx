@@ -9,7 +9,7 @@ import AnswerComponent from '@/app/[locale]/(auth-guard)/story/ChoiceForm';
 import Feedback, { StoryFeedback } from '@/app/[locale]/(auth-guard)/story/Feedback';
 import { useRouter } from '@/i18n';
 import { SupabaseClient } from '@/utils/supabase/server';
-import SupabaseService from '@/utils/supabase/server/Connector';
+import SupabaseService from '@/app/api/opposition/Connector';
 
 let kickedOffStory = false;
 
