@@ -19,18 +19,14 @@ type Props = {
 
 export default function RootLayout({ children, env }: Props) {
   return (
-    <html>
-      <body>
-        <GlobalProvider>
-          <SupabaseProvider>
-            <UserProvider>
-              <EnvProvider env={env}>
-                <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
-              </EnvProvider>
-            </UserProvider>
-          </SupabaseProvider>
-        </GlobalProvider>
-      </body>
-    </html>
+    <GlobalProvider>
+      <SupabaseProvider>
+        <UserProvider>
+          <EnvProvider env={env}>
+            <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
+          </EnvProvider>
+        </UserProvider>
+      </SupabaseProvider>
+    </GlobalProvider>
   );
 }
