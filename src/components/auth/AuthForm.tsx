@@ -1,75 +1,174 @@
+import { useEnv } from "@/providers/EnvProvider";
 import { SupabaseClient } from "@/utils/supabase/server";
-import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
-import { ViewType } from "@supabase/auth-ui-shared";
-import React from "react";
+import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 
-const AuthForm = () => {
+type AuthView = "sign_in" | "sign_up" | "forgotten_password";
+
+const AuthForm: React.FC = () => {
   const supabaseClient = SupabaseClient.getClient();
+  const [view, setView] = useState<AuthView>("sign_in");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const env = useEnv();
 
-  const [view, setView] = React.useState("sign_in" as ViewType);
-  // console.log(view);
+  const router = useRouter();
+  const locale = useLocale();
+
+  const handleSignIn = async (): Promise<void> => {
+    setLoading(true);
+    setErrorMessage("");
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setErrorMessage(error.message);
+      setLoading(false);
+    } else {
+      router.replace('/');
+    }
+  };
+
+  const handleSignUp = async (): Promise<void> => {
+    setLoading(true);
+    setErrorMessage("");
+
+    const emailDomain = email.split('@')[1];
+
+    if (!env.ALLOWED_DOMAINS.includes(emailDomain)) {
+      return router.replace(`/${locale}/waitlist?email=${encodeURIComponent(email)}`);
+    }
+
+    const { error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      setErrorMessage(error.message);
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (): Promise<void> => {
+    setLoading(true);
+    setErrorMessage("");
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      setErrorMessage(error.message);
+    } else {
+      alert("Password reset link sent to your email");
+    }
+
+    setLoading(false);
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+
+    if (view === "sign_in") {
+      handleSignIn();
+    } else if (view === "sign_up") {
+      handleSignUp();
+    } else {
+      handlePasswordReset();
+    }
+  };
+
+  const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) =>
+    (e: ChangeEvent<HTMLInputElement>): void => {
+      setter(e.target.value);
+    };
 
   return (
-    <>
-      <h2 className="text-2xl font-semibold mb-4">
-        {view === "sign_in" ? "Login" : (view === "sign_up" ? "Register" : "Reset Password")}
-      </h2>
-      <div className="flex justify-center flex-col">
-        <SupabaseAuth
-          supabaseClient={supabaseClient}
-          view={view}
-          showLinks={false}
-          localization={{
-            variables: {
-              sign_up: {
-                email_input_placeholder: "",
-                password_input_placeholder: "",
-                email_label: "Your (university) email address",
-              },
-              sign_in: {
-                email_input_placeholder: "",
-                password_input_placeholder: "",
-                email_label: "Your (university) email address",
-              }
-            }
-          }}
-          appearance={{
-            extend: false,
-            // needed instead of theme because auth ui broken on ssr
-            className: {
-              anchor:
-                "text-sm underline mx-auto text-black/70 hover:text-black/50 transition-all",
-              button:
-                "bg-zinc-900 my-5 text-white rounded-lg p-2 hover:bg-zinc-700 transition-all",
-              container: "flex flex-col",
-              divider: "",
-              input:
-                "flex h-9 w-full rounded-md border border-input transition-all bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-              label: "mt-3 flex flex-col text-start text-md font-semibold mb-1",
-              loader: "",
-              message: "text-red-500 text-center block mt-3",
-            },
-          }}
-          // providers={["google"]}
-          providers={[]}
-          socialLayout="horizontal"
-        />
-        <div className="flex flex-col items-center">
+    <div>
+      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-4">
+        <h2 className="text-3xl font-bold mb-6 text-center">
+          {view === "sign_in"
+            ? "Login"
+            : view === "sign_up"
+              ? "Register"
+              : "Reset Password"}
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-gray-700 text-sm font-semibold mb-1">
+              Your (university) email address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={handleInputChange(setEmail)}
+              placeholder="student@university.edu.se"
+              required
+              className="w-full h-12 border rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            />
+          </div>
+
+          {view !== "forgotten_password" && (
+            <div>
+              <label className="block text-gray-700 text-sm font-semibold mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={handleInputChange(setPassword)}
+                required
+                className="w-full h-12 border rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              />
+            </div>
+          )}
+
+          {errorMessage && (
+            <p className="text-red-500 text-sm text-center">{errorMessage}</p>
+          )}
+
           <button
-            className={"text-sm underline mx-auto text-black/70 hover:text-black/50 transition-all "+(view === "forgotten_password" ? "hidden" : "")}
+            type="submit"
+            className={`w-full h-12 rounded-md text-white font-semibold ${loading ? 'bg-gray-500' : 'bg-indigo-600 hover:bg-indigo-700'} transition`}
+            disabled={loading}
+          >
+            {loading
+              ? "Loading..."
+              : view === "sign_in"
+                ? "Sign In"
+                : view === "sign_up"
+                  ? "Sign Up"
+                  : "Reset Password"}
+          </button>
+        </form>
+
+        <div className="flex flex-col items-center mt-6">
+          <button
+            className={`text-sm font-semibold ${view === "forgotten_password" ? "hidden" : "text-gray-700 hover:text-gray-900"}`}
             onClick={() => setView(view === "sign_in" ? "sign_up" : "sign_in")}
           >
-            {view === "sign_in" ? "Don't have an account? Register" : "Already have an account? Log in"}
+            {view === "sign_in"
+              ? "Don't have an account? Register"
+              : "Already have an account? Log in"}
           </button>
+
           <button
-            className={"text-sm underline mx-auto text-black/70 hover:text-black/50 transition-all "+(view === "sign_up" ? "hidden" : "")}
+            className={`text-sm mt-2 ${view === "sign_up" ? "hidden" : "text-gray-700 hover:text-gray-900"}`}
             onClick={() => setView(view === "forgotten_password" ? "sign_in" : "forgotten_password")}
           >
-            {view === "forgotten_password" ? "Back to login" : "Forgot your password?"}
+            {view === "forgotten_password"
+              ? "Back to login"
+              : "Forgot your password?"}
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

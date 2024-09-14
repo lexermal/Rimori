@@ -54,9 +54,9 @@ const WaitlistPage = () => {
         });
         setEmail('');
       } else {
-        let errorMessage = t('Failed to add you to the waitlist Please try again');
+        let errorMessage = t('Failed to add you to the waitlist. Please try again.');
         if (error.code === '23505') {
-          errorMessage = t('You have already been registered to the waitlist We will contact you when Rimori is available for you');
+          errorMessage = t('You have already been registered to the waitlist. We will contact you when Rimori is available for you.');
         }
         setStatusMessage({
           status: Status.Error,
@@ -66,46 +66,50 @@ const WaitlistPage = () => {
     } catch (error) {
       setStatusMessage({
         status: Status.Error,
-        message: t('An error occurred Please try again later'),
+        message: t('An error occurred. Please try again later.'),
       });
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#406d46] to-[#5e6b20] p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-green-500 via-teal-500 to-blue-500 p-6">
       <Head>
         <title>{t('Join Our Waitlist')}</title>
       </Head>
-      <h1 className="text-4xl font-bold mb-4 text-white">{t('Rimori will soon be available at your university!')}</h1>
-      <p className="text-lg mb-6 text-gray-300 font-semibold">{t('Till then, how about staying updated?')}</p>
 
-      <div className="w-full max-w-md p-8">
+      <div className="w-full max-w-lg text-center p-8 bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl">
+        <h1 className="text-4xl font-bold text-white mb-6 animate-fadeIn">{t('Rimori will soon be available at your university!')}</h1>
+        <p className="text-lg text-gray-200 mb-8">{t('Till then, stay updated by joining our waitlist')}</p>
+
         {!emailParam && (
-          <div className="mb-4">
+          <div className="mb-6">
             <input
               id="email"
               type="email"
               placeholder="john.doe@university.edu"
               value={email}
               onChange={handleInputChange}
-              className="border border-gray-300 p-2 w-full rounded-lg"
+              className="w-full p-4 text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg"
               required
             />
           </div>
         )}
-        {statusMessage.status === Status.Error && <p className="text-red-500 text-sm mb-4">{statusMessage.message}</p>}
-        {statusMessage.status === Status.Success && <p className="text-green-500 text-sm mb-4">{statusMessage.message}</p>}
 
-        <div className="flex justify-center align-middle space-x-4 mt-6">
+        {statusMessage.status === Status.Error && <p className="text-red-500 mb-4">{statusMessage.message}</p>}
+        {statusMessage.status === Status.Success && <p className="text-green-500 mb-4">{statusMessage.message}</p>}
+
+        <div className="flex justify-center items-center space-x-4 mt-8">
           <button
-            className="bg-white text-black font-semibold p-2 rounded-lg hover:bg-gray-100 transition duration-300"
+            className="bg-gradient-to-r from-green-400 to-teal-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
             onClick={handleClick}
+            disabled={statusMessage.status === Status.Loading}
           >
-            {t('Sign me up!')}
+            {statusMessage.status === Status.Loading ? t('Signing you up...') : t('Sign me up!')}
           </button>
+
           <button
             type="button"
-            className="bg-gray-400 text-white p-2 rounded-lg hover:bg-gray-100 transition duration-300"
+            className="bg-white/80 text-gray-900 font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-white hover:text-gray-700 transition-all duration-300 ease-in-out"
             onClick={() => router.replace('/')}
           >
             {t('Go to homepage')}

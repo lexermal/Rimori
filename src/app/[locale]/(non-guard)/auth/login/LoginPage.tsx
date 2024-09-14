@@ -4,52 +4,42 @@ import Head from 'next/head';
 import Image from 'next/image';
 import * as React from 'react';
 
-import { useUser } from '@/hooks/useUser';
-import AuthForm from '@/components/auth/AuthForm';
 import { useTranslations } from 'next-intl';
-import { redirect } from 'next/navigation';
+import AuthForm from '@/components/auth/AuthForm';
 
 export default function LoginPage() {
-  const { user } = useUser();
   const t = useTranslations('Index');
-
-  React.useEffect(() => {
-    if (user) {
-      redirect('/');
-    }
-  }, [user]);
 
   return (
     <main className="flex flex-col min-h-screen bg-gray-100">
-      <Head>
+      <Head key="login">
         <title>Rimori</title>
       </Head>
 
-      <div className="flex-1 flex">
-        <div className="hidden md:flex w-1/2 items-center justify-center relative p-32"
+      <div className="flex-1 flex flex-col md:flex-row">
+        <div
+          className="hidden md:flex flex-1 items-center justify-center relative p-6 md:p-12 lg:p-24 bg-cover bg-center"
           style={{
             backgroundImage: 'url("/login-bg.png")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
           }}
         >
-          <div className="relative bg-white bg-opacity-30 rounded-lg p-6 flex flex-col items-start min-h-[50vh] min-w-[100%]">
-            <p className="text-3xl font-bold text-white mt-4 max-w-[325px]">
+          <div className="relative bg-white bg-opacity-50 rounded-lg p-6 flex flex-col items-start max-w-lg mx-auto">
+            <p className="text-xl md:text-2xl lg:text-3xl font-bold text-white mt-4 mr-24">
               {t('Unlock your AI learning journey today and propel your academic success to new heights!')}
             </p>
             <Image
               src="/login-sphere.png"
               alt="Sphere Graphic"
-              width={80}
-              height={80}
-              className="absolute bottom-4 left-[-40px]"
+              width={60}
+              height={60}
+              className="absolute bottom-4 left-[-30px] lg:left-[-40px]"
             />
             <Image
               src="/login-avatar.png"
               alt="Woman Graphic"
-              width={350}
-              height={420}
-              className="absolute bottom-0 right-[-65px] h-auto w-auto"
+              width={300}
+              height={350}
+              className="absolute bottom-0 right-[-30px] lg:right-[-65px] h-auto w-auto"
             />
           </div>
         </div>
@@ -64,18 +54,7 @@ export default function LoginPage() {
           />
 
           <div className="text-center max-w-xs w-full">
-            {user ? (
-              <div>
-                <h2 className="text-2xl font-semibold mb-4">Welcome Back!</h2>
-                <p className="text-gray-700 mb-4">
-                  You have logged in successfully!
-                </p>
-              </div>
-            ) : (
-              <div>
-                <AuthForm />
-              </div>
-            )}
+            <AuthForm />
           </div>
         </div>
       </div>
