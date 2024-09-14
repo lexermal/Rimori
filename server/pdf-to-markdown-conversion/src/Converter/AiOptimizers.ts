@@ -23,11 +23,11 @@ export async function improveTextWithAI(unpretty_markdown_text: string): Promise
   const msg = await anthropic.messages.create({
     model: "claude-3-5-sonnet-20240620",
     system: systemPrompt,
-    max_tokens: 1000 + unpretty_markdown_text.split(" ").length * 2,
+    max_tokens: 8192,
     messages: [{ "role": "user", "content": unpretty_markdown_text }]
   });
 
-  logger.info("Response from AI: ", msg.usage);
+  logger.info("Optimized text with AI", { input_token: msg.usage.input_tokens, output_token: msg.usage.output_tokens });
 
   return (msg.content[0] as TextBlock).text;
 }

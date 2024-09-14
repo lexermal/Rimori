@@ -29,9 +29,10 @@ app.get('/health', (req: any, res: any) => {
 
 // Validate JWT token
 app.use((req: any, res: any, next: any) => {
-  logger.info('Validating JWT token...');
+  logger.info('Checking authorization token...');
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
+    logger.warn('No token provided');
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -42,6 +43,7 @@ app.use((req: any, res: any, next: any) => {
 app.post('/upload', upload.single('file'), async (req: any, res) => {
   const file = req.file;
   if (!file) {
+    logger.warn('No file uploaded');
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
@@ -51,7 +53,7 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
   const fileExtension = path.extname(file.originalname);
 
   const fileId = await db.createDocument(file.originalname.replace(fileExtension, ''));
-  logger.debug('File ID:', fileId);
+  logger.debug('Processing document ', { id: fileId });
 
   fs.mkdirSync(`./upload/${fileId}`);
 
@@ -70,9 +72,9 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
     const sections2 = await getMarkdownSections(markdown2);
     let headingID = "";
 
-    // console.log("Creating heading section relationships")
+    logger.info("Creating heading section relationships")
     for (let index = 0; index < sections2.length; index++) {
-      console.log(`Creating heading section relationships for section ${index} of ${sections2.length}`);
+      logger.info(`Creating heading section relationships for section ${index} of ${sections2.length}`);
       const { heading, markdown, level } = sections2[index];
       const sectionId = await db.createDocumentSection(fileId, heading, level, markdown, await getVectors(markdown), index);
 
@@ -84,13 +86,15 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
     }
 
     await db.setRealHeadings(fileId);
-    console.log("Heading section relationships created")
+    logger.info("Heading section relationships created")
 
-    fs.rm(`./upload/${fileId}`, { recursive: true }, (err) => err && logger.error(err));
+    fs.rm(`./upload/${fileId}`, { recursive: true },
+      (err) => err && logger.error("Error at deleting the markup conversion folder", { err }));
   } catch (error: any) {
     logger.error('Failed to convert PDF to Markdown:', error);
     await db.deleteDocument(fileId);
-    fs.rm(`./upload/${fileId}`, { recursive: true }, (err) => err && logger.error(err));
+    fs.rm(`./upload/${fileId}`, { recursive: true },
+      (err) => err && logger.error("Error at deleting the markup conversion folder", { err }));
 
     return res.status(400).json({ error: error.message });
   }
@@ -100,6 +104,7 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
 
 app.listen(3001, () => {
   logger.info('Server is running on port 3001');
+  logger.info("The following domain is allowed to access the server:", { FRONTEND_DOMAIN });
 });
 
 async function convertPdfToMarkdown(fileId: string) {
@@ -113,7 +118,7 @@ async function convertPdfToMarkdown(fileId: string) {
     .filter((percentage) => percentage !== null)
     .reduce((acc, curr) => (acc + curr) / 2);
 
-  logger.debug('Total percentage of images:', totalPercentageOfLines);
+  logger.debug('Total percentage of images:' + totalPercentageOfLines);
 
   if (totalPercentageOfLines > 80) {
     logger.error('The document contains more than 80% images.');
@@ -121,7 +126,7 @@ async function convertPdfToMarkdown(fileId: string) {
   }
   fs.writeFileSync(`./upload/markdown/${fileId}_withoutAI.md`, pages.join('\n\n'));
 
-  logger.info('PDF converted to Markdown successfully. ID: ', fileId);
+  logger.info('PDF converted to Markdown successfully. ', { id: fileId });
 
   return pages.join('\n\n');
 }
@@ -138,7 +143,6 @@ async function splitMarkdownIntoSections(markdown: string): Promise<Section[]> {
   return improvedSections;
 }
 
-
 async function uploadMarkdownDocument(token: string, id: string, markdown: string) {
   const client = new SupabaseService(token)
   const { sub } = jwt.decode(token) as { sub: string };
@@ -152,7 +156,7 @@ async function uploadMarkdownDocument(token: string, id: string, markdown: strin
   });
 
   await Promise.all(assets.map(async (file) => {
-    logger.debug('Uploading image:', file);
+    logger.debug('Uploading image: ' + file);
     await client.uploadAsset(`./upload/${id}/${file}`, sub + "/" + file);
   }));
 
@@ -162,7 +166,7 @@ async function uploadMarkdownDocument(token: string, id: string, markdown: strin
 
   await client.completeDocument(id, markdown);
 
-  logger.info('Markdown document uploaded successfully. ID:', id);
+  logger.info('Markdown document uploaded successfully.', { id });
 }
 
 function getImageRatio(markdown: string): number | null {

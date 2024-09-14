@@ -46,7 +46,7 @@ class SupabaseService {
             logger.error('Failed to delete document:', error);
             throw new Error('Failed to delete document');
         }
-        logger.info('Document deleted successfully', id);
+        logger.info('Document deleted successfully', { id });
     }
 
     public async uploadAsset(filePath: string, fileName: string): Promise<any> {
@@ -60,9 +60,9 @@ class SupabaseService {
             });
 
         if (error) {
-            logger.error('Error uploading file:', error.message);
+            logger.error('Error uploading file:' + error.message);
         } else {
-            logger.info('File uploaded successfully:', data.id);
+            logger.info('Asset uploaded successfully', { id: data.id });
         }
     }
 
@@ -77,9 +77,9 @@ class SupabaseService {
             });
 
         if (error) {
-            logger.error('Error uploading file:', error.message);
+            logger.error('Error uploading file:' + error.message);
         } else {
-            logger.info('File uploaded successfully:', data.id);
+            logger.info('File uploaded successfully', { id: data.id });
         }
     }
 
@@ -90,7 +90,7 @@ class SupabaseService {
             .select();
 
         if (error) {
-            console.error('Failed to create document section:', error.message);
+            logger.error('Failed to create document section:', { error: error.message });
             throw new Error('Failed to create document section');
         }
 
@@ -104,7 +104,7 @@ class SupabaseService {
             .select();
 
         if (error) {
-            console.error('Failed to create section relation:', error.message);
+            logger.error('Failed to create section relation:', { error: error.message });
             throw new Error('Failed to create section relation');
         }
 
@@ -116,11 +116,9 @@ class SupabaseService {
             .rpc('update_is_real_heading', { p_document_id: documentId })
 
         if (error) {
-            console.error('Error executing updating real headings column:', error)
+            logger.error('Error executing updating real headings column:', { error })
         }
     }
-
-
 }
 
 export default SupabaseService;

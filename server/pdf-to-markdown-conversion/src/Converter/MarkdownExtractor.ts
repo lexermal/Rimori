@@ -115,7 +115,7 @@ class MarkdownExtractor {
     }
 
     if (Object.keys(textElement).length > 1) {
-      console.error('Unknown text element:', textElement);
+      logger.error('Unknown text element:', textElement);
     }
 
     return '';
