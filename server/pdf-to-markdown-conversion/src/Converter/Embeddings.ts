@@ -1,5 +1,8 @@
 import OpenAI from "openai";
 import { OPENAI_API_KEY } from "../utils/constants";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("Embeddings.ts");
 
 export async function getVectors(markdown: string): Promise<number[]> {
     try {
@@ -13,10 +16,10 @@ export async function getVectors(markdown: string): Promise<number[]> {
 
         const enbeddings = embeddingResponse.data[0].embedding
 
-        // console.log("embeddings for markdown: ", enbeddings)
+        logger.info("Created embedding")
         return enbeddings;
     } catch (err) {
-        console.error(`Failed to generate embeddings for '${markdown}'`, err)
+        logger.error(`Failed to generate embeddings for '${markdown}'`, {error: err})
         return [];
     }
 }

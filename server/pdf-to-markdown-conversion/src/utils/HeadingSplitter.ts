@@ -1,3 +1,5 @@
+import { createLogger } from "./logger";
+
 export interface Section {
     heading: string;
     level: number;
@@ -5,8 +7,9 @@ export interface Section {
     documentPosition: number;
 }
 
+const logger = createLogger("HeadingSplitter.ts");
+
 export async function getMarkdownSections(markdown: string): Promise<Section[]> {
-    // console.log("markdown: ", markdown);
     const sections: Section[] = [];
     const regex = /^(#{1,6})\s+(.*)$/gm;
     let match;
@@ -19,8 +22,6 @@ export async function getMarkdownSections(markdown: string): Promise<Section[]> 
 
         const sectionMarkdown = markdown.substring(startIndex, endIndex).trim();
 
-        // console.log("sectionMarkdown: ", sectionMarkdown);
-
         if (isRealHeading(heading)) {
             const section: Section = {
                 heading: cleanHeading(heading),
@@ -29,10 +30,10 @@ export async function getMarkdownSections(markdown: string): Promise<Section[]> 
                 documentPosition: sections.length + 1,
             };
 
-            // console.log("section: ", section)
             sections.push(section);
         }
     }
+    logger.info(`Found ${sections.length} sections in markdown`);
 
     return sections;
 }
