@@ -11,6 +11,7 @@ import SupabaseProvider from '@/providers/SupabaseProvider';
 import UserProvider from '@/providers/UserProvider';
 import { EnvProvider } from '@/providers/EnvProvider';
 import { Env } from '@/utils/constants';
+import { SupabaseClient } from '@/utils/supabase/server';
 
 type Props = {
   env: Env;
@@ -18,6 +19,8 @@ type Props = {
 };
 
 export default function RootLayout({ children, env }: Props) {
+  SupabaseClient.getClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+
   return (
     <GlobalProvider>
       <SupabaseProvider>
