@@ -4,7 +4,7 @@ import Head from 'next/head';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
-import { createClient } from '@/utils/supabase/server';
+import { SupabaseClient } from '@/utils/supabase/server';
 
 enum Status {
   Idle,
@@ -44,7 +44,7 @@ const WaitlistPage = () => {
     });
 
     try {
-      const supabase = createClient();
+      const supabase = SupabaseClient.getClient();
       const { error } = await supabase.from('waitlist').insert({ email });
 
       if (!error) {

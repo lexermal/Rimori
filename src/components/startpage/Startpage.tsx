@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from '@/i18n';
 import DocumentSelection from '@/components/startpage/DocumentSelection';
 import { FileUpload } from '@/components/startpage/FileUpload';
-import { createClient } from '@/utils/supabase/server';
+import { SupabaseClient } from '@/utils/supabase/server';
 import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
 
 export interface MarkdownDocument {
@@ -31,7 +31,7 @@ const StartPage = () => {
   const [documents, setDocuments] = useState<DocumentStatus[]>([]);
 
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = SupabaseClient.getClient();
 
   const fetchDocuments = async () => {
     const { data, error } = await supabase.rpc('get_real_headings')

@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import { OpenAI } from "openai";
 import VoiceRecorder from "@/components/ai-sidebar/VoiceRecoder";
-import { createClient } from "@/utils/supabase/server";
+import { SupabaseClient } from "@/utils/supabase/server";
+import { useEnv } from "@/providers/EnvProvider";
 
 const Role = {
   Student: 0,
@@ -35,6 +36,7 @@ const ExamSimulator = () => {
   const [isStudent1Thinking, setIsStudent1Thinking] = useState(false);
   const [isStudent2Thinking, setIsStudent2Thinking] = useState(false);
   const [loading, setLoading] = useState(true); // Added loading state
+  const env=useEnv();
 
   const voiceRecorderRef = useRef<{ startRecording: () => void; stopRecording: () => void, getTranscript: () => Promise<string> } | null>(null);
 
@@ -51,7 +53,7 @@ const ExamSimulator = () => {
   useEffect(() => {
     const fetchData = async () => {
       const filename = new URLSearchParams(window.location.search).get('file') || '';
-      const supabase = createClient();
+      const supabase = SupabaseClient.getClient();
 
       try {
         const session = await supabase.auth.getSession();
@@ -134,7 +136,7 @@ const ExamSimulator = () => {
   };
 
   const fetchAIResponse = async (role: number, prompt: string, maxTokens: number) => {
-    const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
+    const openai = new OpenAI({ apiKey:env.OPENAI_API_KEY, dangerouslyAllowBrowser: true });
 
     try {
       const response = await openai.chat.completions.create({
@@ -210,7 +212,7 @@ const ExamSimulator = () => {
       const evaluationPrompt = `Evaluate the following student's response on a scale of 1 to 10 for topic ${updatedRounds[i].topic}: "${studentResponse}". Provide a brief explanation for the score.`;
 
       try {
-        const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
+        const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY, dangerouslyAllowBrowser: true });
         const response = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: [{ role: "system", content: evaluationPrompt }],

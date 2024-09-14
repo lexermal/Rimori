@@ -1,8 +1,8 @@
 "use client";
 
 import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
-import { UPLOAD_BACKEND } from '@/utils/constants';
-import { createClient } from '@/utils/supabase/server';
+import { useEnv } from '@/providers/EnvProvider';
+import { SupabaseClient } from '@/utils/supabase/server';
 import { InputHTMLAttributes, useEffect, useState } from 'react';
 import { DropzoneRootProps, useDropzone } from 'react-dropzone';
 import { FaUpload } from 'react-icons/fa6';
@@ -23,6 +23,7 @@ export function FileUpload(props: Props) {
       'application/pdf': [],
     },
   });
+  const env = useEnv();
 
   useEffect(() => {
     if (acceptedFiles.length === 0) {
@@ -39,9 +40,9 @@ export function FileUpload(props: Props) {
     setIsUploading(true);
     EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-init' });
 
-    const supabase = createClient();
+    const supabase = SupabaseClient.getClient();
     supabase.auth.getSession().then(({ data }) => {
-      fetch(UPLOAD_BACKEND, {
+      fetch(env.UPLOAD_BACKEND, {
         method: 'POST',
         body: formData,
         headers: { Authorization: `Bearer ${data.session?.access_token}` },

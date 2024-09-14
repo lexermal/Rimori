@@ -10,7 +10,7 @@ import { GlobalProvider } from '@/context/GlobalContext';
 import SupabaseProvider from '@/providers/SupabaseProvider';
 import UserProvider from '@/providers/UserProvider';
 import { EnvProvider } from '@/providers/EnvProvider';
-import { Env } from './layout';
+import { Env } from '@/utils/constants';
 
 type Props = {
   env: Env;

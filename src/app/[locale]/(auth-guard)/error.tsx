@@ -2,21 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { RiAlarmWarningFill } from 'react-icons/ri';
-import { createClient } from '@/utils/supabase/server';
+import { SupabaseClient } from '@/utils/supabase/server';
 import { getMatomoInstance } from '@/utils/matomo';
 import { User } from '@supabase/supabase-js';
 import { usePathname } from 'next/navigation';
+import { useEnv } from '@/providers/EnvProvider';
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
+interface Props {
   reset: () => void;
-}) {
+  error: Error & { digest?: string };
+}
+
+export default function GlobalError({ error, reset }: Props) {
   const [user, setUser] = useState<User | null>(null);
-  const supabase = createClient();
-  const [matomoInstance, setMatomoInstance] = useState(getMatomoInstance());
+  const supabase = SupabaseClient.getClient();
+  const env = useEnv();
+  const [matomoInstance, setMatomoInstance] = useState(getMatomoInstance(env.MATOMO_URL));
   const pathname = usePathname();
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function GlobalError({
   }, [supabase]);
 
   useEffect(() => {
-    const instance = getMatomoInstance(user?.id);
+    const instance = getMatomoInstance(env.MATOMO_URL, user?.id);
     setMatomoInstance(instance);
   }, [user?.id]);
 

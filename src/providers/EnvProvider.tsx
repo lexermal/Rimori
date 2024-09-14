@@ -1,4 +1,4 @@
-import { Env } from '@/app/layout';
+import { Env } from '@/utils/constants';
 import React, { createContext, useContext, ReactNode } from 'react';
 
 interface EnvProviderProps {

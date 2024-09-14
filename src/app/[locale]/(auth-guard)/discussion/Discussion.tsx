@@ -8,8 +8,7 @@ import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 
 import Card from '../../../../components/discussion/Card';
 import DiscussionPopup from '../../../../components/discussion/DiscussionPopup';
-import EmbeddedAssistent from '../../../../components/EmbeddedAssistent/EmbeddedAssistent';
-import { createClient } from '@/utils/supabase/server';
+import { SupabaseClient } from '@/utils/supabase/server';
 import Assistentv2 from './components/Assistentv2';
 
 interface Exam {
@@ -41,7 +40,7 @@ export default function Discussion(): JSX.Element {
     }
     currentlyFetchingTopics = true;
 
-    const supabase = createClient();
+    const supabase = SupabaseClient.getClient();
     supabase.auth.getSession().then((session) => {
       fetch(`/api/opposition/topics?file=${filename}`, {
         headers: { Authorization: `Bearer ${session.data.session?.access_token}` },

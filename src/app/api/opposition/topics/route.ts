@@ -1,4 +1,4 @@
-import { NEXT_PUBLIC_ANTHROPIC_API_KEY } from "@/utils/constants";
+import { env } from "@/utils/constants";
 import SupabaseService from "@/utils/supabase/server/Connector";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText, convertToCoreMessages } from "ai";
@@ -69,7 +69,7 @@ async function getData(fileContent: string) {
         }
     ] as { role: "system" | "user", content: string }[];
 
-    const anthropic = createAnthropic({ apiKey: NEXT_PUBLIC_ANTHROPIC_API_KEY });
+    const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
     const result = await generateText({
         model: anthropic("claude-3-5-sonnet-20240620"),
         messages: convertToCoreMessages(messages),

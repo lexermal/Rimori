@@ -1,4 +1,4 @@
-import { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_ALLOWED_DOMAINS } from '@/utils/constants';
+import { env} from '@/utils/constants';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -18,8 +18,8 @@ export async function updateSession(
   }
 
   const supabase = createServerClient(
-    NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    env.SUPABASE_URL,
+    env.SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
@@ -48,7 +48,7 @@ export async function updateSession(
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const allowedDomains = NEXT_PUBLIC_ALLOWED_DOMAINS;
+  const allowedDomains = env.ALLOWED_DOMAINS;
 
   if (user) {
     const emailDomain = user.email?.split('@')[1];

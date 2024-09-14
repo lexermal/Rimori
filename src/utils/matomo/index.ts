@@ -1,14 +1,13 @@
-import { NEXT_PUBLIC_MATOMO_URL } from '@/utils/constants';
 import { createInstance } from '@jonkoops/matomo-tracker-react';
 
 let matomoInstance: any;
 let currentUserId: string | undefined;
 
-export const getMatomoInstance = (userId?: string) => {
+export const getMatomoInstance = (backendUrl: string, userId?: string) => {
   if (userId !== currentUserId) {
     currentUserId = userId;
     matomoInstance = createInstance({
-      urlBase: NEXT_PUBLIC_MATOMO_URL,
+      urlBase: backendUrl,
       siteId: 1,
       userId,
       disabled: false,

@@ -3,14 +3,14 @@
 import { convertToCoreMessages, streamText } from 'ai';
 import { z } from 'zod';
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { NEXT_PUBLIC_ANTHROPIC_API_KEY } from '@/utils/constants';
+import { env } from '@/utils/constants';
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const anthropic = createAnthropic({ apiKey: NEXT_PUBLIC_ANTHROPIC_API_KEY });
+  const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
   const result = await streamText({
     model: anthropic("claude-3-5-sonnet-20240620"),
@@ -113,13 +113,13 @@ toolBuilder.addUserInteractionTool("explanationUnderstood", "Evaluate the explan
   .addParameter("improvementHints", "string", "hints for improvement, directed to the user directly")
   .build();
 
-  toolBuilder.addUserInteractionTool("oppinionChanged", "Evaluate if the user managed to change your oppinion.")
+toolBuilder.addUserInteractionTool("oppinionChanged", "Evaluate if the user managed to change your oppinion.")
   .addParameter("studentKnowsTopic", "boolean", "if the student knows the topic in depth and explained it right. TRUE or FALSE")
   .addParameter("explanation", "string", "The explanation why the oppinion was changed or not")
   .addParameter("improvementHints", "string", "hints for improvement, directed to the user directly")
   .build();
 
-  toolBuilder.addUserInteractionTool("conceptApplied", "Evaluate if the user managed to apply the concept in the given setting.")
+toolBuilder.addUserInteractionTool("conceptApplied", "Evaluate if the user managed to apply the concept in the given setting.")
   .addParameter("studentAppliesConcept", "boolean", "if the student managed to apply the concept in the given setting. TRUE or FALSE")
   .addParameter("explanation", "string", "The explanation how well or not he applied the concept in the setting")
   .addParameter("improvementHints", "string", "hints for improvement, directed to the user directly")

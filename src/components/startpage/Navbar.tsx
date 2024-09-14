@@ -6,14 +6,14 @@ import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
-import { createClient } from '@/utils/supabase/server';
+import { SupabaseClient } from '@/utils/supabase/server';
 
 export function CustomNavbar() {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const supabase = createClient();
+  const supabase = SupabaseClient.getClient();
 
   useEffect(() => {
     const fetchUser = async () => {

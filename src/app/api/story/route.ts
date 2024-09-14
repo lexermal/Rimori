@@ -1,14 +1,14 @@
 import { convertToCoreMessages, streamText } from 'ai';
 import { z } from 'zod';
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { NEXT_PUBLIC_ANTHROPIC_API_KEY } from '@/utils/constants';
+import { env } from '@/utils/constants';
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const anthropic = createAnthropic({ apiKey: NEXT_PUBLIC_ANTHROPIC_API_KEY });
+  const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
   const result = await streamText({
     model: anthropic("claude-3-5-sonnet-20240620"),

@@ -1,10 +1,10 @@
-import { createClient } from "@/utils/supabase/server";
+import { SupabaseClient } from "@/utils/supabase/server";
 import { Auth as SupabaseAuth } from "@supabase/auth-ui-react";
 import { ViewType } from "@supabase/auth-ui-shared";
 import React from "react";
 
 const AuthForm = () => {
-  const supabaseClient = createClient();
+  const supabaseClient = SupabaseClient.getClient();
 
   const [view, setView] = React.useState("sign_in" as ViewType);
   // console.log(view);

@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import AnswerComponent from '@/app/[locale]/(auth-guard)/story/ChoiceForm';
 import Feedback, { StoryFeedback } from '@/app/[locale]/(auth-guard)/story/Feedback';
 import { useRouter } from '@/i18n';
-import { createClient } from '@/utils/supabase/server';
+import { SupabaseClient } from '@/utils/supabase/server';
 import SupabaseService from '@/utils/supabase/server/Connector';
 
 let kickedOffStory = false;
@@ -35,7 +35,7 @@ export default function Story() {
   console.log("messages", messages);
 
   useEffect(() => {
-    const supabase = createClient();
+    const supabase = SupabaseClient.getClient();
     supabase.auth.getSession().then(session => {
       const fileId = new URLSearchParams(window.location.search).get("file");
       if (!fileId) {
@@ -231,9 +231,9 @@ Remember the usecase should have max 300 words.
 }
 
 async function getMarkdownContent(jwt: string, id: string) {
-  const db = new SupabaseService(jwt);
-  const document = await db.getDocumentContent(id);
-
-  return document;
+  return fetch("/api/appwrite/documents?documentId=" + id, {
+    headers: { Authorization: jwt }
+  }).then(response => response.json())
+    .then(data => data.data);
 }
 

@@ -1,22 +1,30 @@
 import { createBrowserClient } from '@supabase/ssr';
-import { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } from '@/utils/constants';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient as Client } from '@supabase/supabase-js';
 
-let supabaseClient: SupabaseClient | null = null;
+export class SupabaseClient {
+  private static instance: SupabaseClient;
+  private static client = null as Client | null;
 
-export function createClient() {
-  if (!supabaseClient) {
-    supabaseClient = createBrowserClient(
-      NEXT_PUBLIC_SUPABASE_URL,
-      NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        cookieEncoding: 'base64url',
-        auth: {
-          flowType: 'pkce',
-        },
-      }
-    );
+  private constructor() {
+    // private constructor to prevent instantiation
   }
 
-  return supabaseClient;
+  public static getClient(supabaseUrl?: string, supabaseAnonKey?: string): Client {
+    if (!SupabaseClient.instance && supabaseUrl && supabaseAnonKey) {
+      console.log('Creating new Supabase client in singleton');
+      SupabaseClient.instance = new SupabaseClient();
+
+      this.client = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+        cookieEncoding: 'base64url',
+        auth: { flowType: 'pkce' },
+      });
+    }
+
+    if (!this.client) {
+      console.log("Stacktrace", new Error().stack);
+      throw new Error('Supabase client not initialized');
+    }
+    return this.client;
+  }
+
 }

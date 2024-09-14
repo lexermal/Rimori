@@ -1,5 +1,5 @@
 import EmitterSingleton from "@/app/[locale]/(auth-guard)/discussion/components/Emitter";
-import { createClient } from "@/utils/supabase/server";
+import { SupabaseClient } from "@/utils/supabase/server";
 import { Spinner } from "flowbite-react";
 import React from "react";
 
@@ -12,7 +12,7 @@ interface Props {
 }
 
 async function fetchDataFromBackend(messages: any[], fileId: string) {
-  const supabase = createClient();
+  const supabase = SupabaseClient.getClient();
   const { data } = await supabase.auth.getSession();
 
   return await fetch('/api/story-answer-validation', {

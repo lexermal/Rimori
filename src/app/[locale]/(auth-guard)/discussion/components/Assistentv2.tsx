@@ -5,6 +5,7 @@ import { VoiceId } from '@/components/EmbeddedAssistent/Voice/TTS';
 import { useChat } from 'ai/react';
 import MessageSender from './MessageSender';
 import EmitterSingleton from './Emitter';
+import { useEnv } from '@/providers/EnvProvider';
 
 const emitter = EmitterSingleton;
 
@@ -20,6 +21,7 @@ const sender = new MessageSender();
 
 function Assistentv2({ personImageUrl, instructions, firstMessage, voiceId, onComplete }: Props) {
     sender.setVoiceId(voiceId);
+    sender.setElevenLabsApiKey(useEnv().ELEVENLABS_API_KEY);
     const [oralCommunication, setOralCommunication] = React.useState(true);
 
     const { messages, append, isLoading, setMessages } = useChat({

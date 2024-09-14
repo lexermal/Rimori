@@ -3,6 +3,7 @@ import { usePathname } from 'next/navigation';
 import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
 import { getMatomoInstance } from '@/utils/matomo';
 import { User } from '@supabase/supabase-js';
+import { useEnv } from '@/providers/EnvProvider';
 
 interface AnalyticsData {
   category?: string;
@@ -11,11 +12,12 @@ interface AnalyticsData {
 }
 
 const useAnalytics = (user: User | null) => {
-  const [matomoInstance, setMatomoInstance] = useState(getMatomoInstance());
+  const env = useEnv();
+  const [matomoInstance, setMatomoInstance] = useState(getMatomoInstance(env.MATOMO_URL));
   const pathname = usePathname();
 
   useEffect(() => {
-    const instance = getMatomoInstance(user?.id);
+    const instance = getMatomoInstance(env.MATOMO_URL, user?.id);
     setMatomoInstance(instance);
   }, [user?.id]);
 

@@ -1,5 +1,4 @@
 import TTS, { VoiceId } from "@/components/EmbeddedAssistent/Voice/TTS";
-import { NEXT_PUBLIC_ELEVENLABS_API_KEY } from "@/utils/constants";
 
 // class that splits the text pieces so it can be sent in an efficient manner for allowing real-time communication
 class MessageSender {
@@ -8,6 +7,7 @@ class MessageSender {
     private tts: TTS | null = null;
     private prefLastAssistentMessage = '';
     private voiceEnabled = true;
+    private ELEVENLABS_API_KEY = "";
 
     public setVoiceId(voiceId: VoiceId) {
         this.voiceId = voiceId;
@@ -15,6 +15,10 @@ class MessageSender {
 
     public setVoiceEnabled(enabled: boolean) {
         this.voiceEnabled = enabled;
+    }
+
+    public setElevenLabsApiKey(apiKey: string) {
+        this.ELEVENLABS_API_KEY = apiKey;
     }
 
     public async steamFullMessage(message: string) {
@@ -39,7 +43,7 @@ class MessageSender {
         }
 
         if (inProgress && !this.tts) {
-            this.tts = await TTS.createAsync(this.voiceId!, NEXT_PUBLIC_ELEVENLABS_API_KEY!);
+            this.tts = await TTS.createAsync(this.voiceId!, this.ELEVENLABS_API_KEY!);
             // console.log('TTS created');
         }
 

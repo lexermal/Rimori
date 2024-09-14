@@ -1,6 +1,6 @@
 import NodeCache from 'node-cache';
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_SUPABASE_URL } from '@/utils/constants';
+import { env } from '@/utils/constants';
 import jwt from 'jsonwebtoken';
 import { embedMany } from 'ai';
 import { openai } from '@ai-sdk/openai';
@@ -19,8 +19,8 @@ class SupabaseService {
         }
 
         this.client = createClient(
-            NEXT_PUBLIC_SUPABASE_URL,
-            NEXT_PUBLIC_SUPABASE_ANON_KEY,
+            env.SUPABASE_URL,
+            env.SUPABASE_ANON_KEY,
             { accessToken: async () => token });
     }
 

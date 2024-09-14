@@ -1,19 +1,26 @@
 import { unstable_noStore as noStore } from 'next/cache';
 
 noStore();
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL')
-if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY')
-if (!process.env.NEXT_PUBLIC_ALLOWED_DOMAINS) throw new Error('Missing env.NEXT_PUBLIC_ALLOWED_DOMAINS')
-if (!process.env.NEXT_PUBLIC_UPLOAD_BACKEND) throw new Error('Missing env.NEXT_PUBLIC_UPLOAD_BACKEND')
-if (!process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY) throw new Error('Missing env.NEXT_PUBLIC_ANTHROPIC_API_KEY')
-if (!process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY) throw new Error('Missing env.NEXT_PUBLIC_ELEVENLABS_API_KEY')
-if (!process.env.NEXT_PUBLIC_MATOMO_URL) throw new Error('Missing env.NEXT_PUBLIC_MATOMO_URL')
 
+if (typeof window !== "undefined") {
+    console.error("This file is only allowed be imported on server side. Currently it's imported on client side.");
+    console.log(new Error().stack);
+}
 
-export const NEXT_PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-export const NEXT_PUBLIC_SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
-export const NEXT_PUBLIC_ALLOWED_DOMAINS = process.env.NEXT_PUBLIC_ALLOWED_DOMAINS as string;
-export const UPLOAD_BACKEND = process.env.NEXT_PUBLIC_UPLOAD_BACKEND as string;
-export const NEXT_PUBLIC_ANTHROPIC_API_KEY = process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY as string;
-export const NEXT_PUBLIC_ELEVENLABS_API_KEY = process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY as string;
-export const NEXT_PUBLIC_MATOMO_URL = process.env.NEXT_PUBLIC_MATOMO_URL as string;
+export type Env = typeof env;
+
+export const env = {
+    SUPABASE_URL: getEnv('NEXT_PUBLIC_SUPABASE_URL'),
+    SUPABASE_ANON_KEY: getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
+    ALLOWED_DOMAINS: getEnv('NEXT_PUBLIC_ALLOWED_DOMAINS'),
+    UPLOAD_BACKEND: getEnv('NEXT_PUBLIC_UPLOAD_BACKEND'),
+    ANTHROPIC_API_KEY: getEnv('NEXT_PUBLIC_ANTHROPIC_API_KEY'),
+    ELEVENLABS_API_KEY: getEnv('NEXT_PUBLIC_ELEVENLABS_API_KEY'),
+    MATOMO_URL: getEnv('NEXT_PUBLIC_MATOMO_URL'),
+    OPENAI_API_KEY: getEnv('OPENAI_API_KEY'),
+};
+
+function getEnv(name: string) {
+    if (!process.env[name]) throw new Error(`Missing environment variable ${name}`)
+    return process.env[name] as string
+}

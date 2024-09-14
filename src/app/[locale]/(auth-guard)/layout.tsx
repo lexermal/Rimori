@@ -1,11 +1,12 @@
 "use client";
 
 import { CustomNavbar } from '@/components/startpage/Navbar';
-import { createClient } from '@/utils/supabase/server';
+import { SupabaseClient } from '@/utils/supabase/server';
 import { MatomoProvider } from '@jonkoops/matomo-tracker-react';
 import { User } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import useAnalytics from '@/hooks/useAnalytics';
+import { useEnv } from '@/providers/EnvProvider';
 
 export default function LocaleLayout({
   children,
@@ -14,7 +15,8 @@ export default function LocaleLayout({
   params: { locale: string };
 }) {
   const [user, setUser] = useState<User | null>(null);
-  const supabase = createClient();
+  const env = useEnv();
+  const supabase = SupabaseClient.getClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
   const matomoInstance = useAnalytics(user);
 
   useEffect(() => {
