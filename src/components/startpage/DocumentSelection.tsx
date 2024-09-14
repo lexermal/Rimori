@@ -32,7 +32,7 @@ export default function HomePage({ items, onSelected, onNewDocument }: Props) {
   // console.log(groupedItems);
 
   return (
-    <div className='bg-gray-300 rounded-lg p-4'>
+    <div className='bg-gray-300 rounded-lg p-4 max-w-96'>
       {Object.keys(groupedItems).map((key, index) => {
         return (
           <AccordionList
