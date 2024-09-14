@@ -8,13 +8,13 @@ image:
   repository: registry.weixler.me/rimori
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.0"
+  tag: "0.2.0"
 
 uploaderImage:
   repository: registry.weixler.me/rimori-pdf-converter
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.0"
+  tag: "0.2.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -46,18 +46,17 @@ securityContext: {}
   # runAsUser: 1000
 
 env:
-  ASSET_PATH: ""
-  APPWRITE_SECRET_KEY: ""
-  APPWRITE_DATABASE_ID: ""
-  APPWRITE_DOCUMENT_COLLECTION_ID: ""
-  APPWRITE_DOCUMENT_BUCKET_ID: ""
-  APPWRITE_PROJECT_ID: ""
-  JWT_SECRET: ""
-  ELEVENLABS_API_KEY: ""
-  APPWRITE_API_ENDPOINT: ""
-  APPWRITE_PROJECT_ID: ""
-  ALLOWED_DOMAINS: ""
-  UPLOAD_BACKEND: ""
+  NEXT_PUBLIC_SUPABASE_URL: ""
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ""
+  NEXT_PUBLIC_OPENAI_API_KEY: ""
+  NEXT_PUBLIC_ANTHROPIC_API_KEY: ""
+  NEXT_PUBLIC_LOGGING_BACKEND_URL: ""
+  NEXT_PUBLIC_LOGGING_USERNAME: ""
+  NEXT_PUBLIC_LOGGING_PASSWORD: ""
+  NEXT_PUBLIC_ALLOWED_DOMAINS: ""
+  NEXT_PUBLIC_ELEVENLABS_API_KEY: ""
+  NEXT_PUBLIC_MATOMO_URL: ""
+  NEXT_PUBLIC_UPLOAD_BACKEND: ""
   OPENAI_API_KEY: ""
   FRONTEND_DOMAIN: "https://rimori.my-domain.com"
 
@@ -102,12 +101,12 @@ resources: {}
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 500Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
 
 livenessProbe:
   httpGet:
@@ -119,7 +118,7 @@ readinessProbe:
     port: http
 
 autoscaling:
-  enabled: false
+  enabled: true
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
