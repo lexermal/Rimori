@@ -1,4 +1,4 @@
-import { env} from '@/utils/constants';
+import { env } from '@/utils/constants';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -48,17 +48,17 @@ export async function updateSession(
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const allowedDomains = env.ALLOWED_DOMAINS;
+  // const allowedDomains = env.ALLOWED_DOMAINS;
 
-  if (user) {
-    const emailDomain = user.email?.split('@')[1];
+  // if (user) {
+  //   const emailDomain = user.email?.split('@')[1];
 
-    if (allowedDomains && !allowedDomains.includes(emailDomain as string)) {
-      const userEmail = user.email;
-      await supabase.auth.signOut();
-      return NextResponse.redirect(new URL(`/${locale}/waitlist?email=${encodeURIComponent(userEmail as string)}`, request.url));
-    }
-  }
+  //   if (allowedDomains && !allowedDomains.includes(emailDomain as string)) {
+  //     const userEmail = user.email;
+  //     await supabase.auth.signOut();
+  //     return NextResponse.redirect(new URL(`/${locale}/waitlist?email=${encodeURIComponent(userEmail as string)}`, request.url));
+  //   }
+  // }
 
   if (!user && !request.nextUrl.pathname.startsWith(loginPath)) {
     return NextResponse.redirect(new URL(loginPath, request.url));

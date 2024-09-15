@@ -13,14 +13,21 @@ const AuthForm: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>(""); // Success state
   const env = useEnv();
 
   const router = useRouter();
   const locale = useLocale();
 
+  const resetForm = (): void => {
+    setEmail("");
+    setPassword("");
+  };
+
   const handleSignIn = async (): Promise<void> => {
     setLoading(true);
     setErrorMessage("");
+    setSuccessMessage("");
 
     const { error } = await supabaseClient.auth.signInWithPassword({
       email,
@@ -29,19 +36,22 @@ const AuthForm: React.FC = () => {
 
     if (error) {
       setErrorMessage(error.message);
-      setLoading(false);
     } else {
-      router.replace('/');
+      setSuccessMessage("Sign in successful! Redirecting...");
+      resetForm();
+      router.refresh();
     }
+    setLoading(false);
   };
 
   const handleSignUp = async (): Promise<void> => {
     setLoading(true);
     setErrorMessage("");
+    setSuccessMessage("");
 
     const emailDomain = email.split('@')[1];
 
-    if (!env.ALLOWED_DOMAINS.includes(emailDomain)) {
+    if (env.ALLOWED_DOMAINS != "" && !env.ALLOWED_DOMAINS.includes(emailDomain)) {
       return router.replace(`/${locale}/waitlist?email=${encodeURIComponent(email)}`);
     }
 
@@ -52,20 +62,26 @@ const AuthForm: React.FC = () => {
 
     if (error) {
       setErrorMessage(error.message);
-      setLoading(false);
+    } else {
+      setSuccessMessage("Registration successful! Please check your email.");
+      resetForm();
     }
+
+    setLoading(false);
   };
 
   const handlePasswordReset = async (): Promise<void> => {
     setLoading(true);
     setErrorMessage("");
+    setSuccessMessage("");
 
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
 
     if (error) {
       setErrorMessage(error.message);
     } else {
-      alert("Password reset link sent to your email");
+      setSuccessMessage("Password reset link sent to your email.");
+      resetForm();
     }
 
     setLoading(false);
@@ -131,6 +147,10 @@ const AuthForm: React.FC = () => {
 
           {errorMessage && (
             <p className="text-red-500 text-sm text-center">{errorMessage}</p>
+          )}
+
+          {successMessage && (
+            <p className="text-green-500 text-sm text-center">{successMessage}</p>
           )}
 
           <button

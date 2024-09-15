@@ -129,7 +129,7 @@ function AccordionList({
 function MyButton({ isOpen, onSelected, id }: any) {
   return (
     <button
-      className={`title ml-3`}
+      className="title ml-3"
       onClick={() => onSelected(id)}
     >
       {!isOpen ? <FaChevronDown /> : <FaChevronUp />}

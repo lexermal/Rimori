@@ -21,6 +21,6 @@ export const env = {
 };
 
 function getEnv(name: string) {
-    if (!process.env[name]) throw new Error(`Missing environment variable ${name}`)
+    if (!process.env[name] && process.env[name] != "") throw new Error(`Missing environment variable ${name}`)
     return process.env[name] as string
 }

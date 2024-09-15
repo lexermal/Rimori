@@ -56,7 +56,7 @@ const WaitlistPage = () => {
       } else {
         let errorMessage = t('Failed to add you to the waitlist. Please try again.');
         if (error.code === '23505') {
-          errorMessage = t('You have already been registered to the waitlist. We will contact you when Rimori is available for you.');
+          errorMessage = t('You have already been registered to the waitlist We will contact you when Rimori is available for you');
         }
         setStatusMessage({
           status: Status.Error,
@@ -96,25 +96,31 @@ const WaitlistPage = () => {
         )}
 
         {statusMessage.status === Status.Error && <p className="text-red-500 mb-4">{statusMessage.message}</p>}
-        {statusMessage.status === Status.Success && <p className="text-green-500 mb-4">{statusMessage.message}</p>}
+        {statusMessage.status === Status.Success ? <p className="text-green-500 mb-4">{statusMessage.message}</p> : (
 
-        <div className="flex justify-center items-center space-x-4 mt-8">
-          <button
-            className="bg-gradient-to-r from-green-400 to-teal-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
-            onClick={handleClick}
-            disabled={statusMessage.status === Status.Loading}
-          >
-            {statusMessage.status === Status.Loading ? t('Signing you up...') : t('Sign me up!')}
-          </button>
 
-          <button
-            type="button"
-            className="bg-white/80 text-gray-900 font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-white hover:text-gray-700 transition-all duration-300 ease-in-out"
-            onClick={() => router.replace('/')}
-          >
-            {t('Go to homepage')}
-          </button>
-        </div>
+          <div className="flex justify-center items-center space-x-4 mt-8">
+            <button
+              className="bg-gradient-to-r from-green-400 to-teal-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
+              onClick={handleClick}
+              disabled={statusMessage.status === Status.Loading}
+            >
+              {statusMessage.status === Status.Loading ? t('Signing you up...') : t('Sign me up!')}
+            </button>
+
+            <button
+              type="button"
+              className="bg-white/80 text-gray-900 font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-white hover:text-gray-700 transition-all duration-300 ease-in-out"
+              onClick={() => router.replace('/')}
+            >
+              {t('Go to homepage')}
+            </button>
+          </div>
+
+
+        )}
+
+
       </div>
     </div>
   );
