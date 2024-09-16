@@ -3,8 +3,9 @@ import SupabaseService from '@/app/api/opposition/Connector';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { convertToCoreMessages, generateText } from 'ai';
 import { NextResponse } from 'next/server';
+import { createLogger } from '@/utils/logger';
 
-export const maxDuration = 30;
+const logger = createLogger("POST /api/story-answer-validation");
 
 export async function POST(req: Request) {
   const { messages, fileId } = await req.json();
@@ -74,7 +75,7 @@ Remember you are a very tough examiner.
     `};
 
 
-  console.log("Users answer was: ", userMessage[0].content);
+  logger.debug("Users answer was: ", userMessage[0].content);
 
   const responseFormat = `
   {
@@ -87,10 +88,22 @@ Remember you are a very tough examiner.
   const result = await generateText({
     model: anthropic("claude-3-5-sonnet-20240620"),
     messages: convertToCoreMessages(messagesWithInstructions),
+  }).catch((error) => {
+    logger.error("Error generating story response:", { error });
+    throw new Error("Failed to generate story response");
   });
 
-  console.log("AI result tokens: ", result.usage);
+  logger.debug("Generated story answer validation response", {
+    inputTokens: (await result.usage).promptTokens,
+    outputTokens: (await result.usage).completionTokens
+  });
 
-  // console.log("AI response: ", responseFormat + result.text);
-  return JSON.parse(responseFormat + result.text);
+  const responseText = (responseFormat + result.text);
+
+  try {
+    return JSON.parse(responseText);
+  } catch (error) {
+    logger.error("Response is not a valid JSON:", { error, responseText });
+    throw new Error("Internal Server Error");
+  }
 }

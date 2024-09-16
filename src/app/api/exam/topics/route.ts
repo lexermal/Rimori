@@ -1,23 +1,30 @@
 import SupabaseService from "@/app/api/opposition/Connector";
+import { createLogger } from "@/utils/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { OpenAI } from 'openai';
 import { parse } from 'url';
 
+const logger = createLogger("GET /api/exam/topics");
+
 export async function GET(req: NextRequest) {
+
   const { query } = parse(req.url, true);
+  logger.info("Generating exam topics", { query });
 
   const db = new SupabaseService(req.headers.get("authorization"));
   const doc = await db.getDocumentContent(query.file as string);
 
   if (!doc) {
+    logger.error("Document not found", { fileId: query.file });
     return NextResponse.json({ error: "Document not found" }, { status: 404 });
   }
 
   try {
     const topics = await generateExamTopics(doc);
+    logger.debug("Generated exam topics", { topics });
     return NextResponse.json(topics);
   } catch (error) {
-    console.error("Error generating exam topics:", error);
+    logger.error("Error generating exam topics:", { error });
     return NextResponse.json({ error: "Failed to generate exam topics" }, { status: 500 });
   }
 };
@@ -75,7 +82,7 @@ async function generateExamTopics(fileContent: string) {
 
 
   } catch (error) {
-    console.error("Error generating exam topics:", error || error);
+    logger.error("Error generating exam topics:", { error });
     throw new Error("Failed to generate exam topics");
   }
 }

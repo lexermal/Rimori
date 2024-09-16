@@ -4,14 +4,19 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText, convertToCoreMessages } from "ai";
 import { NextRequest, NextResponse } from "next/server";
 import { parse } from 'url';
+import { createLogger } from "@/utils/logger";
+
+const logger = createLogger("GET /api/opposition/topics");
 
 export async function GET(req: NextRequest) {
     const { query } = parse(req.url, true);
 
+    logger.info("Generating opposition topics", { query });
     const db = new SupabaseService(req.headers.get("authorization"));
     const doc = await db.getDocumentContent(query.file as string);
 
     if (!doc) {
+        logger.error("Document not found", { fileId: query.file });
         throw new Error("Document not found");
     }
 
@@ -73,11 +78,19 @@ async function getData(fileContent: string) {
     const result = await generateText({
         model: anthropic("claude-3-5-sonnet-20240620"),
         messages: convertToCoreMessages(messages),
+    }).catch((error) => {
+        logger.error("Error generating opposition topics:", { error });
+        throw new Error("Failed to generate opposition topics");
     });
 
-    // console.log(prefilledContent + result.text);
-
-    return JSON.parse((prefilledContent + result.text)
+    const responseText = (prefilledContent + result.text)
         .replaceAll("opposition_starting_text", "firstMessage")
-        .replaceAll("opposition_win_instructions", "topic"));
+        .replaceAll("opposition_win_instructions", "topic");
+
+    try {
+        return JSON.parse(responseText);
+    } catch (error) {
+        logger.error("Response is not a valid JSON:", { error, responseText });
+        throw new Error("Internal Server Error");
+    }
 }

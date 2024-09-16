@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { unstable_noStore as noStore } from 'next/cache';
 import { env } from '@/utils/constants';
+import { createLogger } from '@/utils/logger';
+
+const logger = createLogger("POST /api/stt");
 
 export async function POST(request: NextRequest) {
-  noStore();
-
   const data = await request.formData()
   const file: File | null = data.get('file') as unknown as File
 
   if (!file) {
+    logger.error('No file uploaded');
     return NextResponse.json({ error: 'No file uploaded' })
   }
 
@@ -23,8 +24,8 @@ export async function POST(request: NextRequest) {
   })
     .then((res) => res.json())
     .then((data) => NextResponse.json({ text: data.text }))
-    .catch((err) => {
-      console.log('error when converting voice into audio: ', err);
+    .catch((error) => {
+      logger.error('Error when converting voice into audio: ', {error});
       return NextResponse.json({ success: false })
     });
 }

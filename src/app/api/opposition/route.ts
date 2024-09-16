@@ -4,11 +4,13 @@ import { convertToCoreMessages, streamText } from 'ai';
 import { z } from 'zod';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { env } from '@/utils/constants';
+import { createLogger } from '@/utils/logger';
 
-export const maxDuration = 30;
+const logger = createLogger("POST /api/opposition");
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
+  logger.info("Generating opposition response")
 
   const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
@@ -16,6 +18,9 @@ export async function POST(req: Request) {
     model: anthropic("claude-3-5-sonnet-20240620"),
     messages: convertToCoreMessages(messages),
     tools: toolBuilder.getTools(),
+  }).catch((error) => {
+    logger.error("Error generating opposition response:", { error });
+    throw new Error("Failed to generate opposition response");
   });
 
   return result.toDataStreamResponse();

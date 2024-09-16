@@ -9,6 +9,7 @@ const nextConfig = {
   },
   experimental: {
     esmExternals: 'loose',
+    serverComponentsExternalPackages: ["pino", "pino-pretty"],
   },
 
   reactStrictMode: false,

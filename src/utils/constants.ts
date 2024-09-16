@@ -1,4 +1,5 @@
 import { unstable_noStore as noStore } from 'next/cache';
+import { LOGGING_BACKEND_URL } from 'server/pdf-to-markdown-conversion/src/utils/constants';
 
 noStore();
 
@@ -18,6 +19,9 @@ export const env = {
     ELEVENLABS_API_KEY: getEnv('NEXT_PUBLIC_ELEVENLABS_API_KEY'),
     MATOMO_URL: getEnv('NEXT_PUBLIC_MATOMO_URL'),
     OPENAI_API_KEY: getEnv('OPENAI_API_KEY'),
+    LOGGING_BACKEND_URL: getEnv("NEXT_PUBLIC_LOGGING_BACKEND_URL"),
+    LOGGING_USERNAME: getEnv("NEXT_PUBLIC_LOGGING_USERNAME"),
+    LOGGING_PASSWORD: getEnv("NEXT_PUBLIC_LOGGING_PASSWORD"),
 };
 
 function getEnv(name: string) {
