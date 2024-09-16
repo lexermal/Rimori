@@ -21,7 +21,7 @@ rimoriApp:
 
 converter:
   enabled: true  # Set to false to disable converter
-  
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -76,14 +76,14 @@ ingress:
   annotations: 
     "cert-manager.io/cluster-issuer": letsencrypt-production
   hosts:
-    - host: rimori.rimori.se
+    - host: study.rimori.se
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls:
    - secretName: rimori-tls
      hosts:
-       - rimori.rimori.se
+       - study.rimori.se
 
 uploaderIngress:
   enabled: true
