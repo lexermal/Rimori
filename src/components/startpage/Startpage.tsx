@@ -8,6 +8,7 @@ import DocumentSelection from '@/components/startpage/DocumentSelection';
 import { FileUpload } from '@/components/startpage/FileUpload';
 import { SupabaseClient } from '@/utils/supabase/server';
 import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
+import { useEnv } from '@/providers/EnvProvider';
 
 export interface MarkdownDocument {
   id: string;
@@ -91,6 +92,7 @@ const StartPage = () => {
 
 function TrainingButtons({ selectedFile }: any) {
   const router = useRouter();
+  const env = useEnv();
 
   const buttons = [
     {
@@ -123,9 +125,7 @@ function TrainingButtons({ selectedFile }: any) {
         EmitterSingleton.emit('analytics-event', { name: 'Exam simulation' });
         router.push(`/exam-session?file=${selectedFile}`);
       },
-      enabled: true //Todo remove this line
-      // enable on 20.09.2024 by using date comparison
-      // enabled: new Date() > new Date('2024-09-20'),
+      enabled: env.EXPERIMENTAL_EXAM_SIMULATION === 'true',
     },
   ];
 

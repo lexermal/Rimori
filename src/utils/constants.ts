@@ -22,9 +22,15 @@ export const env = {
     LOGGING_BACKEND_URL: getEnv("NEXT_PUBLIC_LOGGING_BACKEND_URL"),
     LOGGING_USERNAME: getEnv("NEXT_PUBLIC_LOGGING_USERNAME"),
     LOGGING_PASSWORD: getEnv("NEXT_PUBLIC_LOGGING_PASSWORD"),
+    EXPERIMENTAL_EXAM_SIMULATION: getEnv("NEXT_PUBLIC_EXPERIMENTAL_EXAM_SIMULATION", "false"),
 };
 
-function getEnv(name: string) {
-    if (!process.env[name] && process.env[name] != "") throw new Error(`Missing environment variable ${name}`)
+function getEnv(name: string, defaultVal?: string): string {
+    if (!process.env[name] && process.env[name] != "") {
+        if (defaultVal !== undefined) {
+            return defaultVal;
+        }
+        throw new Error(`Missing environment variable ${name}`)
+    }
     return process.env[name] as string
 }
