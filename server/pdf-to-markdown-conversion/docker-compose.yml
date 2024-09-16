@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: registry.weixler.me/rimori-pdf-converter:0.1.0
+    image: registry.rimori.se/study/rimori-pdf-converter:0.3.0
     ports:
       - "3001:3001"
     environment:

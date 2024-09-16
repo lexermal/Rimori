@@ -45,5 +45,8 @@ RUN npm install --only=production --ignore-scripts
 # Expose the port the app runs on
 EXPOSE 3000
 
+# https://stackoverflow.com/questions/74536726/nextjs-on-kubernetes-fails-to-start
+ENV HOSTNAME=0.0.0.0
+
 # Start the Next.js application
 CMD ["npm", "start"]

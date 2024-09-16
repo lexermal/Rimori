@@ -12,8 +12,8 @@ npm run dev
 The environment variables need to be set in .env
 
 ```bash
-docker build -t registry.weixler.me/rimori-pdf-converter:0.2.0 .
-docker push registry.weixler.me/rimori-pdf-converter:0.2.0
+docker build -t registry.rimori.se/study/rimori-pdf-converter:0.3.0 .
+docker push registry.rimori.se/study/rimori-pdf-converter:0.3.0
 docker compose up -d
 ```
 

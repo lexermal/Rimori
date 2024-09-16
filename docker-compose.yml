@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: registry.weixler.me/rimori:0.2.0
+    image: registry.rimori.se/study/rimori:0.3.0
     ports:
       - "3000:3000"
     environment:

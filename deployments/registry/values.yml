@@ -1,0 +1,44 @@
+# helm upgrade --install harbor harbor/harbor -f values.yml -n harbor --create-namespace
+expose:
+  tls:
+    certSource: secret
+    secret:
+      secretName: harbor-ssl
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: letsencrypt-production
+    hosts:
+      core: registry.rimori.se
+      notary: notary.my-domain.com
+externalURL: https://registry.rimori.se
+harborAdminPassword: ZJtisiOfiq69K0fssFJC
+secretKey: pYM5HwQXZ9ExQino
+registry:
+  credentials:
+    username: reg_admin
+    password: 5IuXjfawRA4B2ULBZf4R
+database:
+  internal:
+    password: IKRNfD3y5zRZ0HhZNLL6
+persistence:
+  persistentVolumeClaim:
+    registry:
+      storageClass: longhorn
+      size: 20Gi
+    jobservice:
+      jobLog:
+        storageClass: longhorn
+    database:
+      storageClass: longhorn
+    redis:
+      storageClass: longhorn
+    trivy:
+      storageClass: longhorn
+
+
+# optional
+trivy:
+    enabled: false
+notary:
+    enabled: false
