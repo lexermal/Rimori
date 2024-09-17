@@ -1,14 +1,14 @@
 'use client';
 
 import { usePathname } from '@/i18n';
-import { Navbar, Button } from 'flowbite-react';
+import { Avatar, Dropdown, Navbar } from 'flowbite-react';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { SupabaseClient } from '@/utils/supabase/server';
 
-export function CustomNavbar() {
+export function CustomNavbar(): JSX.Element {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
@@ -16,7 +16,7 @@ export function CustomNavbar() {
   const supabase = SupabaseClient.getClient();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUser = async (): Promise<void> => {
       const { data, error } = await supabase.auth.getUser();
 
       if (!error) {
@@ -25,10 +25,9 @@ export function CustomNavbar() {
     };
 
     fetchUser();
-  }, []);
+  }, [supabase]);
 
-
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
       router.replace(`/${locale}/auth/login`);
@@ -36,7 +35,7 @@ export function CustomNavbar() {
   };
 
   return (
-    <Navbar rounded className="w-full top-0 bg-white shadow-md">
+    <Navbar fluid rounded>
       <Navbar.Brand href={`/${locale}`}>
         <div
           className="mr-3 h-16 w-40 overflow-hidden"
@@ -50,23 +49,34 @@ export function CustomNavbar() {
         />
       </Navbar.Brand>
 
-      <div className="flex md:order-2 items-center">
-        {user && (
-          <Button color="light" onClick={handleLogout} className="btn-sm mr-3">
-            Logout
-          </Button>
-        )}
+      <div className="flex md:order-2">
+
+
+        {user && <Dropdown
+          className='mx-1'
+          arrowIcon={false}
+          inline
+          label={
+            <span className="font-medium text-gray-600 dark:text-gray-300 bg-gray-200 rounded-full p-1">{user.user_metadata.name.split(" ")[0][0] + " " + user.user_metadata.name.split(" ")[1][0]}</span>
+          }
+        >
+          <Dropdown.Header>
+            <span className="block text-sm">{user?.user_metadata.name}</span>
+            <span className="block truncate text-sm font-medium">{user.email}</span>
+          </Dropdown.Header>
+          <Dropdown.Item>Invite friends</Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item onClick={handleLogout}>Sign out</Dropdown.Item>
+        </Dropdown>}
         <Navbar.Toggle />
+
       </div>
 
       <Navbar.Collapse>
-        {/* <Navbar.Link href={`/${locale}`} active={pathname === `/${locale}`}>
-          Home
-        </Navbar.Link> */}
-        <Navbar.Link href={`https://discord.gg/3ReFE7ET`} active={pathname === `/${locale}`}>
+        {/* Centered "Support" link */}
+        <Navbar.Link href="https://discord.gg/3ReFE7ET" active={pathname === `/${locale}`}>
           Support
         </Navbar.Link>
-        {/* Add more Navbar links here if needed */}
       </Navbar.Collapse>
     </Navbar>
   );

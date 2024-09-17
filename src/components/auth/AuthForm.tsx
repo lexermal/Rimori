@@ -106,14 +106,22 @@ const AuthForm: React.FC = () => {
 
   return (
     <div>
-      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-4">
-        <h2 className="text-3xl font-bold mb-6 text-center">
+      <div className="w-full max-w-md bg-white rounded-lg p-4">
+        <h3 className="text-3xl font-bold text-center">
           {view === "sign_in"
-            ? "Login"
+            ? "Sign in"
             : view === "sign_up"
               ? "Register"
               : "Reset Password"}
-        </h2>
+        </h3>
+
+        <div className="text-sm text-gray-600 mb-6 text-center">
+          {view === "sign_in"
+            ? "Welcome back. Please enter your details"
+            : view === "sign_up"
+              ? "Please enter your details to register."
+              : "Forgot your password? Please enter your email."}
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -170,7 +178,7 @@ const AuthForm: React.FC = () => {
 
         <div className="flex flex-col items-center mt-6">
           <button
-            className={`text-sm font-semibold ${view === "forgotten_password" ? "hidden" : "text-gray-700 hover:text-gray-900"}`}
+            className={`text-sm ${view === "forgotten_password" ? "hidden" : "text-gray-700 hover:text-gray-900"}`}
             onClick={() => setView(view === "sign_in" ? "sign_up" : "sign_in")}
           >
             {view === "sign_in"
