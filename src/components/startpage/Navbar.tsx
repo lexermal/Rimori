@@ -57,14 +57,14 @@ export function CustomNavbar(): JSX.Element {
           arrowIcon={false}
           inline
           label={
-            <span className="font-medium text-gray-600 dark:text-gray-300 bg-gray-200 rounded-full p-1">{user.user_metadata.name.split(" ")[0][0] + " " + user.user_metadata.name.split(" ")[1][0]}</span>
+            <span className="font-medium text-gray-600 dark:text-gray-300 bg-gray-200 rounded-full p-1">{getAccount(user)}</span>
           }
         >
           <Dropdown.Header>
             <span className="block text-sm">{user?.user_metadata.name}</span>
             <span className="block truncate text-sm font-medium">{user.email}</span>
           </Dropdown.Header>
-          <Dropdown.Item>Invite friends</Dropdown.Item>
+          {/* <Dropdown.Item>Invite friends</Dropdown.Item> */}
           <Dropdown.Divider />
           <Dropdown.Item onClick={handleLogout}>Sign out</Dropdown.Item>
         </Dropdown>}
@@ -80,4 +80,11 @@ export function CustomNavbar(): JSX.Element {
       </Navbar.Collapse>
     </Navbar>
   );
+}
+
+function getAccount(user: User): string {
+  if(!user.user_metadata.name) {
+    return "Account";
+  }
+  return user.user_metadata.name.split(" ")[0][0] + " " + user.user_metadata.name.split(" ")[1][0];
 }
