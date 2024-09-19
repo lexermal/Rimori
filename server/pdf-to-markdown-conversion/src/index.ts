@@ -56,10 +56,20 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
   logger.debug('Processing document ', { id: fileId });
 
   fs.mkdirSync(`./upload/${fileId}`);
+  //check if the folder exists, if not create it
+  if (!fs.existsSync(`./upload/markdown`)) {
+    fs.mkdirSync(`./upload/markdown`);
+  }
 
   // Move the uploaded file into the created folder with the new name
   fs.renameSync(file.path, `./upload/${fileId}/${fileId}${fileExtension}`);
 
+  processDocument(db, fileId, req.token);
+
+  return res.status(200).json({ message: 'File uploaded successfully' });
+});
+
+async function processDocument(db: SupabaseService, fileId: string, token: string) {
   try {
     const markdown = await convertPdfToMarkdown(fileId);
     const sections = await splitMarkdownIntoSections(markdown);
@@ -68,7 +78,7 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
     //write markdown to file in upload/markdown folder
     fs.writeFileSync(`./upload/markdown/${fileId}.md`, markdown2);
 
-    await uploadMarkdownDocument(req.token, fileId, markdown2);
+    await uploadMarkdownDocument(token, fileId, markdown2);
     const sections2 = await getMarkdownSections(markdown2);
     let headingID = "";
 
@@ -90,17 +100,20 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
 
     fs.rm(`./upload/${fileId}`, { recursive: true },
       (err) => err && logger.error("Error at deleting the markup conversion folder", { err }));
+
+    logger.info('Document processed successfully.', { id: fileId });
+
+    await db.completeDocument(fileId, markdown2);
+
   } catch (error: any) {
     logger.error('Failed to convert PDF to Markdown:', error);
     await db.deleteDocument(fileId);
     fs.rm(`./upload/${fileId}`, { recursive: true },
       (err) => err && logger.error("Error at deleting the markup conversion folder", { err }));
 
-    return res.status(400).json({ error: error.message });
+    //return res.status(400).json({ error: error.message });
   }
-
-  return res.status(200).json({ message: 'File uploaded successfully' });
-});
+}
 
 app.listen(3001, () => {
   logger.info('Server is running on port 3001');
@@ -164,7 +177,6 @@ async function uploadMarkdownDocument(token: string, id: string, markdown: strin
   logger.info('Uploading original PDF file');
   await client.uploadDocument(`./upload/${id}/${id}.pdf`, sub + "_" + id + "_original.pdf");
 
-  await client.completeDocument(id, markdown);
 
   logger.info('Markdown document uploaded successfully.', { id });
 }

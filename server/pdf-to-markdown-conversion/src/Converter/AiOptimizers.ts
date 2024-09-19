@@ -6,6 +6,28 @@ import { ANTHROPIC_API_KEY } from "../utils/constants";
 const logger = createLogger("AiOptimizers.ts");
 
 export async function improveTextWithAI(unpretty_markdown_text: string): Promise<string> {
+ //call internalConversion function and try again if it fails for 30 times. Weit 1000ms between each try.
+  let pretty_markdown_text = unpretty_markdown_text;
+  for (let i = 0; i < 30; i++) {
+    try {
+      pretty_markdown_text = await internalConversion(unpretty_markdown_text);
+      break;
+    } catch (error) {
+      logger.error("Failed to optimize text with AI", { error });
+      if (i === 29) {
+        throw new Error("Failed to optimize text with AI");
+      }
+      //random number between 20-40
+      const random = Math.floor(Math.random() * 20) + 20;
+      console.log(`Retrying in ${random} seconds...`);
+      await new Promise((resolve) => setTimeout(resolve, random * 1000));
+    }
+  }
+
+  return pretty_markdown_text;
+}
+
+async function internalConversion(unpretty_markdown_text: string): Promise<string> {
   const systemPrompt = `
 **Markdown Formatting Instructions:**
 

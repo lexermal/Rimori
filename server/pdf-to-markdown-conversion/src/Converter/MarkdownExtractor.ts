@@ -18,6 +18,15 @@ class MarkdownExtractor {
       return Math.max(biggestFontSize, pageBiggestFontSize);
     }, 0);
 
+    const smallestFontSize = this.toArray(xmlObject.pdf2xml.page).reduce((smallestFontSize: number, page: any) => {
+      const pageSmallestFontSize = this.toArray(page.text).reduce((smallestFontSize: number, textElement: any) => {
+        const fontSize = parseInt(textElement.$.height);
+        return Math.min(smallestFontSize, fontSize);
+      }, 1000);
+
+      return Math.min(smallestFontSize, pageSmallestFontSize);
+    }, 1000);
+
     return this.toArray(xmlObject.pdf2xml.page).map((page: any, index: number) => {
       logger.info(`Converting page ${index + 1} to markdown...`);
 
@@ -27,7 +36,7 @@ class MarkdownExtractor {
       // Extract text data from the page, and store it in the resultingMarkdown map
       this.toArray(page.text).forEach((textElement: any) => {
         const top = parseInt(textElement.$.top);
-        const textData = this.extractTextData(textElement, biggestFontSize);
+        const textData = this.extractTextData(textElement, biggestFontSize, smallestFontSize);
         const contentOnSameLine = resultingMarkdown.get(top);
         resultingMarkdown.set(top, contentOnSameLine ? `${contentOnSameLine} ${textData}` : textData);
       });
@@ -47,11 +56,11 @@ class MarkdownExtractor {
     });
   }
 
-  private extractTextData(textElement: any, biggestFontSize: number): string {
+  private extractTextData(textElement: any, biggestFontSize: number, smallestFont:number): string {
     // Extract text data from the text element and convert it to markdown
 
     const headingAttribute = parseInt(textElement.$.height);
-    const heading = headingAttribute ? this.fontSizeToMarkdownHeading(biggestFontSize, headingAttribute) : "";
+    const heading = headingAttribute ? this.fontSizeToMarkdownHeading(biggestFontSize,smallestFont, headingAttribute) : "";
 
     if (textElement.b) {
       const text = textElement.b[0].toString().trim();
@@ -132,8 +141,8 @@ class MarkdownExtractor {
     return Array.isArray(obj) ? obj : [obj];
   }
 
-  private fontSizeToMarkdownHeading(biggestFont: number, currentFontSize: number): string {
-    const smallestFont = 10;
+  private fontSizeToMarkdownHeading(biggestFont: number,smallestFont:number, currentFontSize: number): string {
+    // console.log(biggestFont, currentFontSize);
 
     if (currentFontSize < smallestFont * 1.5) {
       return ""; // Return empty string for normal text, no heading
