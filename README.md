@@ -4,13 +4,13 @@
 The environment variables need to be set in .env
 
 ```bash
-docker build -t registry.weixler.me/rimori:0.1.0 .
+docker build -t registry.rimori.se/study/rimori:0.3.0 .
+docker push registry.rimori.se/study/rimori:0.3.0
 docker compose up -d
 ```
 
 ## Todo
 
-* Audio recording works well at beginning but is cut off when I say a second sentence after a pause.
 * Stories improvements
   * Make it audible (STT, TTS)
   * Add animations

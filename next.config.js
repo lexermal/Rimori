@@ -9,9 +9,10 @@ const nextConfig = {
   },
   experimental: {
     esmExternals: 'loose',
+    serverComponentsExternalPackages: ["pino", "pino-pretty"],
   },
 
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
   typescript: {
     ignoreBuildErrors: true,

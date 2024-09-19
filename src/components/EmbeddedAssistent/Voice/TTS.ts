@@ -13,15 +13,13 @@ export default class TTS {
     private player = new ChunkedAudioPlayer();
     private sentencesParts = [] as number[];
     private messageCount = 0;
-    private apiKey;
 
-    private constructor(socket: WebSocket, apiKey: string) {
+    private constructor(socket: WebSocket) {
         this.socket = socket;
-        this.apiKey = apiKey;
     }
 
     // based on https://elevenlabs.io/docs/api-reference/websockets#example-voice-streaming-using-elevenlabs-and-openai
-    static createAsync(voiceId: VoiceId,apiKey:string, model = 'eleven_monolingual_v1'): Promise<TTS> {
+    static createAsync(voiceId: VoiceId, apiKey: string, model = 'eleven_monolingual_v1'): Promise<TTS> {
         return new Promise((resolve, reject) => {
             const wsUrl = `wss://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream-input?model_id=${model}`;
             const socket = new WebSocket(wsUrl);
@@ -38,7 +36,7 @@ export default class TTS {
 
                 socket.send(JSON.stringify(bosMessage));
 
-                const tts = new TTS(socket, apiKey);
+                const tts = new TTS(socket);
                 socket.onmessage = tts.handleMessage.bind(tts);
                 socket.onerror = tts.handleError.bind(tts);
                 socket.onclose = tts.handleClose.bind(tts);
@@ -53,15 +51,13 @@ export default class TTS {
     }
 
     endConversation() {
-        const eosMessage = {
-            "text": ""
-        };
+        const eosMessage = { "text": "" };
 
         this.socket.send(JSON.stringify(eosMessage));
     }
 
     sendMessage(text: string) {
-        console.log('Sending message ' + this.messageCount + ":" + text);
+        // console.log('Sending message ' + this.messageCount + ":" + text);
 
         const textMessage = {
             "text": text,
@@ -72,7 +68,7 @@ export default class TTS {
 
         // If textMessage contains a sentence ending like . or ! or ?, write the current index to sentencesParts
         if (textMessage.text.match(/[.!?]/)) {
-            console.log("Sentence ending found")
+            // console.log("Sentence ending found")
             this.sentencesParts.push(this.messageCount);
         }
         this.messageCount++;
@@ -94,7 +90,7 @@ export default class TTS {
         if (response.audio) {
             const audioChunk = response.audio as string;
             this.chunks.push(audioChunk);
-            console.log("Received audio chunk");
+            // console.log("Received audio chunk");
 
             // const audioBuffer = this.base64ToArrayBuffer(audioChunk);
             // const audioContext = new AudioContext();
@@ -123,9 +119,9 @@ export default class TTS {
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = new Audio(audioUrl);
             audio.playbackRate = 1.05;
-            console.log("Start Playing audio...");
+            // console.log("Start Playing audio...");
             // audio.play();
-            console.log("Audio played");
+            // console.log("Audio played");
             this.player.endConversation();
 
             // Clear the chunks after playing the audio

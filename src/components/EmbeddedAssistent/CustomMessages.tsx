@@ -73,7 +73,7 @@ export default function CustomMessages({
       assistentMessages[assistentMessages.length - 1]?.content;
 
     if (inProgress && !tts) {
-      TTS.createAsync(voiceId!,ttsAPIKey).then((tts) => {
+      TTS.createAsync(voiceId!,ttsAPIKey!).then((tts) => {
         console.log('TTS created');
         setTTS(tts);
       });

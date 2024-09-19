@@ -1,67 +1,83 @@
 'use client';
 
-import { Navbar } from 'flowbite-react';
+import { usePathname } from '@/i18n';
+import { Avatar, Dropdown, Navbar } from 'flowbite-react';
 import { useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { User } from '@supabase/supabase-js';
+import { SupabaseClient } from '@/utils/supabase/server';
 
-export function CustomNavbar() {
+export function CustomNavbar(): JSX.Element {
   const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = SupabaseClient.getClient();
+
+  useEffect(() => {
+    const fetchUser = async (): Promise<void> => {
+      const { data, error } = await supabase.auth.getUser();
+
+      if (!error) {
+        setUser(data.user);
+      }
+    };
+
+    fetchUser();
+  }, [supabase]);
+
+  const handleLogout = async (): Promise<void> => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      router.replace(`/${locale}/auth/login`);
+    }
+  };
 
   return (
-    <Navbar rounded className='fixed w-full top-0'>
-      <Navbar.Brand href={'/' + locale}>
+    <Navbar fluid rounded>
+      <Navbar.Brand href={`/${locale}`}>
         <div
-          className='mr-3 h-16 w-40 overflow-hidden fixed ml-3'
+          className="mr-3 h-16 w-40 overflow-hidden"
           style={{
             backgroundImage: 'url("/logo.svg")',
             backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundColor: 'white',
             backgroundRepeat: 'no-repeat',
-            top: '0',
-            left: '0',
           }}
-        >
-          {/* <img src="/logo.svg" className="mr-3 h-40" alt="Flowbite React Logo" /> */}
-        </div>
-        {/* <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Flowbite React</span> */}
+        />
       </Navbar.Brand>
-      <div className='flex md:order-2 mb-16'>
-        {/* <Dropdown
+
+      <div className="flex md:order-2">
+
+
+        {user && <Dropdown
+          className='mx-1'
           arrowIcon={false}
           inline
           label={
-            <Avatar alt="User settings" img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" rounded />
+            <span className="font-medium text-gray-600 dark:text-gray-300 bg-gray-200 rounded-full p-1">{user.user_metadata.name.split(" ")[0][0] + " " + user.user_metadata.name.split(" ")[1][0]}</span>
           }
         >
           <Dropdown.Header>
-            <span className="block text-sm">Alexander Weixler</span>
-            <span className="block truncate text-sm font-medium">alexander@riau.ai</span>
+            <span className="block text-sm">{user?.user_metadata.name}</span>
+            <span className="block truncate text-sm font-medium">{user.email}</span>
           </Dropdown.Header>
-          {/* <Dropdown.Item>Dashboard</Dropdown.Item> */}
-        {/* <Dropdown.Item>Settings</Dropdown.Item> */}
-        {/* <Dropdown.Item>Earnings</Dropdown.Item> */}
-        {/* <Dropdown.Divider />
-          <Dropdown.Item>Sign out</Dropdown.Item>
-        </Dropdown> */}
+          <Dropdown.Item>Invite friends</Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item onClick={handleLogout}>Sign out</Dropdown.Item>
+        </Dropdown>}
         <Navbar.Toggle />
+
       </div>
+
       <Navbar.Collapse>
-        {/* <Navbar.Link href="#" active>
-          Home
-        </Navbar.Link> */}
-        {/* <Navbar.Link href={'/' + locale + '/go'}> Study</Navbar.Link> */}
-        {/* <Navbar.Link
-          target='_blank'
-          href='http://www.educationplanner.org/students/self-assessments/learning-styles'
-        >
-          Study Type
-        </Navbar.Link> */}
-        {/* <Navbar.Link disabled href='#'>
-          Plan your study
-        </Navbar.Link> */}
-        {/* <Navbar.Link href="#">Pricing</Navbar.Link> */}
-        {/* <Navbar.Link href="#">Contact</Navbar.Link> */}
+        {/* Centered "Support" link */}
+        <Navbar.Link href="https://discord.gg/3ReFE7ET" active={pathname === `/${locale}`}>
+          Support
+        </Navbar.Link>
       </Navbar.Collapse>
-    </Navbar >
+    </Navbar>
   );
 }

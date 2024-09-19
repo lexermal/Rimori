@@ -7,25 +7,29 @@ import '@/styles/globals.css';
 import '@/styles/colors.css';
 
 import { GlobalProvider } from '@/context/GlobalContext';
-import { UserProvider } from '@/context/UserContext';
+import SupabaseProvider from '@/providers/SupabaseProvider';
+import UserProvider from '@/providers/UserProvider';
+import { EnvProvider } from '@/providers/EnvProvider';
+import { Env } from '@/utils/constants';
+import { SupabaseClient } from '@/utils/supabase/server';
 
 type Props = {
+  env: Env;
   children: ReactNode;
-  allowedDomains: string[];
-  apiEndpoint: string,
-  projectId: string
 };
 
-export default function RootLayout({ children, allowedDomains, apiEndpoint, projectId }: Props) {
+export default function RootLayout({ children, env }: Props) {
+  SupabaseClient.getClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+
   return (
-    <html>
-      <body>
-        <GlobalProvider>
-          <UserProvider allowedDomains={allowedDomains} apiEndpoint={apiEndpoint} projectId={projectId}>
+    <GlobalProvider>
+      <SupabaseProvider>
+        <UserProvider>
+          <EnvProvider env={env}>
             <CopilotKit url='/api/copilotkit/openai'>{children}</CopilotKit>
-          </UserProvider>
-        </GlobalProvider>
-      </body>
-    </html>
+          </EnvProvider>
+        </UserProvider>
+      </SupabaseProvider>
+    </GlobalProvider>
   );
 }

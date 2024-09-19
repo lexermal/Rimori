@@ -1,16 +1,23 @@
-import { openai } from '@ai-sdk/openai';
 import { convertToCoreMessages, streamText } from 'ai';
 import { z } from 'zod';
+import { createAnthropic } from '@ai-sdk/anthropic';
+import { env } from '@/utils/constants';
+import { createLogger } from '@/utils/logger';
 
-export const maxDuration = 30;
+const logger = createLogger("POST /api/story");
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
+  const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
+
   const result = await streamText({
-    model: openai('gpt-4-turbo'),
+    model: anthropic("claude-3-5-sonnet-20240620"),
     messages: convertToCoreMessages(messages),
     tools: toolBuilder.getTools(),
+  }).catch((error) => {
+    logger.error("Error generating story response:", { error });
+    throw new Error("Failed to generate story response");
   });
 
   return result.toDataStreamResponse();

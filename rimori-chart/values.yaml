@@ -5,16 +5,22 @@
 replicaCount: 1
 
 image:
-  repository: registry.weixler.me/rimori
+  repository: registry.rimori.se/study/rimori
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.0"
+  tag: "0.3.0"
 
 uploaderImage:
-  repository: registry.weixler.me/rimori-pdf-converter
+  repository: registry.rimori.se/study/rimori-pdf-converter
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1.0"
+  tag: "0.3.0"
+
+rimoriApp:
+  enabled: true  # Set to false to disable rimori-app
+
+converter:
+  enabled: true  # Set to false to disable converter
 
 imagePullSecrets: []
 nameOverride: ""
@@ -46,21 +52,20 @@ securityContext: {}
   # runAsUser: 1000
 
 env:
-  ASSET_PATH: ""
-  APPWRITE_SECRET_KEY: ""
-  APPWRITE_DATABASE_ID: ""
-  APPWRITE_DOCUMENT_COLLECTION_ID: ""
-  APPWRITE_DOCUMENT_BUCKET_ID: ""
-  APPWRITE_PROJECT_ID: ""
-  JWT_SECRET: ""
-  ELEVENLABS_API_KEY: ""
-  APPWRITE_API_ENDPOINT: ""
-  APPWRITE_PROJECT_ID: ""
-  ALLOWED_DOMAINS: ""
-  UPLOAD_BACKEND: ""
+  NEXT_PUBLIC_SUPABASE_URL: https://bznvqlkxankwapnodhek.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ""
+  NEXT_PUBLIC_OPENAI_API_KEY: ""
+  NEXT_PUBLIC_ANTHROPIC_API_KEY: ""
+  NEXT_PUBLIC_LOGGING_BACKEND_URL: https://logging.rimori.se
+  NEXT_PUBLIC_LOGGING_USERNAME: admin
+  NEXT_PUBLIC_LOGGING_PASSWORD: ""
+  NEXT_PUBLIC_ALLOWED_DOMAINS: ""
+  NEXT_PUBLIC_ELEVENLABS_API_KEY: ""
+  NEXT_PUBLIC_MATOMO_URL: https://matomo.rimori.se
+  NEXT_PUBLIC_UPLOAD_BACKEND: https://upload.rimori.se/upload
   OPENAI_API_KEY: ""
-  FRONTEND_DOMAIN: "https://rimori.my-domain.com"
-
+  FRONTEND_DOMAIN: https://study.rimori.se
+  
 service:
   type: ClusterIP
   port: 3000
@@ -69,45 +74,43 @@ ingress:
   enabled: true
   className: "traefik"
   annotations: 
-    # kubernetes.io/ingress.class: traefik
     "cert-manager.io/cluster-issuer": letsencrypt-production
   hosts:
-    - host: rimori.my-domain.com
+    - host: study.rimori.se
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls:
    - secretName: rimori-tls
      hosts:
-       - rimori.my-domain.com
+       - study.rimori.se
 
 uploaderIngress:
   enabled: true
   className: "traefik"
   annotations: 
-    # kubernetes.io/ingress.class: traefik
     "cert-manager.io/cluster-issuer": letsencrypt-production
   hosts:
-    - host: upload.my-domain.com
+    - host: upload.rimori.se
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls:
    - secretName: rimori-uploader-tls
      hosts:
-       - upload.my-domain.com
+       - upload.rimori.se
 
-resources: {}
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 500Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
 
 livenessProbe:
   httpGet:
@@ -119,7 +122,7 @@ readinessProbe:
     port: http
 
 autoscaling:
-  enabled: false
+  enabled: true
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80

@@ -1,0 +1,18 @@
+# helm upgrade --install wordpress wordpress/wordpress -f values.yml -n wordpress --create-namespace
+
+global:
+    storageClass: longhorn
+wordpressUsername: admin
+wordpressPassword: 9Xt5mLjkZmFCWAYOxwKy
+mariadb:
+    auth:
+        rootPassword: uSCIfaPO2d3S98b7CBLk
+ingress:
+    enabled: true
+    ingressClassName: traefik
+    hostname: rimori.se
+    tls: true
+    annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+service:
+    type: ClusterIP

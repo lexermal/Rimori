@@ -1,0 +1,16 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    hostNetwork: true
+    service:
+      spec:
+        # this forwards the real source IP to internal services
+        externalTrafficPolicy: Local
+    # enables detailed logs
+    additionalArguments:
+      - "--log.level=DEBUG"
+      - "--accesslog=true"

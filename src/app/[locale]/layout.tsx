@@ -1,8 +1,6 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 
-import { CustomNavbar } from '@/components/startpage/Navbar';
-
 export default async function LocaleLayout({
   children,
   params: { locale }
@@ -13,7 +11,6 @@ export default async function LocaleLayout({
   // Providing all messages to the client
   // side is the easiest way to get started
   const messages = await getMessages();
-  console.log('Locale layout 1st')
 
   return (
     <html lang={locale}>
@@ -23,10 +20,6 @@ export default async function LocaleLayout({
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <CustomNavbar />
-          <div className='h-28'>
-          </div>
-
           {children}
         </NextIntlClientProvider>
       </body>

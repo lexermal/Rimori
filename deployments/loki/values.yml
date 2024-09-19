@@ -1,0 +1,160 @@
+# helm upgrade -i loki-stack grafana/loki-stack -f values.yml -n loki-stack --create-namespace
+
+grafana:
+  enabled: true
+  persistence:
+    storageClassName: longhorn
+  ingress:
+    enabled: true
+    annotations:
+    hosts:
+    - grafana.rimori.se
+    tls:
+    - secretName: grafana-tls
+      hosts:
+      - grafana.rimori.se
+
+prometheus:
+  enabled: true
+  persistentVolume:
+    storageClass: longhorn
+  prometheus-node-exporter:
+    enabled: false
+  server:
+    baseURL: https://prometheus.rimori.se
+  ingress:
+    enabled: true
+    annotations:
+    hosts:
+    - prometheus.rimori.se
+    tls:
+    - secretName: prometheus-tls
+      hosts:
+      - prometheus.rimori.se
+  alertmanager:
+    persistentVolume:
+      enabled: false
+  server:
+    persistentVolume:
+      enabled: false
+
+loki:
+  auth_enabled: false
+  persistence:
+    enabled: true
+    storageClassName: longhorn
+    size: 5Gi
+  deploymentMode: SimpleScalable
+  loki:
+    schemaConfig:
+      configs:
+        - from: 2024-04-01
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+    ingester:
+      chunk_encoding: snappy
+    tracing:
+      enabled: true
+    querier:
+      # Default is 4, if you have enough memory and CPU you can increase, reduce if OOMing
+      max_concurrent: 4
+  
+  ingress:
+    enabled: false
+    ingressClassName: traefik
+    hosts:
+      - host: logging.rimori.se
+        paths:
+          - /
+    tls:
+      - secretName: loki-gateway-tls
+        hosts:
+          - logging.rimori.se
+  
+  ingester:
+    replicas: 0
+  querier:
+    replicas: 0
+    maxUnavailable: 2
+  queryFrontend:
+    replicas: 0
+    maxUnavailable: 1
+  queryScheduler:
+    replicas: 0
+  distributor:
+    replicas: 0
+    maxUnavailable: 2
+  compactor:
+    replicas: 0
+  indexGateway:
+    replicas: 0
+    maxUnavailable: 1
+  
+  bloomCompactor:
+    replicas: 0
+  bloomGateway:
+    replicas: 0
+  
+  # Enable minio for storage
+  minio:
+    enabled: true
+  
+  # Zero out replica counts of other deployment modes
+  backend:
+    replicas: 1
+  read:
+    replicas: 1
+  write:
+    replicas: 1
+  
+  singleBinary:
+    replicas: 0 
+  write:
+    persistence:
+      storageClass: longhorn
+  read:
+    persistence:
+      storageClass: longhorn
+  backend:
+    persistence:
+      storageClass: longhorn
+  ingester:
+    persistence:
+      claims:
+      - storageClass: longhorn
+  querier:
+    persistence:
+      storageClass: longhorn
+  indexGateway:
+    persistence:
+      storageClass: longhorn
+  compactor:
+    persistence:
+      storageClass: longhorn
+  compactor:
+    persistence:
+      claims:
+      - storageClass: longhorn
+  bloomGateway:
+    persistence:
+      storageClass: longhorn
+  bloomGateway:
+    persistence:
+      claims:
+      - storageClass: longhorn
+  ruler:
+    persistence:
+      storageClass: longhorn
+  resultsCache:
+    persistence:
+      storageClass: longhorn
+  chunksCache:
+    persistence:
+      storageClass: longhorn
+  
+  
+

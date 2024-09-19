@@ -199,3 +199,32 @@
 .css-1lrqz9v .remirror-editor.ProseMirror {
   height: 620px;
 }
+
+/**
+* Insanely annoying but I need to use this to target the buttons
+* inside the auth UI, because currently their SSR doesn't work.
+* 
+* So if we don't do this, it will flicker the styles.
+*/
+/*
+* The container for the social buttons (only when socialLayout="horizontal")
+*/
+.supabase-auth-ui_ui-container[direction="horizontal"][gap="medium"] {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 10px !important; /* Adjust the gap as needed */
+}
+/*
+* Social buttons themselves
+*/
+.supabase-auth-ui_ui-container[direction="horizontal"][gap="medium"] button {
+  padding: 20px !important;
+  background-color: white !important;
+  border: 1px solid #e5e7eb !important; /* This is the Tailwind CSS color for zinc-100 */
+}
+.supabase-auth-ui_ui-container[direction="horizontal"][gap="medium"]
+  button:hover {
+  background-color: #e5e7eb !important; /* Tailwind CSS color for zinc-200 */
+}

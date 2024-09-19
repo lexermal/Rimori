@@ -1,0 +1,9 @@
+ingress:
+  enabled: true
+  hostname: test.rimori.se   # <-- change
+  ingressClassName: traefik
+  tls: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+service:
+  type: ClusterIP
