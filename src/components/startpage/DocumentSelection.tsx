@@ -1,4 +1,5 @@
 import { DocumentStatus } from '@/components/startpage/Startpage';
+import { Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 
@@ -6,9 +7,10 @@ interface Props {
   items: DocumentStatus[];
   onSelected: (id: string) => void;
   onNewDocument: () => void;
+  processingDocuments: string[];
 }
 
-export default function HomePage({ items, onSelected, onNewDocument }: Props) {
+export default function DocumentSelector({ items, onSelected, onNewDocument, processingDocuments }: Props) {
   const [openAccordion, setOpenAccordion] = useState('');
   const [selectedEntry, setSelectedEntry] = useState('');
 
@@ -46,6 +48,14 @@ export default function HomePage({ items, onSelected, onNewDocument }: Props) {
           />
         );
       })}
+      {processingDocuments.length > 0 && (
+        processingDocuments.map((doc: string, index: number) => (
+          <div key={index} className='flex flex-row mb-1 ml-3'>
+            <p key={index} className='font-bold text-left mr-1'>{doc} </p>
+            <Spinner className='h-5 w-5 inline-block' />
+          </div>
+        ))
+      )}
       {/* <button onClick={onNewDocument}>
         <svg
           xmlns='http://www.w3.org/2000/svg'

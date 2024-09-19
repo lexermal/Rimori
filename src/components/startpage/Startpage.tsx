@@ -30,6 +30,7 @@ const StartPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<string>('');
   const [documents, setDocuments] = useState<DocumentStatus[]>([]);
+  const [processingDocuments, setProcessingDocuments] = useState<string[]>([]);
 
   const router = useRouter();
   const supabase = SupabaseClient.getClient();
@@ -43,6 +44,23 @@ const StartPage = () => {
 
     setDocuments(data || []);
     setLoading(false);
+    fetchUnfinishedDocuments();
+  }
+
+  //create a function that fetches unfinished documents from suaabase, waits for 5 seconds and then fetches again untol no more documents are found
+  const fetchUnfinishedDocuments = async () => {
+    const { data, error } = await supabase.from('documents').select("*").eq('status', 'in_progress');
+
+    if (error) console.error('Failed to retrieve unfinished documents:', error);
+
+    console.log('data', data);
+    setProcessingDocuments((data||[]).map((d: any) => d.name));
+
+    if (data!=null&&data.length > 0) {
+      console.log('Unfinished documents found, waiting 5 seconds before retrying');
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      fetchDocuments();
+    }
   }
 
   useEffect(() => {
@@ -65,6 +83,7 @@ const StartPage = () => {
         </h2>
         {documents.length > 0 && (
           <DocumentSelection
+          processingDocuments={processingDocuments}
             onSelected={(id) => {
               if (!id.includes("_")) {
                 const availableDocuments = documents.filter(d => d.document_id == id && d.section_id != id);
