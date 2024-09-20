@@ -18,49 +18,153 @@ class MarkdownExtractor {
       return Math.max(biggestFontSize, pageBiggestFontSize);
     }, 0);
 
-    const smallestFontSize = this.toArray(xmlObject.pdf2xml.page).reduce((smallestFontSize: number, page: any) => {
-      const pageSmallestFontSize = this.toArray(page.text).reduce((smallestFontSize: number, textElement: any) => {
-        const fontSize = parseInt(textElement.$.height);
-        return Math.min(smallestFontSize, fontSize);
-      }, 1000);
+    // const smallestFontSize = this.toArray(xmlObject.pdf2xml.page).reduce((smallestFontSize: number, page: any) => {
+    //   const pageSmallestFontSize = this.toArray(page.text).reduce((smallestFontSize: number, textElement: any) => {
+    //     const fontSize = parseInt(textElement.$.height);
+    //     return Math.min(smallestFontSize, fontSize);
+    //   }, 1000);
 
-      return Math.min(smallestFontSize, pageSmallestFontSize);
-    }, 1000);
+    //   return Math.min(smallestFontSize, pageSmallestFontSize);
+    // }, 1000);
 
     return this.toArray(xmlObject.pdf2xml.page).map((page: any, index: number) => {
       logger.info(`Converting page ${index + 1} to markdown...`);
 
       // Create a map to store the resulting markdown based on the order of the elements found in the xml as "top" attribute
-      const resultingMarkdown = new Map<number, string>();
+      // const resultingMarkdown = new Map<number, string>();
 
-      // Extract text data from the page, and store it in the resultingMarkdown map
-      this.toArray(page.text).forEach((textElement: any) => {
-        const top = parseInt(textElement.$.top);
-        const textData = this.extractTextData(textElement, biggestFontSize, smallestFontSize);
-        const contentOnSameLine = resultingMarkdown.get(top);
-        resultingMarkdown.set(top, contentOnSameLine ? `${contentOnSameLine} ${textData}` : textData);
-      });
+      const mostUsedFontSizeInt = this.getMostUsedFontSizeInt(page);
 
-      // Extract image data from the page, and store it in the resultingMarkdown map
-      this.toArray(page.image).forEach((imageElement: any) => {
-        const top = parseInt(imageElement.$.top);
-        const imageData = this.extractImageData(imageElement, uploadFolder);
-        const contentonSameLine = resultingMarkdown.get(top);
-        resultingMarkdown.set(top, contentonSameLine ? `${contentonSameLine} ${imageData}` : imageData);
-      });
 
-      // Sort the resultingMarkdown map based on the "top" attribute
-      const sortedMarkdown = new Map([...resultingMarkdown.entries()].sort((a, b) => a[0] - b[0]));
+      const isTwoColumnLayout = this.detectTwoColumnLayout(page);
+      logger.info(`Page ${index + 1} is a two-column layout: ${isTwoColumnLayout}`);
 
-      return replaceSentenceLineSplits(Array.from(sortedMarkdown.values()).join('\n\n'));
+      const { firstColumn, secondColumn } = this.arrangeContentInColumns(page, isTwoColumnLayout);
+
+      const sortedMarkdown = this.xml2TextLines(firstColumn.text, firstColumn.images, biggestFontSize, mostUsedFontSizeInt, uploadFolder);
+      let markdown = Array.from(sortedMarkdown.values()).join('\n\n')
+      if (isTwoColumnLayout) {
+        const secondColumnMarkdown = Array.from(this.xml2TextLines(secondColumn.text, secondColumn.images, biggestFontSize, mostUsedFontSizeInt, uploadFolder).values()).join('\n\n');
+        markdown += `\n\n${secondColumnMarkdown}`;
+      }
+      return replaceSentenceLineSplits(markdown);
     });
   }
 
-  private extractTextData(textElement: any, biggestFontSize: number, smallestFont:number): string {
+  private arrangeContentInColumns(page: any, isTwoColumnLayout: boolean): {
+    firstColumn: { text: any[], images: any[] },
+    secondColumn: { text: any[], images: any[] }
+  } {
+    const content = {
+      firstColumn: { text: [] as any[], images: [] as any[] },
+      secondColumn: { text: [] as any[], images: [] as any[] }
+    };
+
+    // const  = this.detectTwoColumnLayout(page);
+    const columnThreshold = 200; // Define a threshold to separate columns based on the `left` position
+
+    // Distribute text content
+    this.toArray(page.text).forEach((textElement: any) => {
+      const leftPosition = parseInt(textElement.$.left);
+
+      if (isTwoColumnLayout && leftPosition < columnThreshold) {
+        content.firstColumn.text.push(textElement); // Push raw text element
+      } else if (isTwoColumnLayout && leftPosition >= columnThreshold) {
+        content.secondColumn.text.push(textElement); // Push raw text element
+      } else {
+        // For one-column layout, push everything into the first column
+        content.firstColumn.text.push(textElement); // Push raw text element
+      }
+    });
+
+    // Distribute image content
+    this.toArray(page.image).forEach((imageElement: any) => {
+      const leftPosition = parseInt(imageElement.$.left);
+
+      if (isTwoColumnLayout && leftPosition < columnThreshold) {
+        content.firstColumn.images.push(imageElement); // Push raw image element
+      } else if (isTwoColumnLayout && leftPosition >= columnThreshold) {
+        content.secondColumn.images.push(imageElement); // Push raw image element
+      } else {
+        // For one-column layout, push everything into the first column
+        content.firstColumn.images.push(imageElement); // Push raw image element
+      }
+    });
+
+    return content;
+  }
+
+
+
+  private detectTwoColumnLayout(page: any): boolean {
+    const positionFrequency: { [key: number]: number } = {};
+    const thresholdDistance = 200; // Define a reasonable threshold for "far apart"
+
+    // Collect horizontal positions (left attribute) of text elements
+    this.toArray(page.text).forEach((textElement: any) => {
+      const leftPosition = parseInt(textElement.$.left);
+
+      if (positionFrequency[leftPosition]) {
+        positionFrequency[leftPosition]++;
+      } else {
+        positionFrequency[leftPosition] = 1;
+      }
+    });
+
+    // console.log({ positionFrequency });
+
+    // Find the two most frequent positions
+    const sortedPositions = Object.keys(positionFrequency)
+      .map(Number)
+      .sort((a, b) => positionFrequency[b] - positionFrequency[a]);
+
+    if (sortedPositions.length < 2) {
+      // Less than 2 distinct positions, so no two-column layout
+      return false;
+    }
+
+    // Check if the two most frequent positions are far enough apart to suggest a two-column layout
+    const firstMax = sortedPositions[0];
+    const secondMax = sortedPositions[1];
+
+    return Math.abs(firstMax - secondMax) > thresholdDistance;
+  }
+
+
+
+
+  private xml2TextLines(text: any[], image: any[], biggestFontSize: number, mostUsedFontSizeInt: number, uploadFolder: string): Map<number, string> {
+    // Create a map to store the resulting markdown based on the order of the elements found in the xml as "top" attribute
+    const resultingMarkdown = new Map<number, string>();
+
+    //const mostUsedFontSizeInt = this.getMostUsedFontSizeInt(page);
+
+    // Extract text data from the page, and store it in the resultingMarkdown map
+    this.toArray(text).forEach((textElement: any) => {
+      const top = parseInt(textElement.$.top);
+      const textData = this.extractTextData(textElement, biggestFontSize, mostUsedFontSizeInt);
+      const contentOnSameLine = resultingMarkdown.get(top);
+      resultingMarkdown.set(top, contentOnSameLine ? `${contentOnSameLine} ${textData}` : textData);
+    });
+
+    // Extract image data from the page, and store it in the resultingMarkdown map
+    this.toArray(image).forEach((imageElement: any) => {
+      const top = parseInt(imageElement.$.top);
+      const imageData = this.extractImageData(imageElement, uploadFolder);
+      const contentonSameLine = resultingMarkdown.get(top);
+      resultingMarkdown.set(top, contentonSameLine ? `${contentonSameLine} ${imageData}` : imageData);
+    });
+
+    // Sort the resultingMarkdown map based on the "top" attribute
+    const sortedMarkdown = new Map([...resultingMarkdown.entries()].sort((a, b) => a[0] - b[0]));
+    return sortedMarkdown;
+  }
+
+  private extractTextData(textElement: any, biggestFontSize: number, smallestFont: number): string {
     // Extract text data from the text element and convert it to markdown
 
     const headingAttribute = parseInt(textElement.$.height);
-    const heading = headingAttribute ? this.fontSizeToMarkdownHeading(biggestFontSize,smallestFont, headingAttribute) : "";
+    const heading = headingAttribute ? this.fontSizeToMarkdownHeading(biggestFontSize, smallestFont, headingAttribute) : "";
 
     if (textElement.b) {
       const text = textElement.b[0].toString().trim();
@@ -130,6 +234,32 @@ class MarkdownExtractor {
     return '';
   }
 
+  private getMostUsedFontSizeInt(page: any): number {
+    const fontSizeFrequency: { [key: number]: number } = {};
+
+    // Populate the frequency map
+    this.toArray(page.text).forEach((textElement: any) => {
+      const fontSize = parseInt(textElement.$.height);
+      if (fontSizeFrequency[fontSize]) {
+        fontSizeFrequency[fontSize]++;
+      } else {
+        fontSizeFrequency[fontSize] = 1;
+      }
+    });
+
+    // Find the most used font size
+    let mostUsedFontSize = 0;
+    let maxFrequency = 0;
+    for (const [fontSize, frequency] of Object.entries(fontSizeFrequency)) {
+      if (frequency > maxFrequency) {
+        maxFrequency = frequency;
+        mostUsedFontSize = parseInt(fontSize);
+      }
+    }
+
+    return mostUsedFontSize;
+  }
+
   private extractImageData(imageElement: any, uploadFolder: string): string {
     // Extract image data from the image element and convert it to markdown
     return `![Image](${uploadFolder}/${imageElement.$.src})`;
@@ -141,8 +271,12 @@ class MarkdownExtractor {
     return Array.isArray(obj) ? obj : [obj];
   }
 
-  private fontSizeToMarkdownHeading(biggestFont: number,smallestFont:number, currentFontSize: number): string {
-    // console.log(biggestFont, currentFontSize);
+  private fontSizeToMarkdownHeading(biggestFont: number, smallestFont: number, currentFontSize: number): string {
+    // console.log({ biggestFont, smallestFont, currentFontSize });
+
+    if (smallestFont < 10) {
+      smallestFont = 10;
+    }
 
     if (currentFontSize < smallestFont * 1.5) {
       return ""; // Return empty string for normal text, no heading

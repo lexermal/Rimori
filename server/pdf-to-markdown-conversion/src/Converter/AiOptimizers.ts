@@ -12,7 +12,12 @@ export async function improveTextWithAI(unpretty_markdown_text: string): Promise
     try {
       pretty_markdown_text = await internalConversion(unpretty_markdown_text);
       break;
-    } catch (error) {
+    } catch (error:any) {
+      if(error.error.error.message === "Output blocked by content filtering policy") {
+        logger.warn("Anthropic detected the text as being a paper or a book, skipping optimization");
+        return unpretty_markdown_text;
+      }
+
       logger.error("Failed to optimize text with AI", { error });
       if (i === 29) {
         throw new Error("Failed to optimize text with AI");
