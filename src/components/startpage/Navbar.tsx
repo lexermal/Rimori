@@ -74,7 +74,7 @@ export function CustomNavbar(): JSX.Element {
 
       <Navbar.Collapse>
         {/* Centered "Support" link */}
-        <Navbar.Link href="https://discord.gg/3ReFE7ET" active={pathname === `/${locale}`}>
+        <Navbar.Link href="https://discord.gg/7ZSAGWSk" active={pathname === `/${locale}`}>
           Support
         </Navbar.Link>
       </Navbar.Collapse>
@@ -83,7 +83,7 @@ export function CustomNavbar(): JSX.Element {
 }
 
 function getAccount(user: User): string {
-  if(!user.user_metadata.name) {
+  if (!user.user_metadata.name) {
     return "Account";
   }
   return user.user_metadata.name.split(" ")[0][0] + " " + user.user_metadata.name.split(" ")[1][0];

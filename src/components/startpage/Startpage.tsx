@@ -77,7 +77,7 @@ const StartPage = () => {
 
   return (
     <div className='pb-16 pt-6'>
-      <div className='w-2/4 mx-auto'>
+      <div className='mx-auto' style={{width:"fit-content"}}>
         <h2 className='text-center mb-5'>
           Study documents
         </h2>
