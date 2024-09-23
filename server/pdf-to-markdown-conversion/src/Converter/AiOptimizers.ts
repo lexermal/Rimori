@@ -13,18 +13,21 @@ export async function improveTextWithAI(unpretty_markdown_text: string): Promise
       pretty_markdown_text = await internalConversion(unpretty_markdown_text);
       break;
     } catch (error:any) {
-      if(error.error.error.message === "Output blocked by content filtering policy") {
+      if(error?.error?.error?.message === "Output blocked by content filtering policy") {
         logger.warn("Anthropic detected the text as being a paper or a book, skipping optimization");
         return unpretty_markdown_text;
       }
 
-      logger.error("Failed to optimize text with AI", { error });
+      logger.warn("Request for optimizing text with AI failed.", { error });
+      
       if (i === 29) {
-        throw new Error("Failed to optimize text with AI");
+        logger.error("Failed to optimize text with AI", { error });
+        // throw new Error("Failed to optimize text with AI");
+        return unpretty_markdown_text;
       }
       //random number between 20-40
       const random = Math.floor(Math.random() * 20) + 20;
-      console.log(`Retrying in ${random} seconds...`);
+      console.info(`Retrying in ${random} seconds...`);
       await new Promise((resolve) => setTimeout(resolve, random * 1000));
     }
   }
