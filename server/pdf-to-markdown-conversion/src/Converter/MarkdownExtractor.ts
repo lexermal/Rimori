@@ -160,11 +160,19 @@ class MarkdownExtractor {
     return sortedMarkdown;
   }
 
-  private extractTextData(textElement: any, biggestFontSize: number, smallestFont: number): string {
+  private extractTextData(textElement: any, biggestFontSize: number, avgFontSize: number): string {
     // Extract text data from the text element and convert it to markdown
 
-    const headingAttribute = parseInt(textElement.$.height);
-    const heading = headingAttribute ? this.fontSizeToMarkdownHeading(biggestFontSize, smallestFont, headingAttribute) : "";
+    let headingAttribute = parseInt(textElement.$.height);
+
+    // if textElement text consists only of one letter then headingAttribute is the smallestFont
+    const headingText = (textElement.b?.[0] || textElement.i?.[0] || textElement.a?.[0] || textElement.u?.[0] || textElement._)?.toString().trim();
+    if (headingText && headingText.length === 1) {
+      logger.info(`Text element consists only of one letter.`, textElement);
+      headingAttribute = avgFontSize;
+    }
+
+    const heading = headingAttribute ? this.fontSizeToMarkdownHeading(biggestFontSize, avgFontSize, headingAttribute) : "";
 
     if (textElement.b) {
       const text = textElement.b[0].toString().trim();
