@@ -46,18 +46,25 @@ export function FileUpload(props: Props) {
         method: 'POST',
         body: formData,
         headers: { Authorization: `Bearer ${data.session?.access_token}` },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          props.onFilesUploaded(data.allFiles);
-          console.log('Success:', data);
-          EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-success' });
-        })
-        .catch((error) => {
-          EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-error', name: error.message ?? 'No error message provided!' });
-          console.error('Error:', error);
-        })
-        .then(() => setIsUploading(false));
+      }).then((response) => {
+        response.json().then((data) => {
+          if (!response.ok) {
+            EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-error', name: data.message ?? 'No error message provided!' });
+            console.error('Error:', data);
+            alert("Processing the document failed. " + (data.error));
+          } else {
+            props.onFilesUploaded(data.allFiles);
+            console.log('Success:', data);
+            EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-success' });
+          }
+          setIsUploading(false)
+        });
+      }).catch((error) => {
+        EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-error', name: error.message });
+        console.error('Error:', error);
+        alert("Could not connect to Rimori. Check your internet connection and try again later.");
+        setIsUploading(false);
+      });
     });
 
   }, [acceptedFiles]);
