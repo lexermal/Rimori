@@ -1,11 +1,18 @@
 import { createLogger } from "../utils/logger";
 import Anthropic from "@anthropic-ai/sdk";
 import { TextBlock } from "@anthropic-ai/sdk/resources";
-import { ANTHROPIC_API_KEY } from "../utils/constants";
+import { ANTHROPIC_API_KEY, SKIPPING_AI_OPTIMIZATION } from "../utils/constants";
 
 const logger = createLogger("AiOptimizers.ts");
 
 export async function improveTextWithAI(unpretty_markdown_text: string): Promise<string> {
+
+  if(SKIPPING_AI_OPTIMIZATION){
+    logger.info("Skiipping AI optimization to save tokens");
+    // AI optimization is disabled to save tokens
+    return unpretty_markdown_text;
+  }
+  
  //call internalConversion function and try again if it fails for 30 times. Weit 1000ms between each try.
   let pretty_markdown_text = unpretty_markdown_text;
   for (let i = 0; i < 30; i++) {
