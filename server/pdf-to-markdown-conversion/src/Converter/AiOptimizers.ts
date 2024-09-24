@@ -8,7 +8,7 @@ const logger = createLogger("AiOptimizers.ts");
 export async function improveTextWithAI(unpretty_markdown_text: string): Promise<string> {
 
   if(SKIPPING_AI_OPTIMIZATION){
-    logger.info("Skiipping AI optimization to save tokens");
+    logger.info("Skipping AI optimization to save tokens");
     // AI optimization is disabled to save tokens
     return unpretty_markdown_text;
   }
