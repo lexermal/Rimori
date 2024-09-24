@@ -6,7 +6,7 @@ import path from 'path';
 import 'dotenv/config';
 
 import MarkdownExtractor from './Converter/MarkdownExtractor';
-import { extractPdfToXml } from './Converter/PdfToHtml';
+import { extractPdfToXml, getPageCount } from './Converter/PdfToHtml';
 import SupabaseService from './utils/Connector';
 import { FRONTEND_DOMAIN } from './utils/constants';
 import jwt from 'jsonwebtoken';
@@ -63,6 +63,12 @@ app.post('/upload', upload.single('file'), async (req: any, res) => {
 
   // Move the uploaded file into the created folder with the new name
   fs.renameSync(file.path, `./upload/${fileId}/${fileId}${fileExtension}`);
+
+  if(await getPageCount(`./upload/${fileId}/${fileId}${fileExtension}`) > 30) {
+    logger.warn('The document contains more than 30 pages. Aborting conversion.');
+    db.deleteDocument(fileId);
+    return res.status(400).json({ error: 'The document has more than 30 pages. Rimori will be able to read such files soon.' });
+  }
 
   processDocument(db, fileId, req.token);
 
