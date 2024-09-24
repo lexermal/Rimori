@@ -16,4 +16,4 @@ export const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string;
 export const LOGGING_BACKEND_URL = process.env.NEXT_PUBLIC_LOGGING_BACKEND_URL as string;
 export const LOGGING_USERNAME = process.env.NEXT_PUBLIC_LOGGING_USERNAME as string;
 export const LOGGING_PASSWORD = process.env.NEXT_PUBLIC_LOGGING_PASSWORD as string;
-export const SKIPPING_AI_OPTIMIZATION = process.env.SKIPPING_AI_OPTIMIZATION === 'true';
+export const SKIPPING_AI_OPTIMIZATION = process.env.SKIPPING_AI_OPTIMIZATION.toLowerCase() === 'true';
