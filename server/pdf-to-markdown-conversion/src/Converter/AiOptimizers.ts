@@ -44,7 +44,7 @@ export async function improveTextWithAI(unpretty_markdown_text: string): Promise
 
 async function internalConversion(unpretty_markdown_text: string): Promise<string> {
   const systemPrompt = `
-**Markdown Formatting Instructions:**
+**Markdown Formatting Instructions for summaries and papers:**
 
 1. Convert user-entered text into Markdown format, ensuring it's easy to read.
 2. Utilize Markdown syntax for lists and apply appropriate text formatting without altering the content.
@@ -53,6 +53,8 @@ async function internalConversion(unpretty_markdown_text: string): Promise<strin
    - Keep headings that are already "##" (h2) or "#" (h1) unchanged.
 4. Transform all list symbols into Markdown list formats.
 5. Keep all images unchanged.
+6. If the text is a scientific paper, summarize the content of every section in around 400 words.
+7. If the text is a scientific paper and the section has a heading, format the heading as h2 (##).
   `;
 
   const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
