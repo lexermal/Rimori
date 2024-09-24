@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { BiSolidRightArrow } from "react-icons/bi";
 import VoiceRecorder from '@/components/ai-sidebar/VoiceRecoder';
 import { HiMiniSpeakerXMark, HiMiniSpeakerWave } from "react-icons/hi2";
+import { useUser } from '@/hooks/useUser';
+import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
 
 interface AudioInputFieldProps {
     onSubmit: (text: string) => void;
@@ -11,6 +13,7 @@ interface AudioInputFieldProps {
 const AudioInputField: React.FC<AudioInputFieldProps> = ({ onSubmit, onAudioControl }) => {
     const [text, setText] = useState('');
     const [audioEnabled, setAudioEnabled] = useState(true);
+    const { user } = useUser();
 
     const handleSubmit = (manualText?: string) => {
         const sendableText = manualText || text;
@@ -42,6 +45,11 @@ const AudioInputField: React.FC<AudioInputFieldProps> = ({ onSubmit, onAudioCont
             </button>}
             <VoiceRecorder onVoiceRecorded={(m: string) => {
                 console.log('onVoiceRecorded', m);
+                EmitterSingleton.emit("analytics-event", {
+                    catorgoryy: "voice",
+                    event: "voice-recorded",
+                    user: user,
+                });
                 handleSubmit(m);
             }}
             />

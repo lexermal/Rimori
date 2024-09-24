@@ -10,6 +10,8 @@ import Card from '../../../../components/discussion/Card';
 import DiscussionPopup from '../../../../components/discussion/DiscussionPopup';
 import { SupabaseClient } from '@/utils/supabase/server';
 import Assistentv2 from './components/Assistentv2';
+import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
+import { useUser } from '@/hooks/useUser';
 
 interface Exam {
   examNr: number;
@@ -29,6 +31,7 @@ export default function DiscussionPage(): JSX.Element {
     oldy: {} as Instructions,
     visionary: {} as Instructions,
   });
+  const { user } = useUser();
 
   useEffect(() => {
     const filename =
@@ -53,148 +56,6 @@ export default function DiscussionPage(): JSX.Element {
     });
   }, []);
 
-  // const actions = [
-  //   {
-  //     name: 'explanationUnderstood',
-  //     description: 'Evaluate the explanation of a topic in easy terms.',
-  //     parameters: [
-  //       {
-  //         name: 'explanationUnderstood',
-  //         type: 'boolean',
-  //         description: 'if the explanation was understood',
-  //       },
-  //       {
-  //         name: 'explanation',
-  //         type: 'string',
-  //         description: 'the explanation why it was understood or not',
-  //       },
-  //       {
-  //         name: 'improvementHints',
-  //         type: 'string',
-  //         description: 'hints for improvement',
-  //       },
-  //     ],
-  //     handler: async (params: any) => {
-  //       console.log('params of explanationUnderstood Result: ', params);
-
-  //       //temporary disabled failing for demo purposes
-  //       if (params.explanationUnderstood) {
-  //         const newExam = {
-  //           examNr: 1,
-  //           passed: true,
-  //           reason: params.explanation,
-  //           improvementHints: params.improvementHints,
-  //         };
-  //         setExams([...exams, newExam]);
-  //       }
-  //       // const newExam = {
-  //       //   examNr: 1,
-  //       //   passed: params.explanationUnderstood,
-  //       //   reason: params.explanation,
-  //       //   improvementHints: params.improvementHints,
-  //       // };
-  //       // setExams([...exams, newExam]);
-  //       setTimeout(() => {
-  //         setShowDiscussion(0);
-  //       }, 20000);
-  //     },
-  //   },
-  //   {
-  //     name: 'oppinionChanged',
-  //     description: 'Evaluate if the user managed to change your oppinion.',
-  //     parameters: [
-  //       {
-  //         name: 'studentKnowsTopic',
-  //         type: 'boolean',
-  //         description:
-  //           'if the student knows the topic in depth and explained it right',
-  //       },
-  //       {
-  //         name: 'explanation',
-  //         type: 'string',
-  //         description: 'the explanation why the oppinion was changed or not',
-  //       },
-  //       {
-  //         name: 'improvementHints',
-  //         type: 'string',
-  //         description: 'hints for improvement',
-  //       },
-  //     ],
-  //     handler: async (params: any) => {
-  //       console.log('params of oppinionChanged Result: ', params);
-
-  //       //temporary disabled failing for demo purposes
-  //       if (params.studentKnowsTopic) {
-  //         const newExam = {
-  //           examNr: 2,
-  //           passed: true,
-  //           reason: params.explanation,
-  //           improvementHints: params.improvementHints,
-  //         };
-  //         setExams([...exams, newExam]);
-  //       }
-  //       // const newExam = {
-  //       //   examNr: 2,
-  //       //   passed: params.studentKnowsTopic,
-  //       //   reason: params.explanation,
-  //       //   improvementHints: params.improvementHints,
-  //       // };
-  //       // setExams([...exams, newExam]);
-  //       setTimeout(() => {
-  //         setShowDiscussion(0);
-  //       }, 20000);
-  //     },
-  //   },
-  //   {
-  //     name: 'conceptApplied',
-  //     description:
-  //       'Evaluate if the user managed to apply the concept in the given setting.',
-  //     parameters: [
-  //       {
-  //         name: 'studentKnowsTopic',
-  //         type: 'boolean',
-  //         description:
-  //           'if the student knows the topic in depth and explained it right',
-  //       },
-  //       {
-  //         name: 'explanation',
-  //         type: 'string',
-  //         description:
-  //           'the explanation how well or not he applied the concept in the setting',
-  //       },
-  //       {
-  //         name: 'improvementHints',
-  //         type: 'string',
-  //         description: 'hints for improvement',
-  //       },
-  //     ],
-  //     handler: async (params: any) => {
-  //       console.log('params of oppinionChanged Result: ', params);
-
-  //       //temporary disabled failing for demo purposes
-  //       // if (params.studentKnowsTopic) {
-  //       //   const newExam = {
-  //       //     examNr: 3,
-  //       //     passed: true,
-  //       //     reason: params.explanation,
-  //       //     improvementHints: params.improvementHints,
-  //       //   };
-  //       //   setExams([...exams, newExam]);
-  //       // }
-  //       const newExam = {
-  //         examNr: 2,
-  //         passed: params.studentKnowsTopic,
-  //         reason: params.explanation,
-  //         improvementHints: params.improvementHints,
-  //       };
-  //       setExams([...exams, newExam]);
-  //       setTimeout(() => {
-  //         setShowDiscussion(0);
-  //       }, 20000);
-  //     },
-  //   },
-  // ] as unknown as FrontendAction[];
-
   return (
     <CopilotKit url='/api/copilotkit/opposition' headers={{ file }}>
       <div className='mt-8'>
@@ -215,7 +76,14 @@ export default function DiscussionPage(): JSX.Element {
                     src={persona.image}
                     description={persona.description}
                     success={exam[0]?.passed}
-                    onClick={() => setShowDiscussion(index + 1)} />
+                    onClick={() => {
+                       setShowDiscussion(index + 1);
+                       EmitterSingleton.emit('analytics-event', {
+                          category: 'opposition',
+                          action: 'opening-discussion-with-'+persona.name,
+                          name: user?.id
+                        });
+                    }} />
                   <DiscussionPopup
                     show={showDiscussion === index + 1}
                     title={persona.discussionTitle}
@@ -228,24 +96,9 @@ export default function DiscussionPage(): JSX.Element {
                           Your opponent is getting ready.
                         </p>
                       ) : (
-                        // <EmbeddedAssistent
-                        //   ttsAPIkey={props.ttsAPIkey}
-                        //   id='discussion_assistant'
-                        //   actions={actions}
-                        //   //temporarely disabled
-                        //   // instructions={''}
-                        //   instructions={persona.instructions}
-                        //   firstMessage={persona.firstMessage}
-                        //   voiceId={persona.voiceId} />
                         <Assistentv2
                           personImageUrl={persona.image}
-                          // ttsAPIkey={props.ttsAPIkey}
-                          // id='discussion_assistant'
-                          // actions={actions}
-                          //temporarely disabled
-                          // instructions={'no instructions from my side'}
                           instructions={persona.instructions}
-                          // firstMessage={"hi test"}
                           firstMessage={persona.firstMessage}
                           voiceId={persona.voiceId}
                           onComplete={(params) => {
@@ -274,6 +127,11 @@ export default function DiscussionPage(): JSX.Element {
                                 improvementHints: params.improvementHints,
                               };
                             }
+                            EmitterSingleton.emit('analytics-event', {
+                              category: 'opposition',
+                              action: 'completed-discussion-with-'+persona.name+"-exam-"+newExam.examNr+"-passed-"+newExam.passed,
+                              name: user?.id
+                            });
                             setExams([...exams, newExam]);
                           }}
                         />

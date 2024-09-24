@@ -1,4 +1,5 @@
 import EmitterSingleton from "@/app/[locale]/(auth-guard)/discussion/components/Emitter";
+import { StoryFeedback } from "@/app/[locale]/(auth-guard)/story/Feedback";
 import { SupabaseClient } from "@/utils/supabase/server";
 import { Spinner } from "flowbite-react";
 import React from "react";
@@ -8,10 +9,10 @@ interface Props {
   fileId: string
   question: string,
   possibilties: string[],
-  onSubmit: (value: string, choice: string) => void,
+  onSubmit: (value: StoryFeedback, choice: string) => void,
 }
 
-async function fetchDataFromBackend(messages: any[], fileId: string) {
+async function fetchDataFromBackend(messages: any[], fileId: string): Promise<StoryFeedback> {
   const supabase = SupabaseClient.getClient();
   const { data } = await supabase.auth.getSession();
 

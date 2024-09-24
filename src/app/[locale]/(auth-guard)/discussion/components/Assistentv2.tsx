@@ -6,6 +6,7 @@ import { useChat } from 'ai/react';
 import MessageSender from './MessageSender';
 import EmitterSingleton from './Emitter';
 import { useEnv } from '@/providers/EnvProvider';
+import { useUser } from '@/hooks/useUser';
 
 const emitter = EmitterSingleton;
 
@@ -23,6 +24,7 @@ function Assistentv2({ personImageUrl, instructions, firstMessage, voiceId, onCo
     sender.setVoiceId(voiceId);
     sender.setElevenLabsApiKey(useEnv().ELEVENLABS_API_KEY);
     const [oralCommunication, setOralCommunication] = React.useState(true);
+    const { user } = useUser();
 
     const { messages, append, isLoading, setMessages } = useChat({
         maxToolRoundtrips: 5,
@@ -82,11 +84,23 @@ function Assistentv2({ personImageUrl, instructions, firstMessage, voiceId, onCo
                     </div>}
                 </div>}
             <AudioInputField
-                onSubmit={m => append({ role: 'user', content: m })}
+                onSubmit={message => {
+                     append({ role: 'user', content: message });
+                     EmitterSingleton.emit("analytics-event", {
+                        category: "opposition",
+                        action: "send-message: " + message,
+                        user: user?.id
+                    });
+                }}
                 onAudioControl={voice => {
                     setOralCommunication(voice);
                     sender.setVoiceEnabled(voice);
                     emitter.emit('enableAudio', voice);
+                    EmitterSingleton.emit("analytics-event", {
+                        category: "opposition",
+                        action: "turn-audio-on: " + voice,
+                        user: user?.id
+                    });
                 }} />
         </div>
     );

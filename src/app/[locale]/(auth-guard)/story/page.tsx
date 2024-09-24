@@ -9,7 +9,8 @@ import AnswerComponent from '@/app/[locale]/(auth-guard)/story/ChoiceForm';
 import Feedback, { StoryFeedback } from '@/app/[locale]/(auth-guard)/story/Feedback';
 import { useRouter } from '@/i18n';
 import { SupabaseClient } from '@/utils/supabase/server';
-import SupabaseService from '@/app/api/opposition/Connector';
+import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
+import { useUser } from '@/hooks/useUser';
 
 let kickedOffStory = false;
 
@@ -18,18 +19,11 @@ export default function Story() {
   const [chapterResult, setChapterResult] = React.useState<StoryFeedback[]>([]);
   const [fileId, setFileId] = React.useState<string | null>(null);
   const router = useRouter();
+  const { user } = useUser();
 
   const { messages, addToolResult, append, isLoading, setMessages } = useChat({
     maxToolRoundtrips: 5,
     api: "/api/story",
-
-    // run client-side tools that are automatically executed:
-    // async onToolCall({ toolCall }) {
-    //   if (toolCall.toolName === 'storyEnded') {
-    //     setStoryEnded(true);
-    //     return true;
-    //   }
-    // },
   });
 
   console.log("messages", messages);
@@ -43,12 +37,12 @@ export default function Story() {
         return;
       }
       setFileId(fileId);
-      console.log("fileId", fileId);
+      // console.log("fileId", fileId);
       getAssistentInstructions(session.data.session!.access_token, fileId).then(data => {
         if (!kickedOffStory) {
           kickedOffStory = true;
           setMessages([{ id: '1', role: 'system', content: data }]);
-          append({ id: '2', role: 'user', content: `Generate first chapter. The users name is Alex.` });
+          append({ id: '2', role: 'user', content: `Generate first chapter. The users name is Lisa.` });
         }
       });
     }
@@ -112,6 +106,11 @@ export default function Story() {
             onSubmit={f => {
               setChapterResult([...chapterResult, f]);
               setFeedback(f);
+              EmitterSingleton.emit("analytics-event", {
+                category: "story",
+                action: "finished-chapter-" + chapterResult.length + "-with-" + f.generalFeedback,
+                user: user?.id
+              });
             }} />;
         })}
         {
@@ -125,6 +124,7 @@ export default function Story() {
 
 function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?: string }, messages: Message[], onSubmit: (result: StoryFeedback) => void, chapterResult: StoryFeedback[], fileId: string }) {
   console.log("toolInvocation", props.toolInvocation);
+  const { user } = useUser();
   const { toolCallId, toolName, args, result } = props.toolInvocation;
 
   // render confirmation tool (client-side tool with user interaction)
@@ -140,11 +140,16 @@ function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?
           messages={props.messages}
           question={args.question as string}
           possibilties={[args.possibility1, args.possibility2, args.possibility3]}
-          onSubmit={(result: any, choseOption: string) => {
+          onSubmit={(result: StoryFeedback, choseOption: string) => {
             console.log("result", result);
             result.chosenOption = choseOption;
 
             props.onSubmit(result);
+            EmitterSingleton.emit("analytics-event", {
+              category: "story",
+              action: "chapter-" + props.chapterResult.length + "-chosen-" + choseOption+"-correct-"+result.isAnswerCorrect,
+              user: user?.id
+            });
           }} />
       </div>
     );
@@ -156,17 +161,30 @@ function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?
 
 function StoryEndRendering(props: { chapterResult: StoryFeedback[] }) {
   const router = useRouter();
+  const { user } = useUser();
   let greeting = "Congratulations! You made it to the end!";
 
   if (props.chapterResult.length < 5) {
     greeting = "This is no happy ending...";
   }
 
+  useEffect(() => {
+    EmitterSingleton.emit("analytics-event", {
+      category: "story",
+      action: "story-ended-successfully-" + (props.chapterResult.length < 5),
+      user: user?.id
+    });
+    EmitterSingleton.emit("analytics-event", {
+      category: "story",
+      action: "feedback: " + JSON.stringify(props.chapterResult),
+      user: user?.id
+    });
+  });
 
   return <div className='bg-gray-300 mx-auto max-w-3xl rounded-xl p-5 mt-5'>
     <p className='font-bold text-3xl mb-3'>{greeting}</p>
 
-    <p className="font-bold text-lg">The feedback of the last chapters:</p>
+    <p className="font-bold text-lg">This is the feedback of all chapters:</p>
     <ol>
       {props.chapterResult.map((feedback, index) => {
         return <li key={index} className='ms-5 list-disc'>
