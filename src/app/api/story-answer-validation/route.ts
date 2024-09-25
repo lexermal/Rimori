@@ -98,7 +98,7 @@ Remember you are a very tough examiner.
     outputTokens: (await result.usage).completionTokens
   });
 
-  const responseText = (responseFormat + result.text);
+  const responseText = (responseFormat + result.text).replace(/\\n/g, '');
 
   try {
     return JSON.parse(responseText);
