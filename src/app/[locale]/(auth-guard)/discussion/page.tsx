@@ -11,7 +11,7 @@ import DiscussionPopup from '../../../../components/discussion/DiscussionPopup';
 import { SupabaseClient } from '@/utils/supabase/server';
 import Assistentv2 from './components/Assistentv2';
 import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
-import { useUser } from '@/hooks/useUser';
+import { useUser } from '@supabase/auth-helpers-react';
 
 interface Exam {
   examNr: number;
@@ -31,7 +31,7 @@ export default function DiscussionPage(): JSX.Element {
     oldy: {} as Instructions,
     visionary: {} as Instructions,
   });
-  const { user } = useUser();
+  const user = useUser();
 
   useEffect(() => {
     const filename =

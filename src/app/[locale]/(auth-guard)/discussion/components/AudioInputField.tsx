@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { BiSolidRightArrow } from "react-icons/bi";
 import VoiceRecorder from '@/components/ai-sidebar/VoiceRecoder';
 import { HiMiniSpeakerXMark, HiMiniSpeakerWave } from "react-icons/hi2";
-import { useUser } from '@/hooks/useUser';
 import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
+import { useUser } from '@supabase/auth-helpers-react';
 
 interface AudioInputFieldProps {
     onSubmit: (text: string) => void;
@@ -13,7 +13,7 @@ interface AudioInputFieldProps {
 const AudioInputField: React.FC<AudioInputFieldProps> = ({ onSubmit, onAudioControl }) => {
     const [text, setText] = useState('');
     const [audioEnabled, setAudioEnabled] = useState(true);
-    const { user } = useUser();
+    const user=useUser();
 
     const handleSubmit = (manualText?: string) => {
         const sendableText = manualText || text;

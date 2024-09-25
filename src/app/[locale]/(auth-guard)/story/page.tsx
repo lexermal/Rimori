@@ -10,7 +10,7 @@ import Feedback, { StoryFeedback } from '@/app/[locale]/(auth-guard)/story/Feedb
 import { useRouter } from '@/i18n';
 import { SupabaseClient } from '@/utils/supabase/server';
 import EmitterSingleton from '@/app/[locale]/(auth-guard)/discussion/components/Emitter';
-import { useUser } from '@/hooks/useUser';
+import { useUser } from '@supabase/auth-helpers-react';
 
 let kickedOffStory = false;
 
@@ -19,7 +19,7 @@ export default function Story() {
   const [chapterResult, setChapterResult] = React.useState<StoryFeedback[]>([]);
   const [fileId, setFileId] = React.useState<string | null>(null);
   const router = useRouter();
-  const { user } = useUser();
+  const user=useUser();
 
   const { messages, addToolResult, append, isLoading, setMessages } = useChat({
     maxToolRoundtrips: 5,
@@ -124,7 +124,7 @@ export default function Story() {
 
 function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?: string }, messages: Message[], onSubmit: (result: StoryFeedback) => void, chapterResult: StoryFeedback[], fileId: string }) {
   console.log("toolInvocation", props.toolInvocation);
-  const { user } = useUser();
+  const user = useUser();
   const { toolCallId, toolName, args, result } = props.toolInvocation;
 
   // render confirmation tool (client-side tool with user interaction)
@@ -161,7 +161,7 @@ function RenderToolInovation(props: { toolInvocation: ToolInvocation & { result?
 
 function StoryEndRendering(props: { chapterResult: StoryFeedback[] }) {
   const router = useRouter();
-  const { user } = useUser();
+  const user = useUser();
   let greeting = "Congratulations! You made it to the end!";
 
   if (props.chapterResult.length < 5) {
