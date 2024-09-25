@@ -61,11 +61,11 @@ export function CustomNavbar(): JSX.Element {
           }
         >
           <Dropdown.Header>
-            <span className="block text-sm">{user?.user_metadata.name}</span>
+            <span className="block text-sm">{user?.user_metadata.name ?? 'Profile'}</span>
             <span className="block truncate text-sm font-medium">{user.email}</span>
           </Dropdown.Header>
           {/* <Dropdown.Item>Invite friends</Dropdown.Item> */}
-          <Dropdown.Divider />
+          {/* <Dropdown.Divider /> */}
           <Dropdown.Item onClick={handleLogout}>Sign out</Dropdown.Item>
         </Dropdown>}
         <Navbar.Toggle />
@@ -82,9 +82,11 @@ export function CustomNavbar(): JSX.Element {
   );
 }
 
-function getAccount(user: User): string {
+function getAccount(user: User): string | undefined {
   if (!user.user_metadata.name) {
-    return "Account";
+    return user?.email?.slice(0, 2).toUpperCase();
   }
-  return user.user_metadata.name.split(" ")[0][0] + " " + user.user_metadata.name.split(" ")[1][0];
+
+  const nameParts = user.user_metadata.name.split(" ");
+  return nameParts[0][0].toUpperCase() + " " + nameParts[1][0].toUpperCase();
 }

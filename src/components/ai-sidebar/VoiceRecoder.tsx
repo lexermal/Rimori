@@ -1,11 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { FaMicrophone } from 'react-icons/fa6';
 
 interface Props {
   onVoiceRecorded: (message: string) => void;
 }
 
-const VoiceRecorder = ({ onVoiceRecorded }: Props) => {
+const VoiceRecorder = forwardRef(({ onVoiceRecorded }: Props, ref) => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -43,6 +43,11 @@ const VoiceRecorder = ({ onVoiceRecorded }: Props) => {
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    startRecording,
+    stopRecording,
+  }));
+
   return (
     <div>
       <button onClick={isRecording ? stopRecording : startRecording}>
@@ -50,7 +55,7 @@ const VoiceRecorder = ({ onVoiceRecorded }: Props) => {
       </button>
     </div>
   );
-};
+});
 
 const whisperRequestSTT = async (audioFile: Blob) => {
   const formData = new FormData();

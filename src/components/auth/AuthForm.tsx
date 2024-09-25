@@ -3,6 +3,7 @@ import { SupabaseClient } from "@/utils/supabase/server";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import React, { useState, ChangeEvent, FormEvent } from "react";
+import toast from "react-hot-toast";
 
 type AuthView = "sign_in" | "sign_up" | "forgotten_password";
 
@@ -12,8 +13,6 @@ const AuthForm: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>(""); // Success state
   const env = useEnv();
 
   const router = useRouter();
@@ -26,28 +25,23 @@ const AuthForm: React.FC = () => {
 
   const handleSignIn = async (): Promise<void> => {
     setLoading(true);
-    setErrorMessage("");
-    setSuccessMessage("");
-
     const { error } = await supabaseClient.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      setErrorMessage(error.message);
+      toast.error(error.message);
     } else {
-      setSuccessMessage("Sign in successful! Redirecting...");
+      toast.success("Sign in successful! Redirecting...");
       resetForm();
-      router.refresh();
+      router.replace('/');
     }
     setLoading(false);
   };
 
   const handleSignUp = async (): Promise<void> => {
     setLoading(true);
-    setErrorMessage("");
-    setSuccessMessage("");
 
     const emailDomain = email.split('@')[1];
 
@@ -61,9 +55,9 @@ const AuthForm: React.FC = () => {
     });
 
     if (error) {
-      setErrorMessage(error.message);
+      toast.error(error.message)
     } else {
-      setSuccessMessage("Registration successful! Please check your email.");
+      toast.success("Registration successful! Please check your email.")
       resetForm();
     }
 
@@ -72,15 +66,13 @@ const AuthForm: React.FC = () => {
 
   const handlePasswordReset = async (): Promise<void> => {
     setLoading(true);
-    setErrorMessage("");
-    setSuccessMessage("");
 
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
 
     if (error) {
-      setErrorMessage(error.message);
+      toast.error(error.message)
     } else {
-      setSuccessMessage("Password reset link sent to your email.");
+      toast.success("Password reset link sent to your email.")
       resetForm();
     }
 
@@ -151,14 +143,6 @@ const AuthForm: React.FC = () => {
                 className="w-full h-12 border rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
               />
             </div>
-          )}
-
-          {errorMessage && (
-            <p className="text-red-500 text-sm text-center">{errorMessage}</p>
-          )}
-
-          {successMessage && (
-            <p className="text-green-500 text-sm text-center">{successMessage}</p>
           )}
 
           <button

@@ -47,13 +47,13 @@ class SupabaseService {
         }
 
         if (id.includes("_")) {
-            logger.info("The document id contains a section id, fetching section details", { id }); 
-            
+            logger.info("The document id contains a section id, fetching section details", { id });
+
             const [fileid, sectionId] = id.split("_");
             const { data, error } = await this.client.rpc("get_section_details_by_heading", { p_heading_id: sectionId });
 
             if (error || !data) {
-                logger.error('Failed to retrieve document:', {error});
+                logger.error('Failed to retrieve document:', { error });
                 throw new Error('Failed to retrieve document');
             }
 
@@ -68,7 +68,7 @@ class SupabaseService {
         const { data, error } = await this.client.from('documents').select().eq('id', id);
 
         if (error || !data) {
-            logger.error('Failed to retrieve documents:', {error});
+            logger.error('Failed to retrieve documents:', { error });
             throw new Error('Failed to retrieve documents');
         }
 
@@ -99,7 +99,7 @@ class SupabaseService {
             });
 
             if (error) {
-                logger.error('Failed to retrieve document sections:', {error});
+                logger.error('Failed to retrieve document sections:', { error });
                 throw new Error('Failed to retrieve document sections');
             }
             logger.info('Retrieved document sections for embedding ' + index);
@@ -114,12 +114,12 @@ class SupabaseService {
     }
 
     private async getEmbedding(sentences: string[]) {
-        logger.debug('Generating embeddings for sentences:', {sentences});
+        logger.debug('Generating embeddings for sentences:', { sentences });
         const { embeddings } = await embedMany({
             model: openai.embedding('text-embedding-ada-002'),
             values: sentences
         }).catch((error) => {
-            logger.error('Failed to generate embeddings:', {error});
+            logger.error('Failed to generate embeddings:', { error });
             throw new Error('Failed to generate embeddings');
         });
 

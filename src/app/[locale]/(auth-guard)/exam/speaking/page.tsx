@@ -36,9 +36,9 @@ const ExamSimulator = () => {
   const [isStudent1Thinking, setIsStudent1Thinking] = useState(false);
   const [isStudent2Thinking, setIsStudent2Thinking] = useState(false);
   const [loading, setLoading] = useState(true); // Added loading state
-  const env=useEnv();
+  const env = useEnv();
 
-  const voiceRecorderRef = useRef<{ startRecording: () => void; stopRecording: () => void, getTranscript: () => Promise<string> } | null>(null);
+  const voiceRecorderRef = useRef<{ startRecording: () => void; stopRecording: () => void } | null>(null);
 
   const handleStartRecording = () => {
     if (voiceRecorderRef.current) {
@@ -136,7 +136,7 @@ const ExamSimulator = () => {
   };
 
   const fetchAIResponse = async (role: number, prompt: string, maxTokens: number) => {
-    const openai = new OpenAI({ apiKey:env.OPENAI_API_KEY, dangerouslyAllowBrowser: true });
+    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY, dangerouslyAllowBrowser: true });
 
     try {
       const response = await openai.chat.completions.create({
@@ -288,7 +288,7 @@ const ExamSimulator = () => {
                     {currentRole === Role.Student && (
                       <div className="flex flex-row">
                         <div className="mr-2">
-                          <VoiceRecorder isDisabled={!isInputEnabled || !isTimerPlaying} onVoiceRecorded={(transcript: string) => handleStudentSubmit(transcript)} ref={voiceRecorderRef} />
+                          <VoiceRecorder onVoiceRecorded={(transcript: string) => handleStudentSubmit(transcript)} ref={voiceRecorderRef} />
                         </div>
                         <div className="font-semibold">Recording will start when you press the button</div>
                       </div>
