@@ -87,8 +87,7 @@ function AccordionList({
   items,
   id,
 }: AccordionListProps) {
-  // console.log('items', items);
-  // console.log('selectionIndex', selectionIndex);
+  items=[]; //temporarily disable items
   const [isOpen, setIsOpen] = useState(!!close);
 
   useEffect(() => {
@@ -142,7 +141,7 @@ function MyButton({ isOpen, onSelected, id }: any) {
       className="title ml-3"
       onClick={() => onSelected(id)}
     >
-      {!isOpen ? <FaChevronDown /> : <FaChevronUp />}
+      {/* {!isOpen ? <FaChevronDown /> : <FaChevronUp />} */}
     </button>
   );
 }
