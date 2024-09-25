@@ -35,7 +35,7 @@ const AuthForm: React.FC = () => {
     } else {
       toast.success("Sign in successful! Redirecting...");
       resetForm();
-      router.refresh();
+      router.replace('/');
     }
     setLoading(false);
   };
