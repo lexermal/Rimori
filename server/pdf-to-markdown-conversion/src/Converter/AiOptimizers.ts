@@ -55,6 +55,7 @@ async function internalConversion(unpretty_markdown_text: string): Promise<strin
 5. Keep all images unchanged.
 6. If the text is a scientific paper, summarize the content of every section in around 400 words.
 7. If the text is a scientific paper and the section has a heading, format the heading as h2 (##).
+8. if the text is a scientific paper, write at the beginning the heading of the paper as h1 (#).
   `;
 
   const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });

@@ -3,7 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from './constants';
 import { createLogger } from './logger';
 
-const logger = createLogger("ApprwriteConnector.ts");
+const logger = createLogger("SupabaseConnector.ts");
 
 class SupabaseService {
     private client: SupabaseClient;
