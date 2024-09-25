@@ -99,7 +99,7 @@ const WaitlistPage = () => {
         <p className="text-green-500 mb-4">{statusMessage.message}</p>
       ) : (
         <button
-          className="bg-white text-gray-900 font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:bg-blue-900"
+          className="bg-white text-gray-900 font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:bg-blue-400 hover:text-white"
           onClick={handleClick}
           disabled={statusMessage.status === Status.Loading}
         >
@@ -108,7 +108,7 @@ const WaitlistPage = () => {
       )}
 
       <div className="absolute bottom-6 flex justify-center space-x-4 text-white">
-        <a href="https://discord.gg/DrKVgMWx" className="hover:text-gray-300">
+        <a href="https://discord.gg/7ZSAGWSk" className="hover:text-gray-300">
           <img src="/icons/discord.png" alt="Discord" className="h-10 w-10" />
         </a>
       </div>

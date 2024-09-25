@@ -54,9 +54,9 @@ const StartPage = () => {
     if (error) console.error('Failed to retrieve unfinished documents:', error);
 
     console.log('data', data);
-    setProcessingDocuments((data||[]).map((d: any) => d.name));
+    setProcessingDocuments((data || []).map((d: any) => d.name));
 
-    if (data!=null&&data.length > 0) {
+    if (data != null && data.length > 0) {
       console.log('Unfinished documents found, waiting 5 seconds before retrying');
       await new Promise((resolve) => setTimeout(resolve, 5000));
       fetchDocuments();
@@ -77,13 +77,13 @@ const StartPage = () => {
 
   return (
     <div className='pb-16 pt-6'>
-      <div className='mx-auto' style={{width:"fit-content"}}>
+      <div className='mx-auto' style={{ width: "fit-content" }}>
         <h2 className='text-center mb-5'>
           Study documents
         </h2>
         {documents.length > 0 && (
           <DocumentSelection
-          processingDocuments={processingDocuments}
+            processingDocuments={processingDocuments}
             onSelected={(id) => {
               if (!id.includes("_")) {
                 const availableDocuments = documents.filter(d => d.document_id == id && d.section_id != id);
@@ -142,7 +142,7 @@ function TrainingButtons({ selectedFile }: any) {
       text: "Exam simulation",
       onClick: () => {
         EmitterSingleton.emit('analytics-event', { name: 'Exam simulation' });
-        router.push(`/exam-session?file=${selectedFile}`);
+        router.push(`/exam/speaking?file=${selectedFile}`);
       },
       enabled: env.EXPERIMENTAL_EXAM_SIMULATION === 'true',
     },
