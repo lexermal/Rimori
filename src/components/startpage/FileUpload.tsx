@@ -51,7 +51,6 @@ export function FileUpload(props: Props) {
         response.json().then((data) => {
           if (!response.ok) {
             EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-error', name: data.message ?? 'No error message provided!' });
-            setIsUploading(false);
             return toast.custom((t) => (
               <div
                 className={`${t.visible ? 'animate-enter' : 'animate-leave'
@@ -85,13 +84,14 @@ export function FileUpload(props: Props) {
             console.log('Success:', data);
             EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-success' });
           }
-          setIsUploading(false)
         });
       }).catch((error) => {
         EmitterSingleton.emit('analytics-event', { category: 'File Upload', action: 'upload-error', name: error.message });
-        setIsUploading(false);
         return toast.error("Could not connect to Rimori. Check your internet connection and try again later.");
-      });
+      }).finally(() => {
+        setIsUploading(false)
+      }
+      );
     });
 
   }, [acceptedFiles]);
