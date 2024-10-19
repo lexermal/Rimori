@@ -1,7 +1,3 @@
-Here is a polished version of your README for Rimori:
-
----
-
 # Rimori
 
 Rimori is an AI-powered study support tool designed to help students master their study material in a more interactive and engaging way. By combining storytelling with AI-driven interactions, Rimori offers a unique learning experience that promotes critical thinking, deep understanding, and the ability to apply knowledge across different fields.
