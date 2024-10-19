@@ -5,7 +5,7 @@ image:
 global:
   storageClass: longhorn
 matomoUsername: "mtadmin"
-# matomoPassword: "MBjccT2Ub2q2Xiq6q2eW"
+matomoPassword: "your-password"
 matomoWebsiteName: "Rimori Study Platform"
 matomoWebsiteHost: "https://study.rimori.se"
 allowEmptyPassword: false
@@ -24,8 +24,8 @@ ingress:
   tls: true
 mariadb:
   auth:
-    rootPassword: 3e3vQJncxWfh5X0cTXrV
-    password: 3e3vQJncxWfh5X0cTXrV
+    rootPassword: your-db-password
+    password: your-db-password
   primary:
     persistence:
       storageClass: longhorn

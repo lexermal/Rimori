@@ -12,15 +12,15 @@ expose:
       core: registry.rimori.se
       notary: notary.my-domain.com
 externalURL: https://registry.rimori.se
-harborAdminPassword: ZJtisiOfiq69K0fssFJC
+harborAdminPassword: your-password # change
 secretKey: pYM5HwQXZ9ExQino
 registry:
   credentials:
     username: reg_admin
-    password: 5IuXjfawRA4B2ULBZf4R
+    password: your-password # change
 database:
   internal:
-    password: IKRNfD3y5zRZ0HhZNLL6
+    password: your-password # change
 persistence:
   persistentVolumeClaim:
     registry:

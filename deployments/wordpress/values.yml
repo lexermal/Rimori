@@ -3,10 +3,10 @@
 global:
     storageClass: longhorn
 wordpressUsername: admin
-wordpressPassword: 9Xt5mLjkZmFCWAYOxwKy
+wordpressPassword: your-password
 mariadb:
     auth:
-        rootPassword: uSCIfaPO2d3S98b7CBLk
+        rootPassword: your-password
 ingress:
     enabled: true
     ingressClassName: traefik
